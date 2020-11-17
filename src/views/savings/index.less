@@ -1,0 +1,460 @@
+@import '@/styles/color.less';
+.Savings {
+    flex            : 1;
+    padding-top     : 70px;
+    
+    .header {
+        margin-top: 30px;
+        
+
+        .countdownBox {
+
+            margin-top: 70px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            background-color: @white;
+            border-radius: 3px;
+            padding: 40px;
+
+            text-align: center;
+
+            .heading {
+                font-size: 38px;
+                font-weight: 500;
+            }
+
+            .addressBox {
+                
+                margin: 16px 0;
+
+                & > div:nth-child(1) {
+                    font-size: 18px;  
+                }
+                & > div:nth-child(2) {
+                    font-size: 13px;
+                    margin-top: 10px;
+                }
+            }
+
+            .stage {
+                // color      : #118b80;
+                color: bla;
+                font-size  : 16px;
+                font-weight: 700;
+                margin-top : 15px;
+            }
+        }
+
+
+        .donnieFarm {
+
+            .donnie {
+                width: 61px;
+            }
+        }
+
+        .tips {
+            color        : #118b80;
+            font-size    : 16px;
+            margin-top   : 14px;
+            margin-bottom: 10px;
+            text-align   : center;
+        }
+        .donnieToken{
+            font-size: 16px;
+            color: #118b80;
+            margin-bottom: 16px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .middle {
+            width: 100%;
+        }
+        .disConnet{
+            width: 80%;
+            max-width: 920px;
+            text-align: center;
+            color: #333;
+        }
+        
+
+        .notice {
+            width           : 78%;
+            height          : 23px;
+            overflow        : hidden;
+            max-width       : 550px;
+            background-color: rgba(17, 139, 128, 0.1);
+            color           : @dark-blue;
+            padding         : 5px 24px;
+            border-radius   : 16px;
+            margin-top      : 30px;
+
+            /deep/.el-carousel .el-carousel__item {
+                text-overflow: ellipsis;
+                overflow     : hidden;
+                white-space  : nowrap;
+            }
+
+            a {
+                text-decoration: none;
+                color          : @dark-blue;
+                display        : flex;
+
+                .medium {
+                    display    : flex;
+                    align-items: center;
+
+                    p {
+                        margin-top: 2px;
+                    }
+                }
+
+                .speaker {
+                    width       : 19px;
+                    height      : 23px;
+                    margin-right: 8px;
+                }
+            }
+        }
+
+        .notice:hover {
+            background-color: rgba(255, 100, 0, 0.1);
+
+            a {
+                color: rgba(255, 100, 0, 1)
+            }
+        }
+    }
+
+    .more {
+        color        : @dark-blue;
+        font-size    : 16px;
+        font-weight  : 700;
+        margin-bottom: 50px;
+        margin-top   : 32px;
+    }
+
+    @media (max-width: 600px) {
+        .header {
+            margin-top: 50px;
+        }
+
+        .list {
+            width         : 100%;
+            flex-direction: row;
+            flex-wrap     : wrap;
+            margin        : auto;
+            margin-top    : 32px;
+            // margin-bottom : 32px;
+
+            .web-item {
+                display: none;
+            }
+
+            .close {
+                background-color: transparent !important;
+            }
+
+            .m-item {
+                width           : 90%;
+                background-color: #fff;
+                display         : flex;
+                position        : relative;
+                margin-bottom   : 22px;
+                border-radius   : 8px;
+
+                .left {
+                    padding: 17px 26px;
+                    flex   : 1;
+                }
+
+                .right {
+                    padding: 0 8px 0 8px;
+
+                    .btn {
+                        width    : 80px;
+                        font-size: 14px;
+                    }
+                }
+
+                .coin {
+                    display       : flex;
+                    flex-direction: row;
+                    align-items   : center;
+                    position      : absolute;
+
+                    img {
+                        width : 28px;
+                        height: 28px;
+                    }
+
+                    p:nth-child(2) {
+                        margin-left: 8px;
+                        font-size  : 16px;
+                        font-weight: 700;
+                    }
+
+                    p:nth-child(3) {
+                        color      : #118b80;
+                        font-size  : 12px;
+                        margin-left: 10px;
+                    }
+                }
+
+                .tips {
+                    color     : #118b80;
+                    font-size : 14px;
+                    margin-top: 35px;
+                    .obtain{
+                        font-size: 12px;
+                    }
+                    .obtain0{
+                        color: #333333;
+                    }
+                    .total {
+                        font-size  : 20px;
+                        margin-top : 4px;
+                        font-family: Bebas-Regular;
+                    }
+
+                    .usd {
+                        margin-top : 4px;
+                        font-size  : 14px;
+                        font-family: Bebas-Regular;
+                    }
+
+                    .rate {
+                        color     : #666666;
+                        margin-top: 5px;
+                        font-size : 13px;
+
+                        span {
+                            font-weight: 700;
+                        }
+                    }
+                }
+                
+                .btn {
+                    width           : 95px;
+                    height          : 38px;
+                    padding         : 0;
+                    border-radius   : 3px;
+                    background-color: @dark-blue;
+                    color           : #fff;
+                    font-size       : 16px;
+                    margin-right    : 14px;
+                    cursor          : pointer;
+                }
+
+                .disable {
+                    background-color: #abc2c0;
+                    cursor          : not-allowed;
+                }
+
+                .rank {
+                    width   : 41px;
+                    height  : 24px;
+                    right   : -5px;
+                    top     : -9px;
+                    position: absolute;
+                    z-index : 11;
+                }
+
+                .rank1 {
+                    width : 41px;
+                    height: 24px;
+                }
+
+                .double {
+                    width   : 71px;
+                    height  : 34px;
+                    right   : -5px;
+                    top     : -13px;
+                    position: absolute;
+                    z-index : 11;
+                }
+
+                .double_en {
+                    width: 105px;
+                }
+            }
+        }
+    }
+
+    @media (min-width: 600px) {
+        .list {
+            width: 100%;
+            // max-width     : 750px;
+            
+            flex-direction: row;
+            flex-wrap: wrap;
+            // margin        : auto;
+            margin-top: 67px;
+            margin-bottom: 140px;
+            
+            .m-item {
+                display: none;
+            }
+
+            .close {
+                background-color: transparent !important;
+            }
+
+            .web-item {
+                width           : 200px;
+                background-color: #fff;
+                // padding         : 30px;
+                margin          : 16px;
+                position        : relative;
+                
+                border          : 1px solid @background;
+
+                .coin {
+                    box-sizing: border-box;
+                    display       : flex;
+                    flex-direction: column;
+                    width: 100%;
+                    padding: 20px 10px;
+                    background-color: @very-light-gray;
+                    border-top-left-radius: 3px;
+                    border-top-right-radius: 3px;
+
+                    img {
+                        width : 40px;
+                        height: 40px;
+                    }
+
+                    p {
+                        margin-left: 8px;
+                        margin-top: 5px;
+                        font-size  : 20px;
+                        font-weight: 700;
+                    }
+                }
+
+                .coinContent {
+                    padding: 15px;
+                    flex-grow: 1;
+                }
+
+                .tips {
+                    color     : #333333;
+                    font-size : 14px;
+                    // margin-top: 10px;
+
+                    .total {
+                        font-family: Bebas-Regular;
+                        font-size  : 30px;
+                        margin-top : 4px;
+                    }
+
+                    .usd {
+                        margin-top : 4px;
+                        font-size  : 16px;
+                        font-family: Bebas-Regular;
+                        color: #777777;
+                    }
+
+                    .rate {
+                        color    : #666666;
+                        font-size: 13px;
+
+                        span {
+                            font-weight: 700;
+                        }
+                    }
+                }
+
+                .btn {
+                    width           : 100%;
+                    margin-top      : 16px;
+                    height          : 38px;
+                    border-radius   : 3px;
+                    background-color: @dark-blue;
+                    color           : #fff;
+                    font-size       : 16px;
+                    cursor          : pointer;
+                }
+
+                .disable {
+                    background-color: #abc2c0;
+                    cursor          : not-allowed;
+                }
+
+                .rank {
+                    width   : 62px;
+                    height  : 36px;
+                    right   : -5px;
+                    top     : -9px;
+                    position: absolute;
+                    z-index : 11;
+                }
+
+                .double {
+                    width   : 71px;
+                    height  : 50px;
+                    right   : -5px;
+                    top     : -13px;
+                    position: absolute;
+                    z-index : 11;
+                }
+            }
+
+            .web-item:hover {
+                border: 1px solid @secondary;
+            }
+        }
+    }
+
+
+}
+
+@media (max-width: 920px) {
+    .Savings {
+        padding-top: 44px;
+
+        .header {
+            margin-top: 70px;
+
+            .minWalletBtn {
+                font-size  : 14px;
+                top        : 68px;
+                font-weight: 800;
+            }
+
+            .donnieFarm {
+                .donnie {
+                    width: 35px;
+                }
+
+                .headline {
+                    margin-left: 10px;
+                    font-size: 40px;
+                    font-weight: 500;
+                    background: -webkit-linear-gradient(#118b80, #0e776e);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+     
+            }
+
+            .notice {
+                a {
+                    font-size: 14px;
+                }
+            }
+        }
+
+        .middle {
+            .TimeDown {
+                .spar {
+                    font-size: 30px;
+                }
+            }
+        }
+    }
+}
