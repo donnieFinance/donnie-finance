@@ -130,6 +130,7 @@ import { isWebMobile, hiddenAddress, keepDecimalsDown } from '@/utils/index';
 import BigNumber from 'bignumber.js';
 import Connected from '@/assets/icon_connect.svg'
 import axios from 'axios'
+import {address} from '@/utils/common'
 
 export default {
   data () {
@@ -192,7 +193,8 @@ export default {
           const iost = window.IWalletJS.newIOST(window.IOST);
 //          console.log(iost.currentRPC._provider._host);
           const iostHost = iost.currentRPC._provider._host;
-          axios.get(iostHost + "/getTokenBalance/" + this.address + "/" + "donnie_test" + "/1").then((data) => {
+//          console.log("!!!!!!!!!!!!!!!!!!!!! " + testnetAddress.token);
+          axios.get(iostHost + "/getTokenBalance/" + this.address + "/" + address.token + "/1").then((data) => {
 //              console.log('data : ',data);
               this.gofBalance = data.data.balance;
 
@@ -212,7 +214,7 @@ export default {
         if (!this.address) { //20201106 - after wallet login, refresh need.
             console.log('==== connecting wallet');
             //window.location.reload();
-            //this.$router.go(this.$router.currentRoute)
+            this.$router.go(this.$router.currentRoute)
         }
       this.getIostAddress();
     }

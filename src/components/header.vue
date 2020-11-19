@@ -177,7 +177,8 @@ export default {
   // background-color: black;
   display: flex;
   justify-content: center;
-  // position: fixed;
+  position: fixed;
+  background: rgba(0,0,0, 0.2);
 
   
   .middle_header {
@@ -320,7 +321,7 @@ export default {
       }
       .lang {
         background-color: transparent;
-        color: @dark-blue;
+        color: #118B80;
         font-size: 14px;
         top: 0;
         right: 0;

@@ -5,10 +5,6 @@ import Server from '../property'
 export const testnetAddress = {
   token: 'donnie_test', //testnet tokenID
 
-  // uniswap: { //always mainnet - for Price
-  //     USDC_WETH: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-  //     //BLY_WETH: '0x95c1e7b3bbc79f073576751fd78e8bbe9f6386b2',  //ref - https://uniswap.info/pair/0x95c1e7b3bbc79f073576751fd78e8bbe9f6386b2
-  // },
   iost: {
       pool: 'Contracth5qtJwVPNrAi51gFRPzirtVGuqPCEqxdukuUPawveuB',  //pool-address
       //erc20: 'iost' // token-name
@@ -31,9 +27,7 @@ export const testnetAddress = {
 
 export const mainnetAddress = {
   token: 'donnie_finance', //TODO mainet tokenID
-  // uniswap: {
-  //     USDC_WETH: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-  // },
+
   iost: {
       pool: '', //TODO
       //erc20: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' //mainnet-weth
@@ -52,7 +46,7 @@ export const mainnetAddress = {
   // },
 }
 
-//for ropsten
+//for testMode
 export const address = (function() {
   if(Server.isTestnet()){
     return testnetAddress

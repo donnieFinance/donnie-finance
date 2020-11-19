@@ -45,12 +45,12 @@ export const goTo = (val, type) => {
         return;
     }
     if (type === undefined || type === 0) {
-        Vue.routerGo.push(val)
+        //같은 경로에 push 를 할 경우 에러가나지 않도록 catch 처리함
+        Vue.routerGo.push(val).catch(err => {})
     }
     else if (type === 1) {
         window.location.href = "/savings";
     }
-
 }
 
 export const isEmpty = (val) => {

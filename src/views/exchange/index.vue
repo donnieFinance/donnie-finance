@@ -1,5 +1,5 @@
 <template>
-  <div class="DonnieVault">
+  <div class="DonnieVault background-gray content">
     <div class="header">
       <div>
         <img src="../../assets/dony_go.png" alt />

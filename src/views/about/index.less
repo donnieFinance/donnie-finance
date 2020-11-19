@@ -1,0 +1,1370 @@
+@charset "utf-8";
+@import "https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap";
+/*  common  */
+/*  Donnie Bank  */
+/* Our Vision */
+/* Product */
+/* Why Don? */
+/* Roadmap + partners*/
+/* Contact Us */
+@keyframes sns_icon {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.1);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+/* The meaning of Donnie */
+/*  ----------  0px   ~   360px 모바일  ----------  */
+/*  ----------  361px   ~   640px 모바일  ----------  */
+/*  ----------  모바일 가로화면  ----------  */
+/*  ----------  641px   ~   1023px 태블릿  ----------  */
+/*  ----------  모바일 가로화면  ----------  */
+/*  　　　　　　　　  모바일  &  태블릿 공통 　　　　　　　　 */
+/* 　　　　　　　　PC 공통 　　　　　　　　 */
+/*  ----------  1025px   ~   1279px PC  ----------  */
+/*  ----------  1280px 이상 PC  ----------  */
+/*@media ( min-width: 1280px) {*/
+/*  ----------  1921px 이상 PC  ----------  */
+body {
+	//font-family: 'Noto Sans', sans-serif, Arial, Tahoma;
+	//font-size: 16px;
+	//color: #333;
+	//letter-spacing: 0px;
+	//line-height: 1.2;
+	//margin: 0;
+	//width: 100%;
+}
+#wrap {
+	width: 100%;
+	background-color: #fff;
+	overflow: hidden;
+	margin-top: 393px;
+}
+.about_cont {
+	&:after {
+		content: '';
+		display: block;
+		clear: both;
+	}
+	.inner {
+		margin: 0 auto;
+		&:after {
+			content: '';
+			display: block;
+			clear: both;
+		}
+	}
+	h3 {
+		font-weight: bold;
+		color: #333;
+		text-align: center;
+	}
+	h2 {
+		display: inline-block;
+		&:after {
+			content: "";
+			display: block;
+			width: 100%;
+			border-bottom: 3px;
+			background-color: #ff9933;
+			height: 3px;
+		}
+	}
+	h6 {
+		text-align: center;
+	}
+}
+h2 {
+	font-weight: bold;
+	color: #333;
+}
+.d_info {
+	.inner {
+		>div {
+			&:nth-child(1) {
+				width: 55%;
+				padding-left: 5%;
+				display: inline-block;
+				float: left;
+			}
+			>p {
+				font-weight: bold;
+				position: relative;
+				&:before {
+					display: block;
+					content: '';
+					position: absolute;
+					background-image: url('../../assets/about/orange_bullet.png');
+					background-repeat: no-repeat;
+					background-position: center;
+					background-size: contain;
+				}
+			}
+		}
+		>.d_info_img {
+			width: 40%;
+			display: inline-block;
+			background-image: url('../../assets/about/donnie_img.png');
+			background-repeat: no-repeat;
+			background-size: contain;
+			background-position: center;
+		}
+		>.service_iconbox {
+			width: 100%;
+			ul {
+				display: flex;
+				margin: 0 auto;
+				li {
+					flex: 1;
+					position: relative;
+					&:after {
+						display: block;
+						content: '';
+						position: absolute;
+						top: 0px;
+						right: 0px;
+						width: 1px;
+						height: 80%;
+						background: #ccc;
+						transform: rotate(-15deg);
+					}
+					&:last-child {
+						&:after {
+							display: none;
+						}
+					}
+					img {
+						margin: 0 auto;
+						display: block;
+					}
+					p {
+						font-weight: bold;
+						text-align: center;
+					}
+				}
+			}
+		}
+	}
+}
+.d_our_vision {
+	background-image: url('../../assets/about/background_curve_vision.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	padding: 2.5em 0;
+	>.inner {
+		>h3 {
+			color: #fff;
+		}
+		>ul {
+			li {
+				background-color: #fff;
+				position: relative;
+				&:before {
+					display: block;
+					content: '';
+					position: absolute;
+					background-image: url('../../assets/about/orange_bookmark.png');
+				}
+				p {
+					text-align: left;
+					strong {
+						font-weight: bold;
+					}
+				}
+			}
+		}
+	}
+}
+.d_product {
+	.inner {
+		div {
+			margin: 0 auto;
+			transition: all .25s ease;
+			display: flex;
+			width: 100%;
+			&:after {
+				content: '';
+				display: block;
+				clear: both;
+			}
+			dl {
+				background: linear-gradient(to top, rgba(0, 79, 89, 1), rgba(0, 49, 72, 1));
+				align-content: flex-end;
+				flex: auto;
+				dt {
+					text-align: right;
+					color: #fff;
+					font-weight: bold;
+					position: relative;
+					&:before {
+						display: block;
+						content: '';
+						position: absolute;
+						background-size: cover;
+						background-position: center;
+					}
+				}
+				&:nth-child(1) {
+					dt {
+						&:before {
+							background-image: url('../../assets/about/icon_product_01checking_saving.png');
+						}
+					}
+				}
+				&:nth-child(2) {
+					dt {
+						&:before {
+							background-image: url('../../assets/about/icon_product_02loan.png');
+						}
+					}
+				}
+				&:nth-child(3) {
+					dt {
+						&:before {
+							background-image: url('../../assets/about/icon_product_03exchange.png');
+						}
+					}
+				}
+				&:nth-child(4) {
+					dt {
+						&:before {
+							background-image: url('../../assets/about/icon_product_04payment.png');
+						}
+					}
+				}
+				&:nth-child(5) {
+					dt {
+						&:before {
+							background-image: url('../../assets/about/icon_product_05pfmgmt_insurance.png');
+						}
+					}
+				}
+				&:nth-child(6) {
+					dt {
+						&:before {
+							background-image: url('../../assets/about/icon_product_06credit_analysis.png');
+						}
+					}
+				}
+				dd {
+					color: #fff;
+					font-weight: normal;
+					line-height: 1.5;
+					position: relative;
+					&:last-child {
+						margin-bottom: 1.5em;
+					}
+					&:before {
+						display: block;
+						content: '';
+						position: absolute;
+						background: #fff;
+					}
+				}
+			}
+		}
+	}
+}
+.d_why_don {
+	>.inner {
+		ul {
+			display: inline-block;
+			li {
+				position: relative;
+				&:before {
+					display: block;
+					content: '';
+					position: absolute;
+					background-image: url('../../assets/about/orange_bullet.png');
+					background-size: cover;
+					background-position: center;
+				}
+				p {
+					padding-left: 1.5em;
+					font-weight: normal;
+				}
+			}
+		}
+		.y_img {
+			height: auto;
+			img {
+				height: auto;
+			}
+		}
+	}
+}
+.d_roadmap {
+	height: auto;
+	background-image: url('../../assets/about/background_curve_history.png');
+	background-repeat: no-repeat;
+	.inner {
+		>img {
+			width: 100%;
+		}
+	}
+	.partner_box {
+		text-align: center;
+		h6 {
+			font-weight: bold;
+		}
+		.partners_list {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			li {
+				flex-grow: 1;
+			}
+		}
+	}
+}
+.d_contact {
+	.inner {
+		h3 {
+			padding-top: 4em;
+			padding-bottom: 0;
+		}
+		h6 {
+			line-height: 1.8;
+		}
+		ul {
+			display: flex;
+			justify-content: space-evenly;
+			li {
+				&:hover {
+					transition: all 0.2s ease-out;
+					animation-iteration-count: infinite;
+					animation-name: sns_icon;
+					animation-duration: 1.5s;
+				}
+				a {
+					display: inline-block;
+					width: 80%;
+					height: auto;
+					margin: 0 10%;
+				}
+			}
+		}
+	}
+}
+.d_meaning_of_d {
+	.inner {
+		text-align: center;
+		ul {
+			li {
+				position: relative;
+				text-align: left;
+				font-weight: bold;
+				&:before {
+					display: block;
+					content: '';
+					position: absolute;
+					background-image: url('../../assets/about/orange_arrow.png');
+					background-repeat: no-repeat;
+					background-size: contain;
+				}
+			}
+		}
+	}
+}
+@media (max-width: 360px) {
+	.m2_hide {
+		display: none !important;
+	}
+	.about_cont {
+		h3 {
+			padding-bottom: 1.2rem;
+			font-size: 1.3rem;
+			padding-top: 1.8rem;
+		}
+		h2 {
+			font-size: 1.375rem;
+			padding: 0.3em 0;
+			&:after {
+				margin-top: 0.6rem;
+			}
+		}
+		.inner {
+			width: 100%;
+			padding: 20px 0 60px;
+		}
+	}
+	h2 {
+		padding-bottom: 1.2rem;
+	}
+	.d_info {
+		.inner {
+			>div {
+				>p {
+					font-size: 16px;
+					line-height: 1.3;
+					padding-left: 24px;
+					&:before {
+						top: 7px;
+						left: 6px;
+						width: 14px;
+						height: 14px;
+					}
+				}
+			}
+			>.d_info_img {
+				height: 200px;
+			}
+			>.service_iconbox {
+				ul {
+					width: 98%;
+					padding-top: 1.2em;
+					li {
+						img {
+							width: 80%;
+						}
+						p {
+							padding: 6px 0;
+							font-size: 14px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_our_vision {
+		background-position: top;
+		background-size: cover;
+		>.inner {
+			>ul {
+				padding: 1em;
+				li {
+					margin: 1.5em 1em;
+					box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.5);
+					&:before {
+						top: -8px;
+						left: 0px;
+						width: 30px;
+						height: 24.666px;
+						background-size: 100%;
+					}
+					p {
+						line-height: 1.8;
+						display: inline-block;
+						width: 95%;
+						margin: 10px 2.5%;
+						height: 100%;
+					}
+				}
+			}
+		}
+	}
+	.d_product {
+		.inner {
+			div {
+				width: 98%;
+				flex-wrap: nowrap;
+				flex-direction: column;
+				dl {
+					width: 97%;
+					margin: 1.5%;
+					dt {
+						font-size: 24px;
+						padding: 1.2em 1em;
+						&:before {
+							top: 16px;
+							left: 10px;
+							width: 75px;
+							height: 56.75px;
+						}
+					}
+					dd {
+						margin: 0 1.3em 0 2.16em;
+						&:before {
+							top: 13px;
+							left: -10px;
+							width: 5px;
+							height: 1px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_why_don {
+		>.inner {
+			ul {
+				width: 98%;
+				margin: 0 1%;
+				li {
+					&:before {
+						top: 4px;
+						left: -24px;
+						width: 13px;
+						height: 13px;
+					}
+					margin-left: 2.5em;
+					font-size: 1em;
+					font-weight: bold;
+					line-height: 1.4;
+				}
+			}
+			.y_img {
+				width: 100%;
+				img {
+					width: 70%;
+					margin: 16px 15%;
+				}
+			}
+		}
+	}
+	.d_roadmap {
+		background-size: cover;
+		.partner_box {
+			padding-top: 2em;
+			h6 {
+				padding-top: 40px;
+			}
+			.logo_iost {
+				width: 50%;
+				margin: 0 25%;
+			}
+			.logo_halborn {
+				width: 50%;
+				margin: 0 25%;
+			}
+			.partners_list {
+				padding: 4% 0.8em;
+				li {
+					img {
+						width: 90%;
+					}
+				}
+			}
+			h3 {
+				padding-top: 3em;
+			}
+		}
+	}
+	.d_contact {
+		.inner {
+			ul {
+				padding: 1em 0 2.5em;
+				li {
+					a {
+						img {
+							width: 94%;
+							margin: 0 10%;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_meaning_of_d {
+		.inner {
+			ul {
+				width: 96%;
+				margin: 0 2%;
+				li {
+					line-height: 1.3;
+					padding: 6px 14px;
+					font-size: 16px;
+					&:before {
+						top: 10px;
+						left: -2px;
+						width: 13px;
+						height: 15.01px;
+					}
+				}
+			}
+			div {
+				padding: 20px 0 0;
+				img {
+					width: 50%;
+				}
+			}
+		}
+	}
+}
+@media (min-width: 361px) and (max-width: 640px) {
+	#wrap {
+		margin-top: 0px;
+	}
+	.m2_hide {
+		display: none !important;
+	}
+	.about_cont {
+		h3 {
+			padding-bottom: 3.2rem;
+			font-size: 1.3rem;
+		}
+		h2 {
+			font-size: 1.75rem;
+			padding: 0.4em 0;
+			&:after {
+				margin-top: 0.6rem;
+			}
+		}
+		.inner {
+			width: 100%;
+			padding: 50px 0;
+		}
+	}
+	h2 {
+		padding-bottom: 3.2rem;
+	}
+	.d_info {
+		.inner {
+			>div {
+				>p {
+					font-size: 18px;
+					line-height: 1.5;
+					padding-left: 24px;
+					&:before {
+						top: 7px;
+						left: 6px;
+						width: 14px;
+						height: 14px;
+					}
+				}
+			}
+			>.d_info_img {
+				height: 280px;
+			}
+			>.service_iconbox {
+				ul {
+					width: 98%;
+					padding-top: 1.2em;
+					li {
+						img {
+							width: 80%;
+						}
+						p {
+							padding: 7px 0;
+							font-size: 15px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_our_vision {
+		background-position: top;
+		background-size: 300%;
+		>.inner {
+			>ul {
+				padding: 2%;
+				li {
+					margin: 0 1em;
+					box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.5);
+					margin: 1.8em 0.5em 0.8em;
+					&:before {
+						top: -8px;
+						left: 0px;
+						width: 30px;
+						height: 24.666px;
+						background-size: 100%;
+					}
+					p {
+						line-height: 1.8;
+						display: inline-block;
+						width: 90%;
+						margin: 10px 5%;
+						height: 100%;
+					}
+				}
+			}
+		}
+	}
+	.d_product {
+		.inner {
+			div {
+				width: 98%;
+				flex-wrap: nowrap;
+				flex-direction: column;
+				dl {
+					width: 97%;
+					margin: 1.5%;
+					dt {
+						font-size: 24px;
+						padding: 1.2em 1em;
+						&:before {
+							top: 20px;
+							left: 1em;
+							width: 75px;
+							height: 56.75px;
+						}
+					}
+					dd {
+						margin: 0 1.3em 0 2.16em;
+						&:before {
+							top: 13px;
+							left: -10px;
+							width: 5px;
+							height: 1px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_why_don {
+		>.inner {
+			ul {
+				width: 100%;
+				li {
+					margin-left: 2.5em;
+					font-size: 1em;
+					font-weight: bold;
+					line-height: 1.4;
+					&:before {
+						top: 4px;
+						left: -24px;
+						width: 13px;
+						height: 13px;
+					}
+				}
+			}
+			.y_img {
+				width: 100%;
+				img {
+					width: 50%;
+					margin: 1em 25%;
+				}
+			}
+		}
+	}
+	.d_roadmap {
+		background-size: cover;
+		.partner_box {
+			padding-top: 6em;
+			.logo_iost {
+				padding-bottom: 80px;
+				width: 200px;
+			}
+			.logo_halborn {
+				padding: 5px 0 120px;
+				width: 200px;
+			}
+			.partners_list {
+				padding: 0.8em 4%;
+				li {
+					img {
+						width: 90%;
+					}
+				}
+			}
+		}
+	}
+	.d_contact {
+		.inner {
+			ul {
+				padding: 2em 0 2.5em;
+				li {
+					a {
+						img {
+							width: 90%;
+							margin: 0 10%;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_meaning_of_d {
+		.inner {
+			div {
+				img {
+					width: 50%;
+				}
+			}
+			ul {
+				width: 92%;
+				margin: 0 4%;
+				li {
+					line-height: 1.3;
+					padding: 6px 14px;
+					font-size: 16px;
+					&:before {
+						top: 10px;
+						left: -6px;
+						width: 15px;
+						height: 17.33px;
+					}
+				}
+			}
+		}
+	}
+}
+@media (min-width: 641px) and (max-width:1023px) {
+	#wrap {
+		margin-top: 0px;
+	}
+	.t_hide {
+		display: none !important;
+	}
+	.about_cont {
+		h3 {
+			padding-bottom: 1.3rem;
+			font-size: 1.7rem;
+		}
+		h2 {
+			font-size: 1.875rem;
+			padding: 0.4em 0;
+			&:after {
+				margin-top: 0.7rem;
+			}
+		}
+		.inner {
+			width: 100%;
+			padding: 60px 0;
+		}
+	}
+	h2 {
+		padding-bottom: 1.3rem;
+	}
+	.d_info {
+		.inner {
+			>div {
+				>p {
+					font-size: 18px;
+					line-height: 1.6;
+					padding-left: 30px;
+					&:before {
+						top: 8px;
+						left: 10px;
+						width: 15px;
+						height: 15px;
+					}
+				}
+			}
+			>.d_info_img {
+				height: 250px;
+			}
+			>.service_iconbox {
+				ul {
+					width: 98%;
+					padding-top: 1.3em;
+					li {
+						img {
+							width: 90px;
+						}
+						p {
+							padding: 10px 0;
+							font-size: 15px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_our_vision {
+		background-size: 150%;
+		>.inner {
+			>ul {
+				padding: 5%;
+				display: flex;
+				li {
+					flex: 1;
+					margin: 0 1%;
+					box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.5);
+					&:before {
+						top: -13px;
+						left: 0px;
+						width: 45px;
+						height: 37px;
+					}
+					p {
+						margin: 2em 0.8em 1.4em;
+						line-height: 1.8;
+					}
+				}
+			}
+		}
+	}
+	.d_product {
+		.inner {
+			div {
+				width: 96%;
+				flex-wrap: wrap;
+				flex-direction: row;
+				dl {
+					width: 48%;
+					margin: 1%;
+					dt {
+						font-size: 24px;
+						padding: 1.5em 1em;
+						&:before {
+							top: 20px;
+							left: 1em;
+							width: 80px;
+							height: 60.53px;
+						}
+					}
+					dd {
+						margin: 0 1.3em 0 2.16em;
+						&:before {
+							top: 13px;
+							left: -10px;
+							width: 5px;
+							height: 1px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_why_don {
+		>.inner {
+			ul {
+				width: 45%;
+				float: left;
+				padding-left: 5%;
+				li {
+					margin-left: 2.5em;
+					font-size: 1em;
+					font-weight: bold;
+					line-height: 1.4;
+					&:before {
+						top: 3px;
+						left: -24px;
+						width: 15px;
+						height: 15px;
+					}
+				}
+			}
+			.y_img {
+				width: 50%;
+				float: left;
+				img {
+					width: 80%;
+					margin: 0 10%;
+				}
+			}
+		}
+	}
+	.d_roadmap {
+		background-size: auto;
+		.partner_box {
+			padding-top: 8em;
+			.logo_iost {
+				padding-bottom: 80px;
+				width: 200px;
+			}
+			.logo_halborn {
+				padding: 5px 0 120px;
+				width: 200px;
+			}
+			.partners_list {
+				padding: 1em 8%;
+				li {
+					img {
+						width: 70%;
+					}
+				}
+			}
+		}
+	}
+	.d_contact {
+		.inner {
+			ul {
+				padding: 2.5em 0 3em;
+				li {
+					a {
+						img {
+							width: 80%;
+							margin: 0 15%;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_meaning_of_d {
+		.inner {
+			div {
+				img {
+					width: 40%;
+				}
+			}
+			ul {
+				width: 90%;
+				margin: 0 5%;
+				li {
+					line-height: 1.4;
+					padding: 8px 16px;
+					font-size: 18px;
+					&:before {
+						top: 13px;
+						left: -6px;
+						width: 15px;
+						height: 20px;
+					}
+				}
+			}
+		}
+	}
+}
+@media (max-width: 1023px) {
+	#wrap {
+		margin-top: 0px;
+	}
+	.m_hide {
+		display: none !important;
+	}
+	.d_info {
+		.inner {
+			>.service_iconbox {
+				padding-top: 60px;
+			}
+		}
+	}
+	.d_roadmap {
+		.partner_box {
+			h3 {
+				padding-bottom: 6px;
+			}
+			h5 {
+				font-size: 14px;
+			}
+			h6 {
+				font-size: 14px;
+			}
+		}
+	}
+}
+@media (min-width:1024px) {
+	.pc_hide {
+		display: none !important;
+	}
+	.about_cont {
+		h3 {
+			padding-bottom: 1.5rem;
+			font-size: 1.75rem;
+		}
+		h2 {
+			&:after {
+				margin-top: 0.75rem;
+			}
+		}
+	}
+	h2 {
+		padding-bottom: 1.5rem;
+	}
+	.d_info {
+		.inner {
+			>div {
+				>p {
+					font-size: 20px;
+					line-height: 1.8;
+					padding-left: 40px;
+					&:before {
+						top: 9px;
+						left: 14px;
+						width: 17px;
+						height: 17px;
+					}
+				}
+			}
+			>.d_info_img {
+				height: 300px;
+			}
+			>.service_iconbox {
+				padding-top: 60px;
+				ul {
+					li {
+						p {
+							padding: 10px 0;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_our_vision {
+		>.inner {
+			>ul {
+				li {
+					flex: 1;
+					box-shadow: 4px 3px 4px 5px rgba(0, 0, 0, 0.5);
+					&:before {
+						top: -13px;
+						left: 0px;
+						width: 45px;
+						height: 37px;
+					}
+				}
+			}
+		}
+	}
+	.d_product {
+		.inner {
+			div {
+				width: 90%;
+				flex-wrap: wrap;
+				flex-direction: row;
+				dl {
+					width: 48%;
+					margin: 1%;
+					dt {
+						font-size: 28px;
+						padding: 1.5em 1em;
+						&:before {
+							top: 20px;
+							left: 1em;
+							width: 104px;
+							height: 78.7px;
+						}
+					}
+					dd {
+						margin: 0 1.5em 0 2.5em;
+						&:before {
+							top: 13px;
+							left: -13px;
+							width: 7px;
+							height: 1px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.d_why_don {
+		>.inner {
+			ul {
+				width: 45%;
+				float: left;
+				padding-left: 5%;
+				li {
+					margin-left: 3em;
+					font-size: 1.1em;
+					font-weight: bold;
+					line-height: 1.8;
+					&:before {
+						top: 10px;
+						left: -24px;
+						width: 17px;
+						height: 17px;
+					}
+				}
+			}
+			.y_img {
+				width: 50%;
+				float: left;
+				img {
+					width: 80%;
+				}
+			}
+		}
+	}
+	.d_roadmap {
+		background-size: auto;
+		.partner_box {
+			padding-top: 10em;
+			h3 {
+				padding-bottom: 7px;
+			}
+			h6 {
+				line-height: 0.1;
+			}
+			.logo_iost {
+				padding-bottom: 150px;
+			}
+			.logo_halborn {
+				padding: 5px 0 150px;
+			}
+			.partners_list {
+				padding: 1em 10%;
+			}
+		}
+	}
+	.d_contact {
+		height: auto;
+		background-image: url('../../assets/about/background_curve_contact.png');
+		background-repeat: no-repeat;
+		.inner {
+			ul {
+				li {
+					a {
+						img {
+							width: 70%;
+							margin: 0 15%;
+						}
+					}
+				}
+				padding: 6em 0 5em;
+			}
+		}
+	}
+	.d_meaning_of_d {
+		.inner {
+			h2 {
+				padding: 1em 10%;
+			}
+			div {
+				width: 50%;
+				float: left;
+				img {
+					width: 100%;
+				}
+			}
+			ul {
+				width: 50%;
+				float: left;
+				li {
+					line-height: 1.5;
+					padding: 10px 20px;
+					font-size: 20px;
+					&:before {
+						top: 14px;
+						left: -6px;
+						width: 18px;
+						height: 24px;
+					}
+				}
+			}
+		}
+	}
+}
+@media (min-width: 1024px) and (max-width:1279px) {
+
+	.about_cont {
+		h2 {
+			font-size: 2.25rem;
+			padding: 0.4rem 0;
+		}
+		.inner {
+			width: 100%;
+			padding: 80px 0;
+		}
+	}
+	.d_info {
+		.inner {
+			>.service_iconbox {
+				ul {
+					width: 90%;
+					padding-top: 1.4em;
+				}
+			}
+		}
+	}
+	.d_our_vision {
+		background-size: cover;
+		>.inner {
+			>ul {
+				padding: 3.4em;
+				display: flex;
+				li {
+					margin: 0 2.1em;
+					p {
+						margin: 2.5em 1.8em 1.5em;
+						line-height: 1.8;
+					}
+				}
+			}
+		}
+	}
+	.d_contact {
+		background-size: 150%;
+		background-position: top;
+	}
+}
+@media (min-width: 1280px) and (max-width:1920px) {
+	.about_cont {
+		h2 {
+			font-size: 2.5rem;
+			padding: 0.6em 0;
+		}
+		.inner {
+			width: 1280px;
+			padding: 100px 0;
+		}
+	}
+	.d_info {
+		.inner {
+			>.service_iconbox {
+				ul {
+					width: 80%;
+					padding-top: 1.5em;
+				}
+			}
+		}
+	}
+	.d_our_vision {
+		background-size: cover;
+		>.inner {
+			>ul {
+				padding: 5em;
+				display: flex;
+				li {
+					margin: 0 4em;
+					p {
+						margin: 2.6em 2em 2em;
+						line-height: 1.8;
+					}
+				}
+			}
+		}
+	}
+	.d_roadmap {
+		background-size: cover;
+	}
+	.d_contact {
+		background-size: auto;
+		.inner {
+			h3 {
+				padding-top: 4em;
+			}
+		}
+	}
+}
+@media (min-width: 1921px) {
+	.about_cont {
+		h2 {
+			font-size: 2.5rem;
+			padding: 0.6em 0;
+		}
+		.inner {
+			width: 1280px;
+			padding: 150px 0;
+		}
+	}
+	.d_info {
+		.inner {
+			>.service_iconbox {
+				ul {
+					width: 80%;
+					padding-top: 1.5em;
+				}
+			}
+		}
+	}
+	.d_our_vision {
+		background-size: cover;
+		>.inner {
+			>ul {
+				padding: 5em;
+				display: flex;
+				li {
+					margin: 0 4em;
+					p {
+						margin: 2.6em 2em 2em;
+						line-height: 1.8;
+					}
+				}
+			}
+		}
+	}
+	.d_roadmap {
+		background-size: cover;
+	}
+	.d_contact {
+		background-size: cover;
+		.inner {
+			h3 {
+				padding-top: 7em;
+			}
+			padding: 100px 0 200px;
+		}
+	}
+}

@@ -1,5 +1,5 @@
 <template>
-  <div class="Savings">
+  <div class="Savings background-gray content">
     <div class="header flex">
       <div
         class="minWalletBtn flex"

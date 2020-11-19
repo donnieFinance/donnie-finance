@@ -14,7 +14,7 @@ const UNTIL = DAYS30;
 const Properties = {
 
   isTestnet: function() {
-    return true;
+    return false;
   }
 }
 Properties.token = token;

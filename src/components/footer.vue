@@ -3,77 +3,77 @@
   <div class="footer" :total="total">
     <div class="web_footer">
       <div class="c2020">
-        <span>©</span> 2020 Donnie
+        ⓒ DONNIE BANK. ALL RIGHTS RESERVED.<br>powered by IOST
       </div>
       <div class="icon flex">
         <!-- 위챗 아이콘 마우스 오버시 QR 바코드 보기 -->
         <img class="er_code" :src="er_code" v-if="er_code_show" />
         <a
-          class="tokenContract flex"
-          :href="getTokenContractAddress()"
-          target="_black"
+            class="tokenContract flex"
+            :href="getTokenContractAddress()"
+            target="_black"
         >Token Contract</a>
-        <a
-          class="tokenContract uniswap flex"
-          :href="getTokenUniswapAddress()"
-          target="_black"
-        >
-          <img src="../assets/icon_uniswap.png" alt />
-          Uniswap {{$t(this.$tokenName)}}-ETH
-        </a>
+<!--        <a-->
+<!--            class="tokenContract uniswap flex"-->
+<!--            :href="getTokenUniswapAddress()"-->
+<!--            target="_black"-->
+<!--        >-->
+<!--          <img src="../assets/icon_uniswap.png" alt />-->
+<!--          Uniswap {{$t(this.$tokenName)}}-ETH-->
+<!--        </a>-->
 
-        <!-- <ul class="footer_icon flex">
+        <ul class="footer_icon flex">
           <li v-for="(item,index) in iconList" v-bind:key="'footer_icon_'+index">
             <a class="flex" :href="item.link" target="_black">
               <img :src="item.img" alt />
             </a>
           </li>
-          <li class="flex">
-            <img
-              src="../assets/icon_wechat.png"
-              alt
-              @mouseleave="er_code_show = false"
-              @mouseover="er_code_show = true"
-            />
-          </li>
-        </ul> -->
+<!--          <li class="flex">-->
+<!--            <img-->
+<!--              src="../assets/icon_wechat.png"-->
+<!--              alt-->
+<!--              @mouseleave="er_code_show = false"-->
+<!--              @mouseover="er_code_show = true"-->
+<!--            />-->
+<!--          </li>-->
+        </ul>
       </div>
     </div>
     <!-- 모바일 미니 하단 바-->
     <div class="m_footer">
       <div class="link">
         <a
-          class="tokenContract flex"
-          :href="getTokenContractAddress()"
-          target="_black"
+            class="tokenContract flex"
+            :href="getTokenContractAddress()"
+            target="_black"
         >Token Contract</a>
-        <a
-          class="tokenContract uniswap flex"
-          :href="getTokenUniswapAddress()"
-          target="_black"
-        >
-          <img src="../assets/icon_uniswap.png" alt />
-          Uniswap {{$t(this.$tokenName)}}-ETH
-        </a>
+<!--        <a-->
+<!--            class="tokenContract uniswap flex"-->
+<!--            :href="getTokenUniswapAddress()"-->
+<!--            target="_black"-->
+<!--        >-->
+<!--          <img src="../assets/icon_uniswap.png" alt />-->
+<!--          Uniswap {{$t(this.$tokenName)}}-ETH-->
+<!--        </a>-->
       </div>
 
-      <!-- <ul class="footer_icon flex">
+      <ul class="footer_icon flex">
         <li v-for="(item,index) in iconList" v-bind:key="'m_footer_icon_'+index">
           <a class="flex" :href="item.link"  target="_black">
             <img :src="item.img" alt />
           </a>
         </li>
-        <li class="flex">
-          <img
-            src="../assets/icon_wechat.png"
-            alt
-            @mouseleave="er_code_show = false"
-            @mouseover="er_code_show = true"
-          />
-        </li>
-      </ul> -->
+<!--        <li class="flex">-->
+<!--          <img-->
+<!--            src="../assets/icon_wechat.png"-->
+<!--            alt-->
+<!--            @mouseleave="er_code_show = false"-->
+<!--            @mouseover="er_code_show = true"-->
+<!--          />-->
+<!--        </li>-->
+      </ul>
       <div class="c2020">
-        <span>©</span> 2020 Donnie
+        ⓒ DONNIE BANK. ALL RIGHTS RESERVED.<br>powered by IOST
       </div>
     </div>
   </div>
@@ -97,39 +97,39 @@ export default {
       iconList: [
         {
           img: require('../assets/icon_telegram.png'),
-          link: 'https://t.me/GolffProtocol'
+          link: 'https://t.me/donniefinance'
         },
         {
           img: require('../assets/icon_twitter.png'),
-          link: 'https://twitter.com/GolffProtocol'
+          link: 'https://twitter.com/DonnieFinance'
         },
-        {
-          img: require('../assets/icon_discord.png'),
-          link: 'https://discord.gg/ySbD6Ck'
-        },
+        // {
+        //   img: require('../assets/icon_discord.png'),
+        //   link: ''
+        // },
         {
           img: require('../assets/icon_medium.png'),
-          link: 'https://medium.com/@GolffProtocol'
+          link: 'https://medium.com/@donnie.finance'
         },
-        {
-          img: require('../assets/icon_reddit.png'),
-          link: 'https://www.reddit.com/user/GolffProtocol'
-        },
+        // {
+        //   img: require('../assets/icon_reddit.png'),
+        //   link: ''
+        // },
         {
           img: require('../assets/icon_github.png'),
-          link: 'https://github.com/golff-protocol/'
+          link: 'https://github.com/donnieFinance/donnie-finance'
         }
       ]
     }
   },
   methods: {
-     getTokenContractAddress(){
-       return ("https://www.iostabc.com/token/" + this.contract_address)
+    getTokenContractAddress(){
+      return ("https://www.iostabc.com/token/" + this.contract_address)
 //      return (this.isTestnet ? 'https://ropsten.etherscan.io/address/':'https://etherscan.io/token/')+this.contract_address;
-     },
-     getTokenUniswapAddress(){
+    },
+    getTokenUniswapAddress(){
       return 'https://uniswap.info/pair/'+this.uniswap_address;
-     } 
+    }
   }
 }
 </script>
@@ -152,8 +152,8 @@ export default {
     height: 180px;
   }
   .c2020 {
-    width: 120px;
-    color: #127164;
+    width: 400px;
+    color: @light-gray;
     font-size: 14px;
     margin-left: 10px;
     span {
@@ -163,11 +163,11 @@ export default {
   .tokenContract {
     width: 136px;
     height: 40px;
-    border: 1px solid @dark-blue;
-    color: @dark-blue;
+    border: 1px solid @secondary;
+    color: @light-gray;
     border-radius: 8px;
     font-size: 14px;
-    margin-right: 40px;
+    margin-right: 10px;
     flex-direction: row;
     cursor: pointer;
     img {
