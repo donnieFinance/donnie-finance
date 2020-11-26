@@ -55,18 +55,18 @@ export default {
             precision: 8,
             rate: 0,
         },
-//        {
-//            name: 'bly',
-//            img: require('./assets/coin_bly.png'),
-//            total: '...',
-//            usd: 0,
-//            totalBalance: 0,
-//            status: 0,
-//            isOpen: true,
-//            decimals: 18,
-//            precision: 8,
-//            rate: '',
-//        },
+       {
+           name: 'don',
+           img: require('./assets/coin_don.png'),
+           total: '...',
+           usd: 0,
+           totalBalance: 0,
+           status: 0,
+           isOpen: true,
+           decimals: 8,
+           precision: 8,
+           rate: 0,
+       },
 //        {
 //          name: 'usdt',
 //          img: require('./assets/coin_usdt.png'),
@@ -291,18 +291,23 @@ export default {
       //TOKEN_ADD2 - price ///////////////////////////////////
 
 
-
-      //TODO DONY <-> UNISWAP 상장. 후 가격조회.
-      /**
-      let DONY = new Token(ChainId.MAINNET, this.contract.address.token, 18)
-      let DONYPair = await Fetcher.fetchPairData(DONY, WETH[ChainId.MAINNET])
-      let DONYRoute = new Route([DONYPair], WETH[ChainId.MAINNET])
-        //dony let dony = USDCWETHRoute.midPrice.toSignificant(18) / GOFUSDCRoute.midPrice.toSignificant(18)
-      let dony = let DONYRoute.midPrice.toSignificant(6);
-      this.DONYPrice = dony;
-       */
-
       this.DONYPrice = 0.005; //1->0.1달러 가정.
+
+      //TODO DONY <->  상장. 후 proxy통해서 가격조회.
+      /**
+       try { // DON id=3xxx`
+            let {data:res} = await axios.get('https://blocery.com/restapi/getCmcPrice?id=3xxx'); //proxy
+
+            let tempPrice = res.data[3xxx].quote.USD.price; //data USD parsing
+            if (tempPrice && !isNaN(tempPrice)) {
+                this.DONYPrice  = tempPrice;
+                console.log('this.DONYPrice  from proxy:' + tempPrice)
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+       */
       console.log('DONYPrice:' + this.DONYPrice)
 
       //TOKEN_ADD3 - price mapping
@@ -312,9 +317,9 @@ export default {
 
           //alert(p.usd);
         }
-//        else if (p.name === 'bly') {
-//            p.usd = new BigNumber(bly_usdt).toNumber();
-//        }
+       else if (p.name === 'don') {
+           p.usd = new BigNumber(this.DONYPrice).toNumber();
+       }
 //        else if (p.name === 'usdt') {
 //            p.usd = 1.0;
 //        }
@@ -365,6 +370,7 @@ export default {
 //    },
     getTotalSupply () {
       let relay = 0
+      console.log("*** ",this.coinList);
       return new Promise((resolve, reject) => {
         this.coinList.map((e, i) => {
           //this.contract[e.name].pool.methods.getTotalSupply().call().then(result => {
@@ -392,7 +398,7 @@ export default {
     async getStartTime () {
 
       //TODO - Set startTime front배포시 iostPool과 시간맞춰서 배포.(지갑 미연결시 startTime 못가져오므로 필요)
-      let startTime = 1603962120; //IostPool에 시작 시간.
+      let startTime = 1606363200; // 20201126:13:00(Seoul) IostPool에 시작 시간.
 
       //let startTime = await this.getPoolStartTime();
       console.log('getStartTime: ' + startTime);
@@ -475,7 +481,6 @@ export default {
 //          //지갑 미연결시 오작동:
 //          //let endTime = result * 1000 - Date.parse(new Date());
 //
-////          //TODO delete test
 ////          //endTime =  1600387200*1000 - Date.parse(new Date());; //ENDED  9/18 0:0
 ////          endTime =  1600300800*1000 - Date.parse(new Date()) + Server.UNTIL; //startInWeek 테스트용
 //
@@ -615,7 +620,7 @@ export default {
       let iost = await this.getPoolRewardRate('iost'); //
       console.log('========iostPool rewardRate:' + iost);
 
-//      let bly = await this.getRewardRate('bly');
+      let don = await this.getPoolRewardRate('don');
 //
 //      let usdt = await this.getRewardRate('usdt');
 //      let lend = await this.getRewardRate('lend');
@@ -623,8 +628,8 @@ export default {
       //TOKEN_ADD4 - rewardRate 아래쪽 포함.//////////////////////////////////////////////
 
       /**
-       //TOKEN_ADD5 - trade.vue 280line
-
+       //TOKEN_ADD5 - trade.vue 295line
+         TOKEN_ADD6 - common.js 상단/하단
         */
 
       //console.log('rewardRate weth, bly: ', weth, bly)
@@ -638,9 +643,9 @@ export default {
                 e.rate = this.calcAPR(iost, e.total, dony, e.usd)
 
                 break;
-//              case 'bly':
-//                e.rate = this.calcAPR(bly, e.total, dony, e.usd)
-//                break;
+              case 'don':
+                e.rate = this.calcAPR(don, e.total, dony, e.usd)
+                break;
 //
 //              case 'usdt':
 //                  e.rate = this.calcAPR(usdt, e.total, dony, e.usd)

@@ -1,6 +1,6 @@
 <template>
 
-  <div class="Trade">
+  <div class="Trade background-gray content">
     
     <el-dialog :visible.sync="receiveAllModel" :append-to-body="true">
       <div class="depositModel model flex">
@@ -292,7 +292,7 @@ export default {
     //TOKEN_ADD5
       //coin = 'bly'
     //if (coin && ['iost', 'bly', 'usdt', 'lend'].indexOf(coin.toLowerCase()) > -1) {
-    if (coin && ['iost'].indexOf(coin.toLowerCase()) > -1) {
+    if (coin && ['iost', 'don'].indexOf(coin.toLowerCase()) > -1) {
       this.$store.commit('updateSelectCoin', coin.toLowerCase());
     } else {
       this.$message.error('Unsupported!');
@@ -393,7 +393,7 @@ export default {
       this.depositModel = true;
     },
     depositSend (type, amount) {
-//        console.log("!!! depositAuth : ", type, amount)
+       // console.log("!!! depositAuth : ", type, amount)
         let contractID = this.contract[this.xCoin].pool;
         switch (type) {
         case 0:
@@ -451,7 +451,7 @@ export default {
           this.loading.receive = true;
 
             let txGetReward = IWalletJS.iost.callABI(contractID, "getReward", []);
-            txGetReward.gasLimit = 2000000;  // gasLimit를 늘려줌
+            txGetReward.gasLimit = 200000;  // gasLimit를 늘려줌
             IWalletJS.iost.signAndSend(txGetReward).on("success", (succ) => {
                 this.$message({
                     message: 'Success',
@@ -465,7 +465,11 @@ export default {
                 errorHandler(fail);
                 this.loading.receive = false;
                 this.receiveModel = false;
-                console.log("fail", fail);
+                let message = JSON.parse(fail.substring(7));
+                if(message.code === 2) {
+                  alert(this.$t('message.lackOfIgas') + txGetReward.gasLimit + '\n' + this.$t('message.chargeIgasTime') )
+                }
+
             });
 
           break;
@@ -473,7 +477,7 @@ export default {
           this.loading.receiveAll = true;
 
           let txExit = IWalletJS.iost.callABI(contractID, "exit", []);
-          txExit.gasLimit = 2000000;  // gasLimit를 늘려줌
+          txExit.gasLimit = 300000;  // gasLimit를 늘려줌
           IWalletJS.iost.signAndSend(txExit).on("success", (succ) => {
               this.$message({
                   message: 'Success',
@@ -488,6 +492,10 @@ export default {
               this.loading.receiveAll = false
               this.receiveAllModel = false;
               console.log("fail", fail);
+              let message = JSON.parse(fail.substring(7));
+              if(message.code === 2) {
+                alert(this.$t('message.lackOfIgas') + txExit.gasLimit + '\n' + this.$t('message.chargeIgasTime') )
+              }
           });
 
           break;
@@ -528,6 +536,8 @@ export default {
         const tempIost = window.IWalletJS.newIOST(window.IOST);
         const iostHost = tempIost.currentRPC._provider._host;
 
+        // console.log("***************** ", e)
+        // console.log("***************** ", this.contract[e].pool)
         let res = await axios.post(iostHost + "/getBatchContractStorage", {
             id: this.contract[e].pool,
             key_fields: [
@@ -548,10 +558,9 @@ export default {
 
     getBalance () {
 
-        //불러와서 계산하기
-        this.getBatchContractStorage('iost').then(result => {
+        this.getBatchContractStorage(this.xCoin).then(result => {
 
-            console.log('===========iost-PeriodFinish:' + result)
+            // console.log('===========iost-PeriodFinish:' + result)
 
             let userBalance = result[0];
 
@@ -620,7 +629,7 @@ export default {
 //        console.log("this.xCoin : ", );
         const iost = window.IWalletJS.newIOST(window.IOST);
         const iostHost = iost.currentRPC._provider._host;
-        axios.get(iostHost + "/getTokenBalance/" + this.address + "/" + this.xCoin + "/1").then((data) => {
+        axios.get(iostHost + "/getTokenBalance/" + this.address + "/" + this.contract[this.xCoin].tokenName + "/1").then((data) => {
 //              console.log('data : ',data);
             this.coinBalance = data.data.balance;
             this.coinBalanceStr = data.data.balance;

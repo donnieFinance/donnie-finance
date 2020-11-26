@@ -1,5 +1,5 @@
 
-const DON_TOKEN = 'donnie_finance'; //testnet Don contract
+const DON_TOKEN = 'don'; //donnie_finance'; //testnet Don contract
 const DON_ADDRESS = 'Contract9prMhghLYRpQbSZmyHtmF9twkm46YMZqVrHKJaxmonzV';
 const STAKE_TOKEN = 'iost'; //IOST
 

@@ -1,5 +1,5 @@
-const TOKEN_NAME = "donnie_finance";
-const fullName = "DON";
+const TOKEN_NAME = "don";
+const fullName = "donnie_finance";
 const decimal = 8;
 const totalSupply = 10000000;
 const admin = "donmanager";
@@ -19,11 +19,11 @@ class Don {
             }
         ]);
 
-        this.issue(TOKEN_NAME, admin, 1000000);
+        this.issue(TOKEN_NAME, admin, 2000000);
     }
 
     can_update(data) {
-        return blockchain.requireAuth(blockchain.contractOwner(), "active");
+        blockchain.requireAuth(blockchain.contractOwner(), "active");
     }
 
     _amount(amount) {

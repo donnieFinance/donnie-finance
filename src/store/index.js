@@ -19,7 +19,7 @@ const state = {
     },
     coinList: [],
     //xCoin: 'gxc',
-    xCoin: 'bly',  //dony test
+    xCoin: 'iost',  //dony test
     reloadTime: '',
     disConnet: false,
     isRouterAlive: true,

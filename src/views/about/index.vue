@@ -53,7 +53,7 @@
             </li>
             <li>
               <p>
-                Too dificult for ordinary people to adopt, <strong>but Anyone can use anywhere with any device without complicated process.</strong>
+                Too difficult for ordinary people to adopt, <strong>but Anyone can use anywhere with any device without complicated process.</strong>
               </p>
             </li>
             <li>

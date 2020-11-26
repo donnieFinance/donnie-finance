@@ -59,6 +59,8 @@ const locale = {
         InternalError: 'Internal error',
         newWorkError: 'Network error, Please try again later',
         newWorkError1:'Asset balance can’t be obtained, please refresh the page',
+        lackOfIgas: 'Your iGAS is lack. Necessary iGAS : ',
+        chargeIgasTime: 'iGAS will be charged automatically over time.',
     }
 }
 

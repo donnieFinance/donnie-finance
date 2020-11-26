@@ -58,6 +58,8 @@ const locale = {
         InternalError: 'Internal error',
         newWorkError: 'Network error, Please try again later',
         newWorkError1:'Asset balance can’t be obtained, please refresh the page',
+        lackOfIgas: 'iGAS가 부족합니다. 필요한 iGAS : ',
+        chargeIgasTime: 'iGAS는 시간이 지나면 자동 충전됩니다.',
     }
 }
 

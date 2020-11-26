@@ -11,8 +11,8 @@ const Card = () => import('@/views/card/index.vue');
 const FundManagement = () => import('@/views/fundManagement/index.vue');
 const ComingSoon = () => import('@/views/commingSoon/index.vue');
 
-const showComingSoonPage = true
-// const showComingSoonPage = false //for iostTest
+// const showComingSoonPage = true
+const showComingSoonPage = false //for iostTest
 
 const routes = [
     {

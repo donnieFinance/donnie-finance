@@ -3,16 +3,16 @@ import Server from '../property'
 // import { Web3Provider } from '@ethersproject/providers'
 
 export const testnetAddress = {
-  token: 'donnie_test', //testnet tokenID
+  token: 'dont', //old=donnie_test', //testnet tokenID
 
   iost: {
-      pool: 'Contracth5qtJwVPNrAi51gFRPzirtVGuqPCEqxdukuUPawveuB',  //pool-address
-      //erc20: 'iost' // token-name
+      pool: 'Contract4sZcpvFqjTFaDVTuy8PxeWdADgyjEXuWyibs1phu2dfB',  //pool-address
+      tokenName: 'iost'
   },
-  // bly: {
-  //     pool: '0xD7a9FcB3442EA391E7504fE965CeE5D12611AC56',
-  //     erc20: '0xF729A6b3929b70C681782C875075f0428aD0080A'  //ropsten-bly
-  // },
+  don: {
+      pool: 'ContractHpKcw1tEm6RwRgvw882tdLg6NFhS4ieamJDYnHCQRv5N',
+      tokenName: 'dont', //old='donnie_test'  //testMode (mainnet)
+  },
   // usdt: {
   //     pool: '0x207768FaA2Fa7D4705246Fb7338F9e986120da0e',
   //     erc20: '0xe4b343a05371d36f1d556c9cc841d0fb8654e9f7' //ropsten-usdt
@@ -26,16 +26,16 @@ export const testnetAddress = {
 }
 
 export const mainnetAddress = {
-  token: 'donnie_finance', //TODO mainet tokenID
+  token: 'don', //old='donnie_finance', //TODO mainet tokenID
 
   iost: {
       pool: '', //TODO
-      //erc20: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' //mainnet-weth
+      tokenName: 'iost'
   },
-  // bly: {
-  //     pool: '', //TODO
-  //     erc20: '0xf8aD7dFe656188A23e89da09506Adf7ad9290D5d'  //mainnet-bly
-  // },
+  don: {
+      pool: '', //TODO
+      tokenName: 'don', //old='donnie_finance'  //mainnet
+  },
   // usdt: {
   //     pool: '', //TODO
   //     erc20: '0xdAC17F958D2ee523a2206206994597C13D831ec7' //mainnet-usdt
@@ -64,9 +64,10 @@ export const initContracts = () => {
     //Contract.setProvider(window.ethereum);
     return {
         address: address,
-        token: address.token, //'Contract5q2t7qB4d2bpheBFQkQZuzV6nznac3B8Y9mhW5vToxVs',
+        token: address.token, //'donnie_test' or 'donnie_finance,
 
-        iost: address.iost
+        iost: address.iost,
+        don: address.don, //TODO TOKEN_ADD6
 
         //{
         //     pool: 'Contract8XrKdcuQs3KALMjwqfmFjTLAVRk6h46wS5wuKHmkXXBv',  //pool-address

@@ -22,6 +22,12 @@
 <!--          Uniswap {{$t(this.$tokenName)}}-ETH-->
 <!--        </a>-->
 
+        <a
+            class="tokenContract flex"
+            href="https://drive.google.com/file/d/1Wgu773VlOyiAcpD1X8m6YYdQIu4y13PE/view?usp=sharing"
+            target="_black"
+        >White Paper</a>
+
         <ul class="footer_icon flex">
           <li v-for="(item,index) in iconList" v-bind:key="'footer_icon_'+index">
             <a class="flex" :href="item.link" target="_black">
@@ -55,6 +61,22 @@
 <!--          <img src="../assets/icon_uniswap.png" alt />-->
 <!--          Uniswap {{$t(this.$tokenName)}}-ETH-->
 <!--        </a>-->
+      </div>
+
+      <div class="link">
+        <a
+            class="tokenContract flex"
+            href="https://drive.google.com/file/d/1Wgu773VlOyiAcpD1X8m6YYdQIu4y13PE/view?usp=sharing"
+            target="_black"
+        >White Paper</a>
+        <!--        <a-->
+        <!--            class="tokenContract uniswap flex"-->
+        <!--            :href="getTokenUniswapAddress()"-->
+        <!--            target="_black"-->
+        <!--        >-->
+        <!--          <img src="../assets/icon_uniswap.png" alt />-->
+        <!--          Uniswap {{$t(this.$tokenName)}}-ETH-->
+        <!--        </a>-->
       </div>
 
       <ul class="footer_icon flex">
@@ -149,13 +171,14 @@ export default {
   .m_footer {
     display: none;
     background-color: #283742;
-    height: 180px;
+    //height: 180px;
   }
   .c2020 {
-    width: 400px;
+    //width: 400px;
     color: @light-gray;
     font-size: 14px;
     margin-left: 10px;
+    flex-shrink: 0;
     span {
       color: #666;
     }
@@ -220,6 +243,8 @@ export default {
     display: none !important;
   }
   .m_footer {
+    padding-bottom: 10px;
+    text-align: center;
     display: block !important;
     .link {
       display: flex;
@@ -241,6 +266,7 @@ export default {
     }
     .footer_icon {
       margin-top: 24px;
+      justify-content: center;
       li {
         margin-right: 10px;
       }
@@ -251,7 +277,7 @@ export default {
     margin-left: 10px;
   }
   .footer {
-    height: 180px;
+    //height: 180px;
     flex-direction: column;
   }
 }
