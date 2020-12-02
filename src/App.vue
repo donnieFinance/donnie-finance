@@ -398,7 +398,7 @@ export default {
     async getStartTime () {
 
       //TODO - Set startTime front배포시 iostPool과 시간맞춰서 배포.(지갑 미연결시 startTime 못가져오므로 필요)
-      let startTime = 1606363200; // 20201126:13:00(Seoul) IostPool에 시작 시간.
+      let startTime = 1608076800; // 20201216:09:00(Seoul) IostPool에 시작 시간.
 
       //let startTime = await this.getPoolStartTime();
       console.log('getStartTime: ' + startTime);

@@ -428,6 +428,7 @@ export default {
           let txWithdraw = IWalletJS.iost.callABI(contractID, "withdraw", [
               amount,
           ]);
+          txWithdraw.gasLimit = 100000;  // default gasLimit와 동일함
           txWithdraw.addApprove('iost', amount)
           txWithdraw.amount_limit.push({ token: "*", value: "unlimited" });
           IWalletJS.iost.signAndSend(txWithdraw).on("success", (succ) => {
@@ -443,7 +444,12 @@ export default {
               errorHandler(fail);
               this.loading.withdraw = false;
               this.depositModel = false;
-              console.log("fail", fail);
+              let message = JSON.parse(fail.substring(7));
+              if(message.code === 2) {
+                alert(this.$t('message.lackOfIgas') + txWithdraw.gasLimit + '\n' + this.$t('message.chargeIgasTime') )
+              }
+
+            console.log("fail", fail);
           });
 
           break;
@@ -465,11 +471,15 @@ export default {
                 errorHandler(fail);
                 this.loading.receive = false;
                 this.receiveModel = false;
-                let message = JSON.parse(fail.substring(7));
-                if(message.code === 2) {
-                  alert(this.$t('message.lackOfIgas') + txGetReward.gasLimit + '\n' + this.$t('message.chargeIgasTime') )
-                }
 
+                if (typeof fail === 'object' && fail.status_code === "BALANCE_NOT_ENOUGH") {
+                  alert(this.$t('message.lackOfIram'));
+                } else {
+                  let message = JSON.parse(fail.substring(7));
+                  if (message.code === 2) {
+                    alert(this.$t('message.lackOfIgas') + txGetReward.gasLimit + '\n' + this.$t('message.chargeIgasTime'))
+                  }
+                }
             });
 
           break;

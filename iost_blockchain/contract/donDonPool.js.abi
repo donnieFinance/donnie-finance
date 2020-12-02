@@ -1,0 +1,83 @@
+{
+    "lang": "javascript",
+    "version": "1.0.0",
+    "abi": [
+        {
+            "name": "can_update",
+            "args": [
+                "string"
+            ],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
+            "name": "getEarned",
+            "args": [
+                "string"
+            ],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
+            "name": "stake",
+            "args": [
+                "string"
+            ],
+            "amountLimit": [{
+                "token": "*",
+                "val": "unlimited"
+            }],
+            "description": ""
+        },
+        {
+            "name": "withdraw",
+            "args": [
+                "string"
+            ],
+            "amountLimit": [{
+                "token": "*",
+                "val": "unlimited"
+            }],
+            "description": ""
+        },
+        {
+            "name": "exit",
+            "args": [],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
+            "name": "getReward",
+            "args": [],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
+            "name": "setDevAddr",
+            "args": [
+                "string"
+            ],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
+            "name": "setOpen",
+            "args": [
+                "string"
+            ],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
+            "name": "notifyRewardAmount",
+            "args": [
+                "string"
+            ],
+            "amountLimit": [{
+                "token": "*",
+                "val": "unlimited"
+            }],
+            "description": ""
+        }
+    ]
+}

@@ -1,10 +1,10 @@
 
 const DON_TOKEN = 'don';
 const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
-const STAKE_TOKEN = 'iost'; //IOST
+const STAKE_TOKEN = 'don'; //DON
 
 
-const START_TIME = 1608076800;      // 20201216:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract9k1RLedtrZnFZhFKQirX65bLFphSc6Ko4xRWZBRyACfT
+const START_TIME = 1608076800;      // 20201216:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract6ZkrKzRUHG9VG7zkvJFqNeXiZ72pG5XMjbhrPn3FD3wA
 const DURATION = 24 * 3600 * 30;    // 30일, in Seconds
 const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;

@@ -36,7 +36,7 @@ const locale = {
     harvest: '수익',
     endStake: 'Stake 종료',
     WalletAuthorization: '지갑 승인',
-    PleaseConnect: '먼저 지갑 링크를 만드세요',
+    PleaseConnect: '먼저 지갑을 연결하세요',
     PleaseInstall: '로그인을 위해서 chrome iWallet을 이용하세요',
     PleaseWallet: '{x} 을 사용하여 코드 로그인 스캔',
     lendContent: 'Donnie 가 내놓은 원터치 중합형 대차 서비스는 현재 주류 DeFi 대차 플렛품을 취합할 수 있습니다. 예를 들면 MakerDAO、Compound、Dharma、dYdX 등이 있습니다. 이것은 대차할 수 있는 하층 자산을 크게 확장할 수 있고, 사용자의 자산 유동성을 증가시킬 것입니다. 또 최적 이율을 우성 선택해서 가입자의 대차 원가를 낮출 수 있습니다.',
@@ -60,6 +60,7 @@ const locale = {
         newWorkError1:'Asset balance can’t be obtained, please refresh the page',
         lackOfIgas: 'iGAS가 부족합니다. 필요한 iGAS : ',
         chargeIgasTime: 'iGAS는 시간이 지나면 자동 충전됩니다.',
+        lackOfIram: 'iRAM을 0.1KB 구입 후 이용해주세요',
     }
 }
 

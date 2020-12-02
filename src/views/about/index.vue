@@ -48,17 +48,17 @@
           <ul>
             <li>
               <p>
-                Misleaded and corrupted by the market, <strong>but Potential to be the next generation of financial services.</strong>
+                Misled and corrupted by the market, <strong>but potential to be the next generation of financial services.</strong>
               </p>
             </li>
             <li>
               <p>
-                Too difficult for ordinary people to adopt, <strong>but Anyone can use anywhere with any device without complicated process.</strong>
+                Too difficult for ordinary people to adopt, <strong>but anyone can use anywhere with any device without complicated process.</strong>
               </p>
             </li>
             <li>
               <p>
-                Owned and governed by the financial service provider, <strong>but 100&#37; Community owned and open-sourced with no intermediary.</strong>
+                Owned and governed by the financial service provider, <strong>but 100&#37; community driven and open sourced with no intermediary.</strong>
               </p>
             </li>
           </ul>
@@ -72,17 +72,17 @@
             <dl>
               <dt>Checking &amp; Saving</dt>
               <dd>Deposit and withdraw cryptocurrency anytime, anywhere without fee</dd>
-              <dd>Any cryptocurrency can be deposited and earn yields (“Token of Your Choice”)</dd>
+              <dd>Deposit and earn yields with any cryptocurrency (“Token of Your Choice”)</dd>
             </dl>
             <dl>
               <dt>Loan</dt>
-              <dd>Borrow and Lend any cryptocurrency with an Algorithmic &amp; Autonomous interest Rate</dd>
-              <dd>We offer sustainable system by issuing dToken which used in smart contract to sign and terminate</dd>
+              <dd>Borrow and Lend any cryptocurrency with an Algorithmic &amp; Autonomous Interest Rate</dd>
+              <dd>Offer sustainable system by issuing dToken which used in smart contract to sign and terminate</dd>
               <dd>Collateral ratio is calculated based on the type of the token and credit of user</dd>
             </dl>
             <dl>
               <dt>Exchange</dt>
-              <dd>We provide safe and stable DEX platform for our users</dd>
+              <dd>Provide safe and stable DEX platform for our users</dd>
               <dd>DON token can lower the transaction and network fee</dd>
               <dd>Adopting hybrid auto-market-making system (AMM), we seek to negate slippage</dd>
               <dd>Impermanent loss is not to be appeared by sustaining stable swap ratio through simultaneously linking the liquidity pools’ swap ratio with off-chain exchange ratio</dd>
@@ -109,11 +109,11 @@
       <!--  d_product  -->
       <div class="d_why_don about_cont">
         <div class="inner">
-          <h3 data-aos="fade-down" data-aos-duration="1500">Why Don?</h3>
+          <h3 data-aos="fade-down" data-aos-duration="1500">Why DON?</h3>
           <ul data-aos="fade-up" data-aos-duration="1000">
             <li>Total Issuance : 10,000,000</li>
-            <li>Fully owned and governed by DON Community</li>
-            <li>Donnie Bank distributed DON to the first-movers and participants as incentive for each services.</li>
+            <li>Fully community driven and open sourced</li>
+            <li>Donnie Bank distributes DON to the first-movers and participants as incentive for each of the services.</li>
             <li>Function :
               <div>
                 <p>- Propose new agenda on its community and vote.</p>
@@ -220,9 +220,9 @@
             <img src="@/assets/about/illust_meaning.png" alt="the meaning of donnie">
           </div>
           <ul>
-            <li>“Don” means “money” in Korean</li>
-            <li>“Donnie” which is a form of English nickname of “Don” is used to engage more users and be acknowledged familiar than other project</li>
-            <li>We focused on the fundamental principle of financial market and seek to implement real meaning of financial services in the De-Fi market. It is the reason why we use “Don” as the project name</li>
+            <li>“DON” means “money” in Korean</li>
+            <li>“Donnie” which is a form of English nickname of “DON” is used to engage more users and be acknowledged familiar than other project</li>
+            <li>We focused on the fundamental principle of financial market and seek to implement real meaning of financial services in the De-Fi market. It is the reason why we use “DON” as the project name</li>
           </ul>
         </div>
       </div>

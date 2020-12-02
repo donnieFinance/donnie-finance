@@ -6,11 +6,11 @@ export const testnetAddress = {
   token: 'dont', //old=donnie_test', //testnet tokenID
 
   iost: {
-      pool: 'Contract4sZcpvFqjTFaDVTuy8PxeWdADgyjEXuWyibs1phu2dfB',  //pool-address
+      pool: 'ContractFKZst4poPLRtScNfBbFPr66wj2kmKSA3qCQVQB9VFar9',  //pool-address
       tokenName: 'iost'
   },
   don: {
-      pool: 'ContractHpKcw1tEm6RwRgvw882tdLg6NFhS4ieamJDYnHCQRv5N',
+      pool: 'Contract54jpK8gCqEzxTY5knGFf1hsaL79kXvKVc14wso5TmpMF',
       tokenName: 'dont', //old='donnie_test'  //testMode (mainnet)
   },
   // usdt: {
@@ -29,11 +29,11 @@ export const mainnetAddress = {
   token: 'don', //old='donnie_finance', //TODO mainet tokenID
 
   iost: {
-      pool: '', //TODO
+      pool: 'ContractABsvBxZRs2ebP2EfUseykskMqsp7eAgnfALZTQKK7zrN', //TODO
       tokenName: 'iost'
   },
   don: {
-      pool: '', //TODO
+      pool: 'ContractEVccWL1ryjYhdStdiB6zL3qjQrfeU4o5cKbdzEheTp9W', //TODO
       tokenName: 'don', //old='donnie_finance'  //mainnet
   },
   // usdt: {
