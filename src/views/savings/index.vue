@@ -13,12 +13,12 @@
       </div>
 
       <div class="donnieBankHeading">
-        <div>DonnieBank</div>
-        <div>Decentralized Total Financial Service Provider</div>
+        <div>Checking & Saving</div>
+        <div>Deposit and Withdraw cryptocurrency anytime, anywhere with no fees</div>
       </div>
       
       <div class="countdownBox donnieBor">
-        <div class="heading">Saving & Checking</div>
+        <div class="heading">Checking & Saving</div>
         <div class="addressBox">
           <div>{{$t('EarnDonnie')}}<br /></div>
           <div class="donnieToken" @click="etherscan(contract_address)">{{$t(this.$tokenName+' TokenID : ')}} '{{contract_address}}'</div>

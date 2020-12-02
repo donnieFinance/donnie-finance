@@ -3,7 +3,7 @@
   <div class="footer" :total="total">
     <div class="web_footer">
       <div class="c2020">
-        ⓒ DONNIE BANK. ALL RIGHTS RESERVED.<br>powered by IOST
+        ⓒ DONNIE FINANCE. ALL RIGHTS RESERVED.<br>powered by IOST
       </div>
       <div class="icon flex">
         <!-- 위챗 아이콘 마우스 오버시 QR 바코드 보기 -->
@@ -121,10 +121,10 @@ export default {
           img: require('../assets/icon_telegram.png'),
           link: 'https://t.me/donniefinance'
         },
-        {
-          img: require('../assets/icon_twitter.png'),
-          link: 'https://twitter.com/DonnieFinance'
-        },
+        // {
+        //   img: require('../assets/icon_twitter.png'),
+        //   link: 'https://twitter.com/DonnieFinance'
+        // },
         // {
         //   img: require('../assets/icon_discord.png'),
         //   link: ''
@@ -201,8 +201,8 @@ export default {
     }
   }
   .tokenContract:hover {
-    border: 1px solid #ff6400;
-    color: #ff6400;
+    border: 1px solid @key;
+    color: @key;
   }
   .uniswap {
     width: 196px;
@@ -256,16 +256,17 @@ export default {
         margin-top: 16px;
       }
       a:nth-child(1) {
-        margin-left: 10px;
-        margin-right: 5px;
+        //margin-left: 10px;
+        //margin-right: 5px;
       }
       a:nth-child(2) {
-        margin-left: 5px;
-        margin-right: 10px;
+        //margin-left: 5px;
+        //margin-right: 10px;
       }
     }
     .footer_icon {
       margin-top: 24px;
+      margin-left: 0;
       justify-content: center;
       li {
         margin-right: 10px;
@@ -274,7 +275,7 @@ export default {
   }
   .c2020 {
     margin-top: 10px;
-    margin-left: 10px;
+    margin-left: 0!important;
   }
   .footer {
     //height: 180px;

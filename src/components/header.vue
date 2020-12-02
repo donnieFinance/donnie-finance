@@ -79,9 +79,9 @@ export default {
           active: true
         },
         {
-          name: 'Savings',
-          router: '/savings',
-          routerChildren: '/savings,/trade',
+          name: 'Checking',
+          router: '/checking',
+          routerChildren: '/checking,/trade',
           active: true
         },
         {
@@ -97,19 +97,19 @@ export default {
           active: false
         },
         {
-          name: 'CreditScore',
-          router: '/creditScore',
-          routerChildren: '/creditScore',
+          name: 'Credit Analysis',
+          router: '/creditAnalysis',
+          routerChildren: '/creditAnalysis',
           active: false
         },
         {
-          name: 'Card',
-          router: '/card',
-          routerChildren: '/card',
+          name: 'Payment',
+          router: '/payment',
+          routerChildren: '/payment',
           active: false
         },
         {
-          name: 'FundManagement',
+          name: 'Portfolio Mgmt.',
           router: '/fundManagement',
           routerChildren: '/fundManagement',
           active: false
@@ -189,6 +189,7 @@ export default {
     .icon {
       display: flex;
       align-items: center;
+      cursor: pointer;
       img {
         width: 130px;
         margin: 0px 0 0 30px;

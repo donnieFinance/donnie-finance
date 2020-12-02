@@ -47,7 +47,7 @@ body {
         .card {
             cursor: pointer;
             text-align: center;
-            transition: 0.3s;
+            transition: 0.3s ease-out;
             background-color: @white;
             display: flex;
             flex-direction: column;
@@ -92,7 +92,9 @@ body {
                 transform: scale(1.1);
                 box-shadow: 2px 2px 17px rgba(0,0,0, 0.2);
                 border-radius: 2rem;
-                
+
+                transition: 0.2s ease-in;
+
                 .icon {
                     width: 9rem;
 

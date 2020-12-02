@@ -195,14 +195,67 @@ a{
   margin: 150px 0 150px 0;
 
   & > div:first-child {
-    color: @key;
-    font-size: 30px;
+    color: @white;
+    font-size: 60px;
+    margin-bottom: 10px;
+    font-weight: 600;
+
+    opacity: 0;
+    -webkit-animation: sub-description-fade-in 0.3s ease-in forwards;
+    -o-animation: sub-description-fade-in 0.3s ease-in forwards;
+    animation: sub-description-fade-in 0.3s ease-in forwards;
   }
   & > div:last-child {
     color: @white;
-    font-size: 50px;
-    font-weight: 600;
+    font-size: 25px;
+    font-weight: lighter;
+    padding: 0 6rem;
+    line-height: 35px;
+    
+    opacity: 0;
+    -webkit-animation: sub-description-fade-in 0.3s ease-in forwards;
+    -o-animation: sub-description-fade-in 0.3s ease-in forwards;
+    animation: sub-description-fade-in 0.3s ease-in forwards;
+    animation-delay: 0.1s;
   }
+}
+
+@keyframes sub-description-fade-in {
+  0% {}
+  100% {opacity: 1;}
+}
+
+.timeInfo {
+  color: @white;
+  background-color: rgba(255, 255, 255, 0.1);
+  font-size: 50px;
+  font-weight: 400;
+  border: 1px solid white;
+  position: relative;
+  left: 50%;
+  max-width: 400px;
+  transform: translateX(-50%);
+  text-align: center;
+  padding: 50px 20px;
+  border-radius: 10px;
+
+  box-shadow: 2px 2px 8px rgba(0,0,0, 0.4);
+
+  animation: timeInfoAni 5s ease-in-out infinite;
+
+  margin-bottom: 90px;
+
+  & div {
+    font-size: 20px;
+    color: @background;
+  }
+}
+
+@keyframes timeInfoAni {
+  0% {}
+  50% {border-color: @lemon;}
+  75% {border-color: #118B80;}
+  100% {}
 }
 
 @keyframes rainbow_an{
@@ -233,7 +286,18 @@ a{
     }
     & > div:last-child {
       font-size: 18px;
-      
+      padding: 0 25px;
+      line-height: 25px;
+    }
+  }
+
+  .timeInfo {
+    font-size: 40px;
+    max-width: 300px;
+
+    & div {
+      font-size: 17px;
+
     }
   }
 }

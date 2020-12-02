@@ -3,18 +3,18 @@
     <div class="header">
 <!--      <div>-->
 <!--        <img src="../../assets/dony_go.png" alt />-->
-<!--        <span class="headline">Fund management</span>-->
+<!--        <span class="headline">Credit Analysis</span>-->
 <!--      </div>-->
+
       <div class="donnieBankHeading">
-        <div>Portfolio Mgmt.</div>
-        <div>Aggregator service gives advice on users' cryptocurrency investments and automatically balances users' digital assets</div>
+        <div>Credit Analysis</div>
+        <div>Create a secure credit analytics system to be used within the decentralized financial ecosystem</div>
       </div>
 
       <div class="timeInfo">
         <div>Target Launch</div>
-        2021 Q3
+        2022 H1
       </div>
-
 
     </div>
 

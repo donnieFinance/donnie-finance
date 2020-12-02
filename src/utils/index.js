@@ -41,7 +41,7 @@ export const goTo = (val, type) => {
     if (val === '/home') {
         //let suffix = window.location.hostname.split('.').slice(-1)[0];
         //window.location.href = "https://donnie."+suffix;
-        window.location.href = "/savings";
+        window.location.href = "/checking";
         return;
     }
     if (type === undefined || type === 0) {
@@ -49,7 +49,7 @@ export const goTo = (val, type) => {
         Vue.routerGo.push(val).catch(err => {})
     }
     else if (type === 1) {
-        window.location.href = "/savings";
+        window.location.href = "/checking";
     }
 }
 

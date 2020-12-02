@@ -3,18 +3,17 @@
     <div class="header">
 <!--      <div>-->
 <!--        <img src="../../assets/dony_go.png" alt />-->
-<!--        <span class="headline">Fund management</span>-->
+<!--        <span class="headline">Payment</span>-->
 <!--      </div>-->
       <div class="donnieBankHeading">
-        <div>Portfolio Mgmt.</div>
-        <div>Aggregator service gives advice on users' cryptocurrency investments and automatically balances users' digital assets</div>
+        <div>Payment</div>
+        <div>Support direct transaction between users through the network</div>
       </div>
 
       <div class="timeInfo">
         <div>Target Launch</div>
-        2021 Q3
+        2021 Q4
       </div>
-
 
     </div>
 

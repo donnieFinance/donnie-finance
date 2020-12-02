@@ -5,14 +5,14 @@
       <img src="../../assets/donnie_logo_b.png" alt />
     </div>
     <div class="web-main">
-      <div class="card" @click="goTo('/savings')">
+      <div class="card" @click="goTo('/checking')">
         <div class="icon">
           <img class="img-default" :src="svg.savings" alt="savings and checking">
           <img class="img-hover" :src="svg.savingsW" alt="savings and checking">
         </div>
         <div class="content">
           <div class="heading">
-            Savings & Checking
+            Checking & Saving
           </div>
           <div class="desc">
             <div>
@@ -51,31 +51,31 @@
           </div>
         </div>
       </div>
-      <div class="card" @click="goTo('/creditScore')">
+      <div class="card" @click="goTo('/creditAnalysis')">
         <div class="icon">
-          <img class="img-default" :src="svg.creditScore" alt="creditScore">
-          <img class="img-hover" :src="svg.creditScoreW" alt="creditScore">
+          <img class="img-default" :src="svg.creditScore" alt="creditAnalysis">
+          <img class="img-hover" :src="svg.creditScoreW" alt="creditAnalysis">
         </div>
         <div class="content">
           <div class="heading">
             Credit Analysis
           </div>
           <div class="desc">
-            <div>Peer-to-Peer network of trusted parties and personal data to create a secure credit analytics system used within the financial ecosystem.</div>
+            <div>Create a secure credit analytics system to be used within the decentralized financial ecosystem.</div>
           </div>
         </div>
       </div>
-      <div class="card" @click="goTo('/card')">
+      <div class="card" @click="goTo('/payment')">
         <div class="icon">
-          <img class="img-default" :src="svg.card" alt="card">
-          <img class="img-hover" :src="svg.cardW" alt="card">
+          <img class="img-default" :src="svg.card" alt="payment">
+          <img class="img-hover" :src="svg.cardW" alt="payment">
         </div>
         <div class="content">
           <div class="heading">
             Payment
           </div>
           <div class="desc">
-            <div>Support direct transaction between users through the network</div>
+            <div>Support direct transaction between users through the network.</div>
           </div>
         </div>
       </div>
@@ -86,16 +86,16 @@
         </div>
         <div class="content">
           <div class="heading">
-            Fund management
+            Portfolio Mgmt.
           </div>
           <div class="desc">
-            <div>Aggregator service giving advice and automatically balancing user's digital assets.</div>
+            <div>Aggregator service gives advice on users' cryptocurrency investments and automatically balances users' digital assets.</div>
           </div>
         </div>
       </div>
     </div>
     <div class="copyright">
-      ⓒ DONNIE BANK. ALL RIGHTS RESERVED.<br/>powered by IOST
+      ⓒ DONNIE FINANCE. ALL RIGHTS RESERVED.<br/>powered by IOST
     </div>
   </div>
 
@@ -104,13 +104,13 @@
       <img src="../../assets/donnie_logo_b.png" alt />
     </div>
     <div class="m-main">
-      <div class="card" @click="goTo('/savings')">
+      <div class="card" @click="goTo('/checking')">
         <div class="icon">
           <img class="img-default" :src="svg.savings" alt="savings and checking">
         </div>
         <div class="content">
           <div class="heading">
-            Savings & Checking
+            Checking & Saving
           </div>
           <div class="desc">
             <div>
@@ -149,9 +149,9 @@
           </div>
         </div>
       </div>
-      <div class="card" @click="goTo('/creditScore')">
+      <div class="card" @click="goTo('/creditAnalysis')">
         <div class="icon">
-          <img class="img-default" :src="svg.creditScore" alt="creditScore">
+          <img class="img-default" :src="svg.creditScore" alt="creditAnalysis">
         </div>
         <div class="content">
           <div class="heading">
@@ -159,12 +159,12 @@
           </div>
           <div class="desc">
             <div>
-              Credit Analysis : Peer-to-Peer network of trusted parties and personal data to create a secure credit analytics system used within the financial ecosystem.
+              Create a secure credit analytics system to be used within the decentralized financial ecosystem.
             </div>
           </div>
         </div>
       </div>
-      <div class="card" @click="goTo('/card')">
+      <div class="card" @click="goTo('/payment')">
         <div class="icon">
           <img class="img-default" :src="svg.card" alt="card">
         </div>
@@ -173,7 +173,7 @@
             Payment
           </div>
           <div class="desc">
-            <div>Support direct transaction between users through the network</div>
+            <div>Support direct transaction between users through the network.</div>
           </div>
         </div>
       </div>
@@ -183,17 +183,17 @@
         </div>
         <div class="content">
           <div class="heading">
-            Fund management
+            Portfolio Mgmt.
           </div>
           <div class="desc">
-            <div>Aggregator service giving advice and automatically balancing user's digital assets.</div>
+            <div>Aggregator service gives advice on users' cryptocurrency investments and automatically balances users' digital assets.</div>
           </div>
         </div>
       </div>
       
     </div>
     <div class="copyright">
-      ⓒ DONNIE BANK. ALL RIGHTS RESERVED.<br/>powered by IOST
+      ⓒ DONNIE FINANCE. ALL RIGHTS RESERVED.<br/>powered by IOST
     </div>
   </div>
 
@@ -205,11 +205,11 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import erc from '@/utils/json/ERC20.json';
-import { toNonExponential, leftTime, mToUpperCase } from '@/utils/index';
-import TimeDown from '@/components/timeDown';
+// import erc from '@/utils/json/ERC20.json';
+import { toNonExponential, mToUpperCase } from '@/utils/index';
+// import TimeDown from '@/components/timeDown';
 import { hiddenAddress } from '@/utils/index';
-import { address } from '@/utils/common'
+// import { address } from '@/utils/common'
 import { goTo } from '@/utils/index';
 
 import Savings from '@/assets/savings.svg'
@@ -227,7 +227,7 @@ import FundManagementW from '@/assets/fund_management_w.svg'
 
 export default {
   components: {
-    TimeDown
+    // TimeDown
   },
   data () {
     return {

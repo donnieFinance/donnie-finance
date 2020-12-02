@@ -1,18 +1,33 @@
 <template>
   <div class="DonnieVault background-gray content">
     <div class="header">
-      <div>
-        <img src="../../assets/dony_go.png" alt />
-        <span class="headline">Loan</span>
+<!--      <div>-->
+<!--        <img src="../../assets/dony_go.png" alt />-->
+<!--        <span class="headline">Loan</span>-->
+<!--      </div>-->
+
+      <div class="donnieBankHeading">
+        <div>Loan</div>
+        <div>Borrow and Lend any cryptocurrency with an Algorithmic & Autonomous Interest Rate</div>
       </div>
+
+      <div class="timeInfo">
+        <div>Target Launch</div>
+        2021 Q2
+      </div>
+
     </div>
-    <div class="content flex">
-      <p>
-        <!-- {{$t('vaultContent')}} -->
-        빌려주고 빌리는 플랫폼 알고리즘을 통해 자동화된 이자 계산
-      </p>
-      <img src="../../assets/coming_soon.png" alt />
-    </div>
+<!--    <div class="content flex">-->
+<!--      <p>-->
+<!--        &lt;!&ndash; {{$t('vaultContent')}} &ndash;&gt;-->
+<!--        빌려주고 빌리는 플랫폼 알고리즘을 통해 자동화된 이자 계산-->
+<!--      </p>-->
+<!--      <img src="../../assets/coming_soon.png" alt />-->
+<!--    </div>-->
+
+
+
+
   </div>
 </template>
 
@@ -29,26 +44,26 @@ export default {
   flex: 1;
   padding-top: 70px;
   background-color: @dark-blue;
-  .header {
-    display: flex;
-    justify-content: center;
-    margin-top: 40px;
-    div {
-      img:nth-child(1) {
-        width: 60px;
-      }
-      // img:nth-child(2) {
-      //   width: 270px;
-      //   margin-left: 25px;
-      // }
-      .headline {
-          margin-left: 10px;
-          font-size: 60px;
-          font-weight: 500;
-          color: #eee;
-      }      
-    }
-  }
+  //.header {
+  //  display: flex;
+  //  justify-content: center;
+  //  margin-top: 40px;
+  //  div {
+  //    img:nth-child(1) {
+  //      width: 60px;
+  //    }
+  //    // img:nth-child(2) {
+  //    //   width: 270px;
+  //    //   margin-left: 25px;
+  //    // }
+  //    .headline {
+  //        margin-left: 10px;
+  //        font-size: 60px;
+  //        font-weight: 500;
+  //        color: #eee;
+  //    }
+  //  }
+  //}
   .content {
     margin-top: 20px;
     color: #fff;
@@ -67,21 +82,21 @@ export default {
 }
 @media (max-width: 920px) {
   .DonnieVault {
-    .header {
-      display: flex;
-      justify-content: center;
-      margin-top: 30px;
-      div {
-        margin-left: 20%;
-        img:nth-child(1) {
-          width: 15%;
-        }
-        img:nth-child(2) {
-          width: 60%;
-          margin-left: 5px;
-        }
-      }
-    }
+    //.header {
+    //  display: flex;
+    //  justify-content: center;
+    //  margin-top: 30px;
+    //  div {
+    //    margin-left: 20%;
+    //    img:nth-child(1) {
+    //      width: 15%;
+    //    }
+    //    img:nth-child(2) {
+    //      width: 60%;
+    //      margin-left: 5px;
+    //    }
+    //  }
+    //}
   }
 }
 </style>

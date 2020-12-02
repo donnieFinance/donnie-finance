@@ -6,8 +6,8 @@ const Trade = () => import(/* webpackChunkName:'Farmer' */ '@/views/savings/trad
 const About = () => import('@/views/about/index.vue');
 const Loan = () => import('@/views/loan/index.vue');
 const Exchange = () => import('@/views/exchange/index.vue');
-const CreditScore = () => import('@/views/creditScore/index.vue');
-const Card = () => import('@/views/card/index.vue');
+const CreditAnalysis = () => import('@/views/creditAnalysis/index.vue');
+const Payment = () => import('@/views/payment/index.vue');
 const FundManagement = () => import('@/views/fundManagement/index.vue');
 const ComingSoon = () => import('@/views/commingSoon/index.vue');
 
@@ -25,12 +25,12 @@ const routes = [
         }
     },
     {
-        path: '/savings',
-        name: 'Savings',
+        path: '/checking',
+        name: 'Checking',
         component: showComingSoonPage ? ComingSoon : Savings,
         meta: {
-            title: 'Savings',
-            key: 'savings'
+            title: 'Checking',
+            key: 'checking'
         }
     },
     {
@@ -61,21 +61,21 @@ const routes = [
       }
     },
     {
-        path: '/CreditScore',
-        name: 'CreditScore',
-        component: showComingSoonPage ? ComingSoon : CreditScore,
+        path: '/CreditAnalysis',
+        name: 'CreditAnalysis',
+        component: showComingSoonPage ? ComingSoon : CreditAnalysis,
         meta: {
-            title: 'CreditScore',
-            key: 'creditScore'
+            title: 'CreditAnalysis',
+            key: 'creditAnalysis'
         }
     },
     {
-      path: '/Card',
-      name: 'Card',
-      component: showComingSoonPage ? ComingSoon : Card,
+      path: '/Payment',
+      name: 'Payment',
+      component: showComingSoonPage ? ComingSoon : Payment,
       meta: {
-          title: 'Card',
-          key: 'card'
+          title: 'Payment',
+          key: 'payment'
       }
     },
     {

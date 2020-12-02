@@ -3,14 +3,14 @@
 
 
     <div class="donnieBankHeading">
-      <div>DonnieBank</div>
+      <div>Donnie Finance</div>
       <div>Decentralized Total Financial Service Provider</div>
     </div>
     <div id="wrap">
       <div class="d_info about_cont">
         <div class="inner">
           <div>
-            <h2>Donnie Bank</h2>
+            <h2>Donnie Finance</h2>
             <p>The First Decentralized and Integrated Financial
               Service Provider</p>
             <p>Community Driven and Open Sourced Platform
@@ -19,7 +19,7 @@
           <div class="d_info_img">
           </div>
           <div class="service_iconbox">
-            <h3>All-in-One Financial services</h3>
+            <h3>All-in-One Financial Services</h3>
             <ul>
               <li data-aos="zoom-in" data-aos-duration="1000">
                 <img src="@/assets/about/icon_services_01global.png" alt="services icon">
@@ -48,17 +48,17 @@
           <ul>
             <li>
               <p>
-                Misled and corrupted by the market, <strong>but potential to be the next generation of financial services.</strong>
+                Current Market is misled and corrupted by the market players, <strong>but Donnie has potential to be the next generation of financial services.</strong>
               </p>
             </li>
             <li>
               <p>
-                Too difficult for ordinary people to adopt, <strong>but anyone can use anywhere with any device without complicated process.</strong>
+                Current Market is too difficult for ordinary people to adopt, <strong>but Donnie is available to anyone, anywhere with any device with no complicated process.</strong>
               </p>
             </li>
             <li>
               <p>
-                Owned and governed by the financial service provider, <strong>but 100&#37; community driven and open sourced with no intermediary.</strong>
+                Current Market is owned and governed by the financial service provider not users, <strong>but Donnie is 100&#37; community driven and open sourced with no intermediary.</strong>
               </p>
             </li>
           </ul>
@@ -70,13 +70,14 @@
           <h3 data-aos="fade-down" data-aos-duration="1500">Product</h3>
           <div>
             <dl>
-              <dt>Checking &amp; Saving</dt>
+              <dt>Checking & Saving</dt>
               <dd>Deposit and withdraw cryptocurrency anytime, anywhere without fee</dd>
               <dd>Deposit and earn yields with any cryptocurrency (“Token of Your Choice”)</dd>
+              <dd>Token of Your Choice : IRC20 Tokens are available when launched, but will be expanded to all ERC20 and other cryptocurrencies.</dd>
             </dl>
             <dl>
               <dt>Loan</dt>
-              <dd>Borrow and Lend any cryptocurrency with an Algorithmic &amp; Autonomous Interest Rate</dd>
+              <dd>Borrow and lend any cryptocurrency with an Algorithmic &amp; Autonomous Interest Rate</dd>
               <dd>Offer sustainable system by issuing dToken which used in smart contract to sign and terminate</dd>
               <dd>Collateral ratio is calculated based on the type of the token and credit of user</dd>
             </dl>
@@ -84,7 +85,7 @@
               <dt>Exchange</dt>
               <dd>Provide safe and stable DEX platform for our users</dd>
               <dd>DON token can lower the transaction and network fee</dd>
-              <dd>Adopting hybrid auto-market-making system (AMM), we seek to negate slippage</dd>
+              <dd>Adopting hybrid Automated Market Maker (AMM), we seek to negate slippage</dd>
               <dd>Impermanent loss is not to be appeared by sustaining stable swap ratio through simultaneously linking the liquidity pools’ swap ratio with off-chain exchange ratio</dd>
             </dl>
             <dl>
@@ -93,15 +94,16 @@
               <dd>Lower the payment cost by dissociating of conventional bank and its network, VAN and PG company</dd>
             </dl>
             <dl>
-              <dt>PF Mgmt. &amp; Insurance</dt>
-              <dd>Aggregator service gives advice and automatically balances user’s digital assets</dd>
+              <dt>Portfolio Mgmt.</dt>
+              <dd>Aggregator service gives advice on users' cryptocurrency investments and automatically balances users' digital assets</dd>
               <dd>Recommends optimized portfolio based on users’ existent portfolio and credit</dd>
               <dd>Automatically farming yields to achieve highest income</dd>
               <dd>Insurance product also integrated as one of the investment assets</dd>
             </dl>
             <dl>
               <dt>Credit Analysis</dt>
-              <dd>Peer-to-Peer network of trusted parties and personal data to create a secure credit analytics system used within the financial ecosystem</dd>
+              <dd>Evaluate appropriate credit levels by evaluating the creditworthiness of those participating in the Decentralized Platform.</dd>
+              <dd>Collect primary data based on data such as loans, deposits, transactions and payments within the service.</dd>
             </dl>
           </div>
         </div>
@@ -113,7 +115,7 @@
           <ul data-aos="fade-up" data-aos-duration="1000">
             <li>Total Issuance : 10,000,000</li>
             <li>Fully community driven and open sourced</li>
-            <li>Donnie Bank distributes DON to the first-movers and participants as incentive for each of the services.</li>
+            <li>Donnie Finance distributes DON to the first-movers and participants as incentive for each of the services.</li>
             <li>Function :
               <div>
                 <p>- Propose new agenda on its community and vote.</p>
@@ -129,6 +131,16 @@
           </div>
         </div>
       </div>
+
+      <div class="about_cont">
+        <div class="inner">
+          <h3 data-aos="fade-down" data-aos-duration="1500" class="m_hide" style="padding-bottom: 0; margin-bottom: -50px;">Token Allocation</h3>
+          <h3 data-aos="fade-down" data-aos-duration="1500" class="pc_hide" style="padding-bottom: 0;">Token Allocation</h3>
+          <img src="@/assets/about/pie_chart_pc.png" alt="donnie pie_chart" class="m_hide" style="width: 100%">
+          <img src="@/assets/about/pie_chart_m.png" alt="donnie pie_chart" class="pc_hide" style="width: 100%">
+        </div>
+      </div>
+
       <!--  d_why_don  -->
       <div class="d_roadmap about_cont">
         <div class="inner">
@@ -140,7 +152,26 @@
             <h6>Powered by</h6>
             <img src="@/assets/about/logo_iost2.png" alt="iost logo" class="logo_iost">
             <h6>Audited and Secured by</h6>
-            <img src="@/assets/about/logo_halborn.png" alt="halborn logo" class="logo_halborn">
+            <div class="m_hide" style="display: flex; justify-content: center; padding-top: 10px;">
+              <span>
+                <img src="@/assets/about/logo_halborn.png" alt="halborn logo" class="logo_halborn">
+              </span>
+              <span style="padding-left: 80px;">
+                <img src="@/assets/about/logo_slowmist.png" alt="halborn logo" class="logo_slowmist">
+              </span>
+            </div>
+
+            <div class="pc_hide" style="display: flex; justify-content: center; padding-top: 10px;">
+              <span>
+                <img src="@/assets/about/logo_halborn.png" alt="halborn logo" class="logo_halborn">
+              </span>
+              <span style="padding-left: 30px;">
+                <img src="@/assets/about/logo_slowmist.png" alt="halborn logo" class="logo_slowmist">
+              </span>
+            </div>
+
+
+
             <h3>Partners</h3>
             <h5>- More To Be Announced -</h5>
             <ul class="partners_list">
@@ -167,15 +198,15 @@
                 <img src="@/assets/about/02_medium.png" alt="medium shortcut">
               </a>
             </li>
-            <li data-aos="zoom-in" data-aos-duration="1000">
-              <a href="https://twitter.com/DonnieFinance" target=”_blank” title="twitter">
-                <img src="@/assets/about/03_twitter.png" alt="twitter shortcut">
-              </a>
-            </li>
-            <li data-aos="zoom-in" data-aos-duration="1000">
-              <a href="#none" title="comming soon">
-                <img src="@/assets/about/04_discord.png" alt="discord shortcut"></a>
-            </li>
+<!--            <li data-aos="zoom-in" data-aos-duration="1000">-->
+<!--              <a href="https://twitter.com/DonnieFinance" target=”_blank” title="twitter">-->
+<!--                <img src="@/assets/about/03_twitter.png" alt="twitter shortcut">-->
+<!--              </a>-->
+<!--            </li>-->
+<!--            <li data-aos="zoom-in" data-aos-duration="1000">-->
+<!--              <a href="#none" title="comming soon">-->
+<!--                <img src="@/assets/about/04_discord.png" alt="discord shortcut"></a>-->
+<!--            </li>-->
             <li data-aos="zoom-in" data-aos-duration="1000">
               <a href="https://github.com/donnieFinance/donnie-finance" target=”_blank” title="github">
                 <img src="@/assets/about/05_github.png" alt="github shortcut">
@@ -194,15 +225,15 @@
                 <img src="@/assets/about/02_medium_c.png" alt="medium shortcut">
               </a>
             </li>
-            <li data-aos="zoom-in" data-aos-duration="1000">
-              <a href="https://twitter.com/DonnieFinance" target=”_blank” title="twitter shortcut">
-                <img src="@/assets/about/03_twitter_c.png" alt="twitter shortcut">
-              </a>
-            </li>
-            <li data-aos="zoom-in" data-aos-duration="1000">
-              <a href="#none">
-                <img src="@/assets/about/04_discord_c.png" alt="discord shortcut"></a>
-            </li>
+<!--            <li data-aos="zoom-in" data-aos-duration="1000">-->
+<!--              <a href="https://twitter.com/DonnieFinance" target=”_blank” title="twitter shortcut">-->
+<!--                <img src="@/assets/about/03_twitter_c.png" alt="twitter shortcut">-->
+<!--              </a>-->
+<!--            </li>-->
+<!--            <li data-aos="zoom-in" data-aos-duration="1000">-->
+<!--              <a href="#none">-->
+<!--                <img src="@/assets/about/04_discord_c.png" alt="discord shortcut"></a>-->
+<!--            </li>-->
             <li data-aos="zoom-in" data-aos-duration="1000">
               <a href="https://github.com/donnieFinance/donnie-finance" target=”_blank” title="github shortcut">
                 <img src="@/assets/about/05_github_c.png" alt="github shortcut">
@@ -253,8 +284,8 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import '@/styles/color.less';
 @import './index.less';
+@import '@/styles/color.less';
 @import '@/styles/aos';
 
 .image {
