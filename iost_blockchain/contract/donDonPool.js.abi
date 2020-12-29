@@ -11,6 +11,14 @@
             "description": ""
         },
         {
+            "name": "updateStartTime",
+            "args": [
+                "string"
+            ],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
             "name": "getEarned",
             "args": [
                 "string"

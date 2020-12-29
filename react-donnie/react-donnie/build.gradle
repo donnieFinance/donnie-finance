@@ -1,0 +1,14 @@
+plugins {
+	id "com.moowork.node" version "1.2.0"
+}
+apply plugin: 'com.moowork.node'
+
+task npmBuild(type: NpmTask) {
+	args = ['run-script','build']
+}
+
+task npmStageBuild(type: NpmTask) {
+    args = ['run-script','build:staging']
+}
+
+//build.dependsOn npmBuild

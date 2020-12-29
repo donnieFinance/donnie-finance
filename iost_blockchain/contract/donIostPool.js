@@ -6,7 +6,7 @@ const STAKE_TOKEN = 'iost'; //IOST
 
 const START_TIME = 1608076800;      // 20201216:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract9k1RLedtrZnFZhFKQirX65bLFphSc6Ko4xRWZBRyACfT
 const DURATION = 24 * 3600 * 30;    // 30일, in Seconds
-const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
+// const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;
 const TO_FIXED = 4;   //소수점 4자리까지 저장.
 
@@ -40,6 +40,11 @@ class DonIostPool {
     }
 
     ////////////////////////StakeToken Wrapper/////////////////////
+
+    updateStartTime(startTime) {
+        storage.put(START_TIME_KEY, ""+startTime);
+        storage.put(PERIOD_FINISH_KEY, ""+(new Int64(startTime).plus(DURATION)));
+    }
 
     _totalSupply() {
         return new Float64(storage.get(TOTAL_SUPPLY_KEY));
@@ -259,7 +264,9 @@ class DonIostPool {
     //return boolean
     _isStart() { // checkStart
 
-        if (START_TIME_NANO.lte(block.time)) {
+        let startTime = storage.get(START_TIME_KEY);
+        let startTimeNano = new Int64(startTime).multi(1000000000);
+        if (startTimeNano.lte(block.time)) {
             return true;
         }
         return false;
@@ -276,7 +283,8 @@ class DonIostPool {
 
     //return int(Sec)
     _getPeriodFinish() {
-        return (START_TIME + DURATION);
+        let startTime = storage.get(START_TIME_KEY);
+        return (new Int64(startTime).plus(DURATION));
     }
 
     //param String : "true" or "false"
