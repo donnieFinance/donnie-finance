@@ -22,6 +22,7 @@ import ImgDon from "~/assets/coin_don.png";
 export const globalState = atom({
     key: 'globalState', // unique ID (with respect to other atoms/selectors)
     default: {
+        walletType: 'IWallet',
         address: null,
         disConnect: false
     }
@@ -52,6 +53,13 @@ export const globalStateSelector = selector({
     }
 });
 
+// 내 지갑 로딩
+export const walletLoadingState = atom({
+    key: 'walletLoadingState',
+    default: {
+        loading: true
+    }
+})
 // 내 지갑 주소
 export const myAddressSelector = selector({
     key: 'globalStateAddress', // unique ID (with respect to other atoms/selectors)
@@ -142,207 +150,59 @@ export const myDonModalState = atom({
     default: false
 })
 
+// Deposit ERC modal state
+export const depositERCModalState = atom({
+    key: 'depositERCModalState',
+    default: false
+})
+
+// Withdraw ERC modal state
+export const withdrawERCModalState = atom({
+    key: 'withdrawERCModalState',
+    default: false
+})
+
+
+// Deposit IW (ERC to IRC) modal state
+export const depositIWERCModalState = atom({
+    key: 'depositIWERCModalState',
+    default: {
+        uniqueKey:'',
+        tokenName:'',
+        isOpen:false
+    }
+})
+// Withdraw iwBly(IRC) to Bly(ERC) modal state
+export const withdrawIWERCModalState = atom({
+    key: 'withdrawIWERCModalState',
+    default: {
+        uniqueKey:'',
+        tokenName:'',
+        isOpen:false
+    }
+})
+
 /* ==== Wallet 정보 END ==== */
 
-/* ==== Checking State 정보 START ==== */
-// Checking State 정보
-// export const checkingState = atom({
-//     key: 'checkingState',
-//     default: {
-//         coinList: [
-//             {
-//                 name: 'iost',
-//                 img: coin_iost_icon,
-//                 total: '...',
-//                 usd: 0,
-//                 totalBalance: 0,
-//                 status: 0,
-//                 isOpen: true,
-//                 decimals: 8,
-//                 precision: 8,
-//                 rate: 0,
-//                 loading: true
-//             },
-//             {
-//                 name: 'don',
-//                 img: coin_don_icon,
-//                 total: '...',
-//                 usd: 0,
-//                 totalBalance: 0,
-//                 status: 0,
-//                 isOpen: true,
-//                 decimals: 8,
-//                 precision: 8,
-//                 rate: 0,
-//                 loading: true
-//             }
-//         ],
-//         reloadTime:''
-//     }
-// })
 
-export const checkingStakeState = atom({
-    key: 'checkingStakeState',
-    default: {
-        startTime: '',
-        time: '',
-        leftTime: null,
-        status: 0,
-        startInWeek: 0
-    }
-})
-
-export const checkingCoinListState = atom({
-    key: 'checkingCoinListState',
-    default: coinList.checking
-})
-
-export const checkingCoinListLoadingState = atom({
-    key: 'checkingCoinListLoadingState',
-    default: true
-})
-
-export const checkingReloadTimeState = atom({
-    key: 'checkingReloadTimeState',
-    default: null
-})
-
-// checkingCoinListSelector
-// const [coinList, setCoinList] = useRecoilState(checkingCoinListSelector);
-export const checkingCoinListSelector = selector({
-    key: 'checkingCoinListSelector', // unique ID (with respect to other atoms/selectors)
-    get: ({get}) => {
-        const state = get(checkingCoinListState);
-        return state;
-    },
-    // set: ({set}, coinList) => {
-    //     set (
-    //         checkingCoinListState,
-    //         (prevState) => ({
-    //             ...prevState,
-    //             coinList
-    //         })
-    //     )
-    // },
+// admin 로그인 정보
+export const adminState = atom({
+    key: 'adminState', // unique ID (with respect to other atoms/selectors)
+    default: null, // default value (aka initial value)
 });
 
-export const checkingReloadTimeSelector = selector({
-    key: 'checkingReloadTimeSelector', // unique ID (with respect to other atoms/selectors)
-    get: ({get}) => {
-        const state = get(checkingReloadTimeState);
-        return state;
-    },
-    set: ({set}, reloadTime) => {
-        set (
-            checkingReloadTimeState,
-            () => (reloadTime)
-        )
-    }
+// 글로벌 현재시간
+export const nowState = atom({
+    key: 'nowState', // unique ID (with respect to other atoms/selectors)
+    default: Date.parse(new Date), // default value (aka initial value)
 });
 
-// checkingStakeSelector
-// const [stake, setStake] = useRecoilState(checkingStakeSelector);
-export const checkingStakeSelector = selector({
-    key: 'checkingStakeSelector', // unique ID (with respect to other atoms/selectors)
-    get: ({get}) => {
-        const state = get(checkingStakeState);
-        return state;
-    },
-    set: ({set}, stake) => {
-        // console.log("stake-----checkingStakeSelector",stake)
-        set (
-            checkingStakeState,
-            (prevState) => ({
-                ...prevState,
-                stake
-            })
-        )
-    }
+// 로딩상태
+// start, stop
+export const loadingState = atom({
+    key: 'loadingState', // unique ID (with respect to other atoms/selectors)
+    default: null, // default value (aka initial value)
 });
-export const checkingStakeStatusSelector = selector({
-    key: 'checkingStakeStatusSelector', // unique ID (with respect to other atoms/selectors)
-    get: ({get}) => {
-        const stakeState = get(checkingStakeState);
-        return stakeState.status;
-    },
-    set: ({set}, status) => {
-        set (
-            checkingStakeState,
-            (prevState) => ({
-                ...prevState,
-                status: status
-            })
-        )
-    }
-});
-export const checkingStakeStartTimeSelector = selector({
-    key: 'checkingStakeStartTimeSelector', // unique ID (with respect to other atoms/selectors)
-    get: ({get}) => {
-        const stakeState = get(checkingStakeState);
-        return stakeState.startTime;
-    },
-    set: ({set}, startTime) => {
-        set (
-            checkingStakeState,
-            (prevState) => ({
-                ...prevState,
-                startTime: startTime
-            })
-        )
-    }
-});
-export const checkingStakeTimeSelector = selector({
-    key: 'checkingStakeTimeSelector', // unique ID (with respect to other atoms/selectors)
-    get: ({get}) => {
-        const stakeState = get(checkingStakeState);
-        return stakeState.time;
-    },
-    set: ({set}, time) => {
-        set (
-            checkingStakeState,
-            (prevState) => ({
-                ...prevState,
-                time: time
-            })
-        )
-    }
-});
-export const checkingStakeLeftTimeSelector = selector({
-    key: 'checkingStakeLeftTimeSelector', // unique ID (with respect to other atoms/selectors)
-    get: ({get}) => {
-        const stakeState = get(checkingStakeState);
-        return stakeState.leftTime;
-    },
-    set: ({set}, leftTime) => {
-        set (
-            checkingStakeState,
-            (prevState) => ({
-                ...prevState,
-                leftTime: leftTime
-            })
-        )
-    }
-});
-export const checkingStakeStartInWeekSelector = selector({
-    key: 'checkingStakeStartInWeekSelector', // unique ID (with respect to other atoms/selectors)
-    get: ({get}) => {
-        const stakeState = get(checkingStakeState);
-        return stakeState.startInWeek;
-    },
-    set: ({set}, startInWeek) => {
-        set (
-            checkingStakeState,
-            (prevState) => ({
-                ...prevState,
-                startInWeek: startInWeek
-            })
-        )
-    }
-});
-/* ==== Checking State 정보 END ==== */
-
-
-
 
 
 /*

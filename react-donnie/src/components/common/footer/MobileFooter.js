@@ -9,23 +9,28 @@ const MobileFooter = ({t, iconList}) => {
             <Div bg={'darkPrimary'} fg={'white'} p={20}>
                 <Div>
                     <a
+                        href={`${properties.DonDistributionFileLink}`}
+                        target="_black"
+                    >
+                        <Button block fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4} mb={20}>Don Distribution</Button>
+                    </a>
+                    <a
                         href={`https://www.iostabc.com/token/${properties.address.token}`}
                         target="_black"
                     >
                         <Button block fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4} mb={20}>Token Contract</Button>
                     </a>
                     <a
-                        href={'https://drive.google.com/file/d/1Wgu773VlOyiAcpD1X8m6YYdQIu4y13PE/view?usp=sharing'}
+                        href={`${properties.whitePaperFileLink}`}
                         target="_black"
                     >
-                        <Button block fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4}>White
-                            Paper</Button>
+                        <Button block fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4}>White Paper</Button>
                     </a>
                 </Div>
                 <Flex justifyContent={'center'} mt={33}>
                     {
                         iconList.map((icon, i) =>
-                            <a href={icon.link} target={'_blank'}>
+                            <a href={icon.link} target={'_blank'} key={`icon_${i}`}>
                                 <Img src={icon.img} alt={''} width={33} ml={i !== 0 && 10}/>
                             </a>
                         )
@@ -33,7 +38,7 @@ const MobileFooter = ({t, iconList}) => {
                 </Flex>
                 <Div textAlign={'center'} mt={10}>
                     <Div>ⓒ DONNIE FINANCE. ALL RIGHTS RESERVED.</Div>
-                    <Div>powered by IOST</Div>
+                    <Div>powered by IOST & EZFARM</Div>
                 </Div>
             </Div>
         </>

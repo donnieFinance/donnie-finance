@@ -12,6 +12,7 @@ import pie_chart_m from '~/assets/about/pie_chart_m.png'
 import diagram_history from '~/assets/about/diagram_history.png'
 import diagram_history_t from '~/assets/about/diagram_history_t.png'
 import diagram_history_m from '~/assets/about/diagram_history_m.png'
+import logo_ezfarm from '~/assets/about/ezfarm_logo.png'
 import logo_iost2 from '~/assets/about/logo_iost2.png'
 import logo_halborn from '~/assets/about/logo_halborn.png'
 import logo_slowmist from '~/assets/about/logo_slowmist.png'
@@ -27,7 +28,7 @@ import illust_meaning from '~/assets/about/illust_meaning.png'
 import logo_tpay from '~/assets/about/logo_tpay.png'
 import logo_cobak from '~/assets/about/logo_cobak.png'
 import logo_deficode from '~/assets/about/logo_deficode.png'
-
+import logo_husd from '~/assets/about/logo_husd.svg'
 
 import './index.less'
 import {PageHeader} from "antd";
@@ -239,8 +240,17 @@ export default withTranslation()((props) => {
                              className="pc_hide t_hide" />
                         <div className="partner_box">
                             <h6>Powered by</h6>
-                            <img src={logo_iost2} alt="iost logo"
-                                 className="logo_iost" />
+                            <span>
+                                <img src={logo_iost2} alt="iost logo" className="logo_iost" />
+                            </span>
+                            <span
+                                // style="padding-left: 80px;"
+                                style={{
+                                    paddingLeft: 30
+                                }}
+                            >
+                                <img src={logo_ezfarm} alt={"ezfarm logo"} className="logo_ezfarm" />
+                            </span>
                             <h6>Audited and Secured by</h6>
                             <div className="m_hide"
                                 // style="display: flex; justify-content: center; padding-top: 10px;"
@@ -290,8 +300,8 @@ export default withTranslation()((props) => {
                             <ul className="partners_list">
                                 <li><img src={logo_tpay} alt="tpay logo" /></li>
                                 <li><img src={logo_cobak} alt="cobak logo" /></li>
-                                <li><img src={logo_deficode} alt="deficode logo" />
-                                </li>
+                                <li><img src={logo_deficode} alt="deficode logo" /></li>
+                                <li><img src={logo_husd} style={{maxWidth:170}} alt="husd logo" /></li>
                             </ul>
                         </div>
                     </div>

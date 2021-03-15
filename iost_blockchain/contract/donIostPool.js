@@ -3,9 +3,8 @@ const DON_TOKEN = 'don';
 const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
 const STAKE_TOKEN = 'iost'; //IOST
 
-
-const START_TIME = 1608076800;      // 20201216:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract9k1RLedtrZnFZhFKQirX65bLFphSc6Ko4xRWZBRyACfT
-const DURATION = 24 * 3600 * 30;    // 30일, in Seconds
+const START_TIME = 1615852800;      // 20210316:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract8JxGDc8B8Xa94uKv12bgSMkvShPjCPRLTNDMZYMbghGi
+const DURATION = 24 * 3600 * 28;    // 28일, in Seconds
 // const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;
 const TO_FIXED = 4;   //소수점 4자리까지 저장.
@@ -18,6 +17,7 @@ const REWARD_RATE_KEY  = "rewardRate";
 const LASTUPDATE_TIME_KEY  = "lastUpdate";
 const TOTAL_SUPPLY_KEY = "totalSupply";
 const DEV_ADDR_KEY = "devAddr";
+const DURATION_KEY = "duration";
 
 const USER_BALANCE_MAPKEY = "userbalance";
 const USER_RPTP_MAPKEY = "userrptp";     // rptp=rewardPerTokenPaid
@@ -43,7 +43,14 @@ class DonIostPool {
 
     updateStartTime(startTime) {
         storage.put(START_TIME_KEY, ""+startTime);
-        storage.put(PERIOD_FINISH_KEY, ""+(new Int64(startTime).plus(DURATION)));
+        let duration = storage.get(DURATION_KEY);
+
+        // addRewardAmount로 duration 변경 전
+        if(!duration) {
+            storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(DURATION).toString());
+        } else {
+            storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(new Int64(duration)).toString());
+        }
     }
 
     _totalSupply() {
@@ -284,7 +291,13 @@ class DonIostPool {
     //return int(Sec)
     _getPeriodFinish() {
         let startTime = storage.get(START_TIME_KEY);
-        return (new Int64(startTime).plus(DURATION));
+        let duration = storage.get(DURATION_KEY);
+
+        // addRewardAmount로 duration 변경 전 (최초 notifyRewardAmount)
+        if(!duration) {
+            return (new Int64(startTime).plus(DURATION));
+        }
+        return (new Int64(startTime).plus(new Int64(duration)));
     }
 
     //param String : "true" or "false"
@@ -303,15 +316,16 @@ class DonIostPool {
             this._updateReward(null);
             let blockTimeSec = new BigNumber(block.time).div(1000000000).toNumber().toFixed(0);
 
-            if ( START_TIME < blockTimeSec ) {
-                throw new Error("notifyRewardAmount Fail - already started:" + START_TIME + ", block.time:" + blockTimeSec );
+            let storedStartTime = new Int64(storage.get(START_TIME_KEY));
+            if ( storedStartTime.lt(blockTimeSec) ) {
+                throw new Error("notifyRewardAmount Fail - already started:" + storedStartTime + ", block.time:" + blockTimeSec );
             }else {
                 //rewardRate = reward.div(DURATION);
                 let rewardRate = new Float64(reward).div(DURATION);
                 storage.put(REWARD_RATE_KEY, rewardRate.toString());
                 //periodFinish = startTime.add(DURATION);
                 //lastUpdateTime = startTime;
-                storage.put(LASTUPDATE_TIME_KEY, "" + START_TIME);
+                storage.put(LASTUPDATE_TIME_KEY, storedStartTime.toString());
                 //don.mint(address(this),reward);
                 blockchain.callWithAuth(DON_ADDRESS, "mint", [blockchain.contractName(), reward]); //call by admin
             }
@@ -321,11 +335,40 @@ class DonIostPool {
         }
     }
 
-    //return Float64
-    // _checkRewardRate() {
-    //
-    //     return new Float64(0);
-    // }
+    //adding reward before startTime : must be called after notifyRewardAmount(initialReward)
+    addRewardAmount(beforeRewardStr, addingRewardStr, durationStrInSeconds) {
+
+        if (tx.publisher === blockchain.contractOwner() && this._isOpen()) { //onlyRewardDistribution, checkOpen
+
+            this._updateReward(null);
+
+            let storedStartTime = new Int64(storage.get(START_TIME_KEY));
+            let blockTimeSec = new BigNumber(block.time).div(1000000000).toNumber().toFixed(0);
+
+            if ( storedStartTime.lt(blockTimeSec) ) {
+                throw new Error("addRewardAmount Fail - already started:" + storedStartTime + ", block.time:" + blockTimeSec );
+            }else {
+                let newDuration = new Int64(durationStrInSeconds);
+                let beforeReward = new Float64(beforeRewardStr);
+                let addingReward = new Float64(addingRewardStr);
+
+                let totalReward = beforeReward.plus(addingReward);
+                let rewardRate = totalReward.div(newDuration);
+
+                storage.put(DURATION_KEY, newDuration.toString());
+                storage.put(PERIOD_FINISH_KEY, storedStartTime.plus(newDuration).toString());
+                storage.put(REWARD_RATE_KEY, rewardRate.toString());
+                //already done(maybe). storage.put(LASTUPDATE_TIME_KEY, "" + START_TIME);
+
+                if(addingReward.gt(new Float64(0))) {
+                    blockchain.callWithAuth(DON_ADDRESS, "mint", [blockchain.contractName(), addingRewardStr]); //call by admin
+                }
+            }
+
+        }else {
+            throw new Error("addRewardAmount Authority Error:" + tx.publisher + ",isopen:" + isOpen );
+        }
+    }
 
 }
 module.exports = DonIostPool;

@@ -70,6 +70,15 @@ const defaultStyle = css`
     ${props => (props.bgFrom || props.bgTo) && `background: linear-gradient(${props.deg || 145}deg, ${color[props.bgFrom] || color.white }, ${color[props.bgTo] || color.white});`};
     
     ${props => hasValue(props.hoverFg) && hoverFg };
+    
+    ${props => props.dot && `
+        &::before {
+            content: '·';
+            display: block;
+            margin-right: 8px;
+        }
+    `}
+    
 `;
 
 export const Div = styled.div`
@@ -140,11 +149,11 @@ export const Mask = styled.div`
     right: 0;
     bottom: 0;
     background-color: rgba(0,0,0, 0.5);
-    z-index: 99;
+    z-index: 9999999;
     
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
 `;
 
 

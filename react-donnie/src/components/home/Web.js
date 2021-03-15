@@ -27,15 +27,9 @@ const Grid = styled(Div)`
     }
 `
 
-
-
-const CardPc = ({pathname, img, hoverImg, alt, title, desc, fg}) => {
-
-    const history = useHistory()
-
-    const Item = styled(Flex)`
+const Item = styled(Flex)`
         transition: 0.17s ease-in;
-        color: ${fg};
+        color: ${props => props.themeColor};
         background-color: ${color.white};
     
         //icon box
@@ -60,7 +54,7 @@ const CardPc = ({pathname, img, hoverImg, alt, title, desc, fg}) => {
         &:hover {
             transform: scale(1.1);
             color: white;
-            background-color: ${fg};
+            background-color: ${props => props.themeColor};
            
             border-radius: ${getValue(30)};
             
@@ -92,8 +86,14 @@ const CardPc = ({pathname, img, hoverImg, alt, title, desc, fg}) => {
         }
     `
 
+
+const CardPc = ({pathname, img, hoverImg, alt, title, desc, fg}) => {
+
+    const history = useHistory()
+
     return(
             <Item minHeight={350} flexGrow={1} flexDirection={'column'}
+                  themeColor={fg}
                   justifyContent={'center'} cursor
                   onClick={()=> history.push(pathname)}
             >
@@ -124,8 +124,9 @@ export default ({store}) =>
         <Div>
             <Grid px={50}>
                 {
-                    store.map(item =>
+                    store.map((item, index) =>
                         <CardPc
+                            key={`item${index}`}
                             pathname={item.pathname}
                             img={item.img}
                             hoverImg={item.hoverImg}
@@ -141,6 +142,6 @@ export default ({store}) =>
 
         <Div textAlign={'center'} fontSize={16} fw={700} py={20}>
             ⓒ DONNIE FINANCE. ALL RIGHTS RESERVED.<br/>
-            <Span>powered by IOST</Span>
+            <Span>powered by IOST & EZFARM</Span>
         </Div>
     </>

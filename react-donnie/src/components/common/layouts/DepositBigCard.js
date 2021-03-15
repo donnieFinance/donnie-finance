@@ -1,122 +1,165 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Button, Div, Flex, Img, RoundedCard} from "~/styledComponents/shared";
+import {HexEdge} from '~/styledComponents/shared/Shapes'
+import ComUtil from "~/util/ComUtil";
+import styled from "styled-components";
 import aniKey from "~/styledComponents/Keyframes";
 
-import useSize from "~/hooks/useSize";
-import SpinnerWrap from '~/components/common/spinnerWrap'
-import styled, {css} from "styled-components";
-import {Spin} from 'antd'
-import {getValue} from "~/styledComponents/Util";
-import {CgShapeHalfCircle} from 'react-icons/cg'
-import Ani from '~/styledComponents/shared/AnimationLayouts'
+import { Skeleton } from 'antd';
+import {color} from "~/styledComponents/Properties";
+import {BsChevronDown, BsChevronUp} from 'react-icons/bs'
+import ImgHexEdgeLine from '~/assets/hex_edge.svg'
 const Content = styled(Flex)`
     opacity: 0;
     animation: 0.2s ${aniKey.fadeIn} ease-in forwards;
     justify-content: center;
 `;
-// const StyledCircle = styled(CgShapeHalfCircle)`
-//      animation: ${aniKey.spin} 0.5s linear infinite;
-// `
+
+const Circle = ({bg}) => <Div bg={bg} width={10} height={10} rounded={'50%'} mr={10}></Div>
 
 const DepositBigCard = ({
-
-                            number, //순위
-                            img = '',
-                            name = '',
-                            explain,
-                            mining,
-                            rate,
-                            total,
-                            usd,
-                            buttonText,
-                            loading,
-
-                            onClick = () => null
+                            isIwFlag,
+                            status, startTime, endTime, duration,
+                            name, img, mining, explain, total, usd, rate, buttonText, loading,
+                            myStaked = true,
+                            totalDon,
+                            onDepositClick = () => null
                         }) => {
 
-    /*
-    decimals: 8
-    img: "/static/media/coin_iost.b40152fb.png"
-    isOpen: "true"
-    name: "iost"
-    precision: 8
-    rate: 0
-    status: 1
-    total: 3488.805
-    totalBalance: 20.743147994604954
-    usd: 0.00594563123895
+    const [showDetail, setShowDetail] = useState(false)
 
-
-     */
-
+    const onDetailClick = () => {
+        setShowDetail(!showDetail)
+    }
 
     return (
-        <Div relative width={200} m={16} >
-            {
-                number <= 3 && (
-                    <Flex
-                        absolute width={45} height={35}
-                        top={-5}
-                        right={-5}
-                        bg={number === 1 ? 'info' : 'secondary'}
-                        fg={'white'}
-                        justifyContent={'center'}
-                        // rounded={10}
-                        fontSize={20}
-                        shadow={'sm'}
-                        bold
-                        rounded={3}
-                        zIndex={1}
-                    >
-                        {number}
-                    </Flex>
-                )
-            }
+        <Div relative width={220} m={16}>
+
             <RoundedCard relative shadow={'lg'}>
 
-                <Flex bg={'light'} flexDirection={'column'} justifyContent={'center'} height={110}>
-                    <Div width={50}>
-                        <Img src={img} alt={name}/>
-                    </Div>
-                    <Div fontSize={20} bold>{name}</Div>
-                </Flex>
-                <Flex p={15} bg={'white'} minHeight={186} flexDirection={'column'} justifyContent={'center'}>
-                    {
-                        loading ? <Spin /> : (
-                            <>
-                                <Div mb={15}>
+
+                <Div bg={'light'}>
+                    <Flex
+                        pl={15}
+                        fledDirection={'column'}
+                        alignItems={'flex-start'}
+                        pt={12}
+                        height={54}
+                        // bg={'info'} fg={'white'} rounded={3} top={0} left={0} zIndex={1} width={120} textAlign={'center'}
+                    >
+                        {
+                            (status === null || status === undefined) ? null : (
+                                <>
                                     {
-                                        mining && <Content fontSize={14} textAlign={'center'}>{mining}<Ani.HalfCircleSpin duration={0.6} /></Content>
+                                        [-1].includes(status) && (
+                                            <Div>
+                                                <Flex><Circle bg={'secondary'} />Preparing</Flex>
+                                            </Div>
+                                        )
                                     }
                                     {
-                                        explain && <Content fontSize={14} textAlign={'center'}>{explain}</Content>
+                                        [0].includes(status) && (
+                                            <Div>
+                                                <Flex><Circle bg={'warning'} />Coming soon</Flex>
+                                                <Div ml={18}>{ComUtil.countdown(ComUtil.leftTime(duration))}</Div>
+                                            </Div>
+                                        )
                                     }
                                     {
-                                        total && <Content fontSize={30} textAlign={'center'} bold>{total}</Content>
+                                        [1].includes(status) && (
+                                            <Div>
+                                                <Flex><Circle bg={'#11BD75'} />Running</Flex>
+                                                <Div ml={18}>{ComUtil.countdown(ComUtil.leftTime(duration))}</Div>
+                                            </Div>
+                                        )
                                     }
                                     {
-                                        usd && <Content fontSize={14} textAlign={'center'}>{usd}</Content>
+                                        [2].includes(status) && (
+                                            <Flex>
+                                                <Circle bg={'danger'} />Finished
+                                            </Flex>
+                                        )
                                     }
-                                    {
-                                        rate && <Content fontSize={14} textAlign={'center'}>{rate}</Content>
-                                    }
+                                </>
+                            )
+                        }
+                    </Flex>
+                    <Flex flexDirection={'column'} justifyContent={'center'} height={130}>
+
+                        {
+                            isIwFlag ? (
+                                <HexEdge>
+                                    <Img src={img} width={30} height={30} alt={ComUtil.coinName(name)}/>
+                                </HexEdge>
+                            ) : (
+                                <Img src={img} width={40} height={40} alt={ComUtil.coinName(name)}/>
+                            )
+                        }
 
 
+                        <Div fontSize={20} mt={5} bold>{ComUtil.coinName(name)}</Div>
+                    </Flex>
+                </Div>
+
+                <Div bg={'white'}>
+                    <Flex p={15} minHeight={186} flexDirection={'column'}>
+                        {
+                            loading ? <Skeleton active /> :
+                                <>
+                                    <Flex flexDirection={'column'} flexGrow={1} mb={15}>
+                                        {
+                                            <Content fontSize={14} textAlign={'center'}>{mining}</Content>
+                                        }
+                                        {/* 예치하여 유동성을 공급함으로써 DON을 획득합니다. */}
+                                        {
+                                            ([-1,0,3].includes(status) && explain) && <Content fontSize={14} textAlign={'center'} flexGrow={1}>{explain}</Content>
+                                        }
+                                        {
+                                            ([1,2].includes(status) && total) && <Content fontSize={30} textAlign={'center'} bold>{total}</Content>
+                                        }
+                                        {
+                                            ([1].includes(status) && usd) && <Content fontSize={14} textAlign={'center'}>{usd}</Content>
+                                        }
+                                        {
+                                            ([1].includes(status) && rate) && <Content fontSize={14} textAlign={'center'}>{rate}</Content>
+                                        }
+                                    </Flex>
+                                    <Div mt={'auto'}>
+
+                                        {
+                                            status !== null && (
+                                                <Content>
+                                                    <Button bg={myStaked ? 'donnie' : 'primary'} fg={'white'} block
+                                                        // disabled={[0,3].includes(status)}
+                                                            onClick={onDepositClick} px={10}>{buttonText}</Button>
+                                                </Content>
+                                            )
+                                        }
+                                    </Div>
+                                </>
+                        }
+                        {/*<Div width={'100%'} style={{borderTop: `1px solid ${color.background}`}}></Div>*/}
+                    </Flex>
+                    <Div>
+                        <Div mx={20} style={{borderTop: `1px solid ${color.light}`}}></Div>
+                        <Flex justifyContent={'center'} px={10} py={8} bold>
+                            <Flex cursor={1} onClick={onDetailClick}>
+                                <Div mr={5}>{showDetail ? 'Hide' : 'Details'} {showDetail ? <BsChevronUp /> : <BsChevronDown />} </Div>
+                            </Flex>
+                        </Flex>
+                        {
+                            showDetail && (
+                                <Div px={20} pb={20} textAlign={'center'}>
+                                    Total : {`${ComUtil.addCommas(totalDon)} DON`}
                                 </Div>
-                                <Content>
-                                    <Button bg={'primary'} fg={'white'} block onClick={onClick} px={10}>{buttonText}</Button>
-                                </Content>
+                            )
+                        }
 
-                            </>
-
-                        )
-                    }
-
-                </Flex>
+                    </Div>
+                </Div>
             </RoundedCard>
         </Div>
-
-    );
+    )
 };
 
 export default DepositBigCard;

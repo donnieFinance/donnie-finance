@@ -6,6 +6,7 @@ import {useRecoilState} from "recoil";
 import SpinnerWrap from '~/components/common/spinnerWrap'
 
 import {
+    walletLoadingState,
     connectWalletModalState,
     menuModalState, myAddressSelector
 } from '~/hooks/atomState'
@@ -16,6 +17,7 @@ import {withTranslation} from "react-i18next";
 
 const MobileHeader = ({t}) => {
 
+    const [loading,] = useRecoilState(walletLoadingState)
     const [address,] = useRecoilState(myAddressSelector)
     const [, setConnectWalletModalOpen] = useRecoilState(connectWalletModalState)
     const [, setMenuOpen] = useRecoilState(menuModalState)
@@ -26,7 +28,7 @@ const MobileHeader = ({t}) => {
                     onClick={() => setConnectWalletModalOpen(true)}
             >
                 <SpinnerWrap
-                    checkValue={address}
+                    checkValue={loading}
                     trueValue={address}
                     falseValue={<BsLockFill/>}
                 />

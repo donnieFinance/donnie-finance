@@ -10,7 +10,7 @@ const CardMobile = ({pathname, fg, img, alt, title, desc}) =>
     <Link to={pathname} display={'block'}>
         <Flex p={20}
               // alignItems={'flex-start'}
-              cursor>
+              cursor={1}>
             <Div maxWidth={80} flexShrink={0} mr={20}>
                 <Img src={img} alt={alt}/>
             </Div>
@@ -72,6 +72,6 @@ export default ({store}) =>
         </Div>
         <Div textAlign={'center'} fontSize={14} fw={500} py={20}>
             ⓒ DONNIE FINANCE. ALL RIGHTS RESERVED.<br/>
-            <Span>powered by IOST</Span>
+            <Span>powered by IOST & EZFARM</Span>
         </Div>
     </>

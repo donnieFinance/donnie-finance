@@ -8,18 +8,24 @@ const WebFooter = ({t, iconList}) => {
         <Flex flexWrap={'no-wrap'} bg={'darkPrimary'} fg={'white'} p={20}>
             <Div flexGrow={1}>
                 <Div>ⓒ DONNIE FINANCE. ALL RIGHTS RESERVED.</Div>
-                <Div>powered by IOST</Div>
+                <Div>powered by IOST & EZFARM</Div>
             </Div>
             <Flex ml={'auto'} flexShrink={0}>
                 <Div mr={20}>
                     <a
+                        href={`${properties.DonDistributionFileLink}`}
+                        target="_black"
+                    >
+                        <Button fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4}>Don Distribution</Button>
+                    </a>
+                    <a
                         href={`https://www.iostabc.com/token/${properties.address.token}`}
                         target="_black"
                     >
-                        <Button fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4}>Token Contract</Button>
+                        <Button fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4} ml={10}>Token Contract</Button>
                     </a>
                     <a
-                        href={'https://drive.google.com/file/d/1Wgu773VlOyiAcpD1X8m6YYdQIu4y13PE/view?usp=sharing'}
+                        href={`${properties.whitePaperFileLink}`}
                         target="_black"
                     >
                         <Button fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4} ml={10}>White
@@ -29,8 +35,8 @@ const WebFooter = ({t, iconList}) => {
                 </Div>
                 <Flex ml={'auto'} mt={3}>
                     {
-                        iconList.map(icon =>
-                            <a href={icon.link} target={'_blank'}>
+                        iconList.map((icon, index) =>
+                            <a key={`icon${index}`} href={icon.link} target={'_blank'}>
                                 <Img src={icon.img} alt={''} width={33}/>
                             </a>
                         )

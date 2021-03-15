@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import iostApi from "~/lib/iostApi";
-import useIWallet from "~/hooks/useIWallet";
+import useWallet from "~/hooks/useWallet";
 import {useRecoilState} from "recoil";
 import {myTokenSelector, tokenState} from '~/hooks/atomState'
 
@@ -8,7 +8,7 @@ const useTokenBalance = ({tokenName}) => {
 
     const [token, setBalance] = useRecoilState(myTokenSelector({tokenName}))
 
-    const {address} = useIWallet()
+    const {address} = useWallet()
 
     useEffect(() => {
         if (address){

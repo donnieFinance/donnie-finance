@@ -86,6 +86,19 @@
                 "val": "unlimited"
             }],
             "description": ""
+        },
+        {
+          "name": "addRewardAmount",
+          "args": [
+              "string",
+              "string",
+              "string"
+          ],
+          "amountLimit": [{
+              "token": "*",
+              "val": "unlimited"
+          }],
+          "description": ""
         }
     ]
 }

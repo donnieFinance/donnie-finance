@@ -1,7 +1,8 @@
 import React, {useEffect} from 'react';
-import Router from "./router";
+import Router from "./router/index";
 import IOST from 'iost'
 import { BrowserRouter } from 'react-router-dom'
+import properties from "~/properties";
 
 //antd config locale setting
 import { ConfigProvider } from 'antd';
@@ -13,30 +14,55 @@ import 'antd/dist/antd.min.css';
 import {RecoilRoot} from 'recoil';
 
 // 캐시 버스터
-import CacheBuster from './CacheBuster';
+//import CacheBuster from './CacheBuster';
+
+require('~/plugins/donnieCustom');
 
 const isKoKR = (localStorage.getItem("ko-KR")||"en_US") === 'ko-KR' ? true:false;
 
 function App() {
+    useEffect(() => {
+        window.clog = function() {
+            if(properties.isTestMode === true) {
+                var i;
+                const logs = []
+                for (i = 0; i < arguments.length; i++) {
+                    logs.push(arguments[i])
+                }
+                console.log(logs);
+            }
+        }
+    }, []);
+
     return (
         <RecoilRoot>
             <ConfigProvider locale={isKoKR ? koKR:enUS}>
-                <CacheBuster>
-                    {({ loading, isLatestVersion, refreshCacheAndReload }) => {
-                        if (loading) return null;
-                        if (!loading && !isLatestVersion) {
-                            refreshCacheAndReload();
-                        }
-                        return (
-                            <BrowserRouter>
-                                <Router />
-                            </BrowserRouter>
-                        );
-                    }}
-                </CacheBuster>
+                <BrowserRouter>
+                    <Router />
+                </BrowserRouter>
             </ConfigProvider>
         </RecoilRoot>
     );
+
+    // return (
+    //     <RecoilRoot>
+    //         <ConfigProvider locale={isKoKR ? koKR:enUS}>
+    //             <CacheBuster>
+    //                 {({ loading, isLatestVersion, refreshCacheAndReload }) => {
+    //                     if (loading) return null;
+    //                     if (!loading && !isLatestVersion) {
+    //                         refreshCacheAndReload();
+    //                     }
+    //                     return (
+    //                         <BrowserRouter>
+    //                             <Router />
+    //                         </BrowserRouter>
+    //                     );
+    //                 }}
+    //             </CacheBuster>
+    //         </ConfigProvider>
+    //     </RecoilRoot>
+    // );
 }
 
 export default App;

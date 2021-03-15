@@ -13,7 +13,7 @@ export default withTranslation()((props) => {
                 description={loan.desc}
             />
 
-            <TargetLaunch quarter={'2021 Q2'}/>
+            <TargetLaunch quarter={'2021 Q4'}/>
         </Div>
     );
 });

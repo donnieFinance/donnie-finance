@@ -15,6 +15,9 @@ import '~/plugins/i18n';
 import { createGlobalStyle } from 'styled-components'
 import GlobalInitStyle from '~/styles/GlobalStyles'
 
+import 'ag-grid-community/dist/styles/ag-grid.min.css';
+import 'ag-grid-community/dist/styles/ag-theme-balham.min.css';
+
 // 메인 토큰 네임 DONY
 window.$tokenName = Server.token.name;
 

@@ -13,7 +13,7 @@ export default withTranslation()((props) => {
                 title={portfolio.name}
                 description={portfolio.desc}
             />
-            <TargetLaunch quarter={'2021 Q3'}/>
+            <TargetLaunch quarter={'2022 H1'}/>
         </Div>
     );
 });

@@ -53,7 +53,7 @@ export const activeColor = {
 
     background: '#D4DBDE',
     donnie: '#E9983E',
-    info: '#118b80',
+    info: '#0e675f',
     white: '#F9F7FA',
     grayText: '#606266',
     black: '#000000ee',

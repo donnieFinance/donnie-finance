@@ -1,13 +1,15 @@
 import React from 'react';
 import {Button, Div, Flex, Img, RoundedCard} from "~/styledComponents/shared";
 import aniKey from "~/styledComponents/Keyframes";
-import useIWallet from '~/hooks/useIWallet'
+import useWallet from '~/hooks/useWallet'
 import useSize from "~/hooks/useSize";
 import styled from "styled-components";
-import {Spin} from 'antd'
+import {Skeleton} from 'antd'
 import {withTranslation} from "react-i18next";
 import {connectWalletModalState} from "~/hooks/atomState";
 import {useRecoilState} from "recoil";
+import ComUtil from "~/util/ComUtil";
+import {HexEdge} from "~/styledComponents/shared/Shapes";
 
 
 const Content = styled(Div)`
@@ -16,41 +18,61 @@ const Content = styled(Div)`
 `;
 
 const TradeBigCard = ({
-    img = '',
-    name = '',
-    balance,
-    explain,
-    childButton,
-    loading,
-    t
-}) => {
+                          isIwFlag,
+                          img = '',
+                          name = '',
+                          balance,
+                          explain,
+                          childButton,
+                          loading,
+                          type,
+                          t
+                      }) => {
 
-    const {address} = useIWallet()
+
+    const {address} = useWallet()
     const [, setConnectWalletOpen] = useRecoilState(connectWalletModalState)
-    const {sizeValue} = useSize()
     const changeConnectWallet = () => {
         setConnectWalletOpen(true);
     }
 
     return (
         <RoundedCard relative shadow={'lg'} >
-            <Flex bg={'light'} flexDirection={'column'} justifyContent={'center'} height={110}>
-                <Div width={40}>
-                    <Img src={img} alt={name}/>
-                </Div>
-                <Div fontSize={20} bold>{name}</Div>
-            </Flex>
-            <Flex p={15} bg={'white'} minHeight={140} flexDirection={'column'} justifyContent={'center'}>
+            <Flex bg={'light'} flexDirection={'column'} justifyContent={'center'} height={140}>
                 {
-                    loading ? <Spin /> : (
+                    isIwFlag ? (
+                        <HexEdge width={60} height={60}>
+                            <Img src={img} width={32} height={32} alt={name}/>
+                        </HexEdge>
+                    ) : (
+                        <Img src={img} width={50} alt={name}/>
+                    )
+                }
+
+                <Div fontSize={20} mt={8} bold>{ComUtil.coinName(name)}</Div>
+            </Flex>
+            <Flex p={15} bg={'white'} minHeight={140} flexDirection={'column'} justifyContent={'center'} relative>
+                {
+                    loading ? <Skeleton /> : (
                         <>
+
+                            {
+                                explain &&
+                                <Div absolute top={-31/2} bg={'white'}
+                                     bc={type === 'harvest' ? 'danger' : 'info'}
+                                     fg={type === 'harvest' ? 'danger' : 'info'}
+                                     fw={500} rounded={12} px={10} py={4} xCenter>
+                                    <Content fontSize={14}>
+                                        {explain.toString()}
+                                    </Content>
+                                </Div>
+                            }
+
                             <Div mb={15} textAlign={'center'}>
                                 {
-                                    balance && <Content fontSize={14}>{balance}</Content>
+                                    balance && <Content fontSize={16}>{balance}</Content>
                                 }
-                                {
-                                    explain && <Content fontSize={14}>{explain}</Content>
-                                }
+
                             </Div>
                             <Content>
                                 {

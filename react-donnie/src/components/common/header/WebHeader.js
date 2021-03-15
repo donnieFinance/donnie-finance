@@ -4,6 +4,7 @@ import {color} from "~/styledComponents/Properties";
 import {Tooltip} from "antd";
 import {
     myAddressSelector,
+    walletLoadingState,
     connectWalletModalState
 } from '~/hooks/atomState'
 
@@ -20,6 +21,8 @@ const CustomNavLink = ({to, fg, children}) =>
 
 const WebHeader = (props) => {
     const {t, fg} = props;
+
+    const [loading,] = useRecoilState(walletLoadingState)
     const [address,] = useRecoilState(myAddressSelector)
     const [, setConnectWalletOpen] = useRecoilState(connectWalletModalState)
 
@@ -86,7 +89,7 @@ const WebHeader = (props) => {
                             onClick={() => setConnectWalletOpen(true)}
                     >
                         <SpinnerWrap
-                            checkValue={address}
+                            checkValue={loading}
                             trueValue={address}
                             falseValue={t('connectWallet')}
                         />

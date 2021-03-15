@@ -1,58 +1,53 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import properties from "~/properties";
-import {Button, Div, Flex, Right, GridColumns, XCenter} from "~/styledComponents/shared";
-import {useHistory} from 'react-router-dom'
+import {Div, Flex, GridColumns, XCenter} from "~/styledComponents/shared";
 import {withTranslation} from "react-i18next";
 import PageHeading from "~/components/common/layouts/PageHeading";
 import useSize from "~/hooks/useSize";
 import loadable from "@loadable/component";
-import {useRecoilState} from "recoil";
-import {
-    myAddressSelector, disConnectSelector,
-    checkingCoinListSelector,
-    checkingStakeSelector,
-    checkingStakeLeftTimeSelector, checkingCoinListLoadingState
-} from '~/hooks/atomState'
-
-import TimeCountDown from "~/components/common/layouts/TimeCountDown";
 import EarnCoinCard from "~/components/common/layouts/EarnCoinCard";
-
-import firstImg from '~/assets/first.png'
-import secondImg from '~/assets/second.png'
-import thirdImg from '~/assets/third.png'
-import doubleEnImg from '~/assets/double_en.png'
-import doubleKoImg from '~/assets/double_ko.png'
+import useRunningStatus from "~/hooks/useRunningStatus";
 import ComUtil from "~/util/ComUtil";
-
-const DepositBigCard = loadable(() => import('~/components/common/layouts/DepositBigCard'))
-const DepositSmallCard = loadable(() => import('~/components/common/layouts/DepositSmallCard'))
-
+import {useRecoilState} from "recoil";
+import {nowState} from "~/hooks/atomState";
+import useInterval from "~/hooks/useInterval";
+import TotalHarvestedDon from "~/components/checking/TotalHarvestedDon";
+const Item = loadable(() => import('./Item'))
 export default withTranslation()((props) => {
+
+    const [, setNow] = useRecoilState(nowState)
+
+    const [status, startTime, endTime, duration] = useRunningStatus(
+        {
+            //EARN CARD 오픈 시간(최초 1회 오픈 전까지만 보이며 running 상태로 진입하면 화면에서 사라짐)
+            forcedStartTime: properties.START_AT_FIRST,
+            forcedEndTime: properties.START_AT_FIRST
+        }
+    )
+
+    // didMount 되었을 때 global 로 사용될 now 세팅
+    useEffect(() => {
+        // setIntervalStart(true)
+        setNow(Date.parse(new Date))
+    }, [])
+
+    // 1초에 한번씩 global 로 사용될 now 갱신
+    useInterval(() => {
+        setNow(Date.parse(new Date))
+    }, 1000)
+
+
+    //!!주의!! 모두 Object 형식임 (Array 아님!)
+    const {contractList, coinList, oldAddress} = properties
+
     const {t} = props;
-    const {contractList} = properties
-    const contractAddress = properties.address.token;
-    //const { checking } = coinList
-    const history = useHistory()
-
-    const {size, sizeValue} = useSize()
-
-    const [address,] = useRecoilState(myAddressSelector);
-    const [disConnect,] = useRecoilState(disConnectSelector);
-    const [stake,] = useRecoilState(checkingStakeSelector);
-    const [leftTime,] = useRecoilState(checkingStakeLeftTimeSelector);
-    const [coinList,] = useRecoilState(checkingCoinListSelector);
-
-    // Checking CoinList loading 여부
-    const [loading,] = useRecoilState(checkingCoinListLoadingState)
-
     const {checking} = t('menu', {returnObjects: true})
+
+    const contractAddress = properties.address.token;
+    const {size, sizeValue} = useSize()
 
     const onTokenScan = () => {
         window.open("https://www.iostabc.com/token/" + contractAddress)
-    }
-
-    const onGoTrade = (coinName) => {
-        history.push(`/trade/${coinName}`)
     }
 
     return (
@@ -61,61 +56,48 @@ export default withTranslation()((props) => {
                 title={checking.name}
                 description={checking.desc}
             />
+            {
+                [-1,0].includes(status) && (
+                    <EarnCoinCard
+                        onTokenScan={onTokenScan}
+                        contractAddress={contractAddress}
+                        status={status}
+                        duration={ComUtil.leftTime(duration)}
+                    />
+                )
+            }
 
-
-            <EarnCoinCard
-                onTokenScan={onTokenScan}
-                contractAddress={contractAddress}
-                leftTime={leftTime}
-            />
-
-
-            <Flex justifyContent={'center'} my={sizeValue(50, 40, 40)}>
-                {
-                    size !== 'sm' ? (
-                        <Flex flexWrap={'wrap'} justifyContent={'center'} maxWidth={928}>
-                            {
-                                coinList.map( (coin,i) => {
-                                    const c = ComUtil.getCheckingAndSavingCoinInfo(coin, t)
-
-                                    return (
-                                        <DepositBigCard
-                                            key={`depositBigCard${i}`}
-                                            number={i+1}
-                                            {...c}
-                                            loading={loading}
-                                            onClick={onGoTrade.bind(this, coin.name)}
-                                        />)
-                                })
-                            }
-                        </Flex>
-                    ) : (
-                        <GridColumns repeat={1} rowGap={22} width={'90%'}>
-                            {
-                                coinList.map( (coin,i) => {
-                                    const c = ComUtil.getCheckingAndSavingCoinInfo(coin, t)
-
-                                    return (
-                                        <DepositSmallCard
-                                            key={`depositBigCard${i}`}
-                                            number={i+1}
-                                            {...c}
-                                            loading={loading}
-                                            onClick={onGoTrade.bind(this, coin.name)}
-                                        />)
-                                })
-                            }
-                        </GridColumns>
-                    )
-                }
+            <Flex justifyContent={'center'} >
+                <TotalHarvestedDon />
             </Flex>
 
-            <XCenter mb={50+10}>
-                {
-                    stake.status === 1 ? <Div fontSize={sizeValue(20, null, 16)} fg={'primary'}>{t('StagePhase')}</Div>:null
-                }
-            </XCenter>
 
+            <Flex justifyContent={'center'}
+                  mt={sizeValue(50, 40, 50)}
+                  pb={sizeValue(200, 90)}
+
+            >
+                <GridColumns repeat={sizeValue(4, null, 1)}
+                             rowGap={sizeValue(10, null,  40)}
+                    // maxWidth={sizeValue(928,  null, '100%' )}
+                             width={sizeValue('unset', null,'90%')}
+                >
+                    {
+
+                        Object.keys(contractList).map( (key,i) => {
+                            const contract = contractList[key]
+                            return (
+                                <Item
+                                    key={`depositBigCard${i}`}
+                                    contract={contract}
+                                    uniqueKey={key}
+                                    size={size === 'sm' ? 'small' : 'big'}
+                                />
+                            )
+                        })
+                    }
+                </GridColumns>
+            </Flex>
 
         </Div>
     );

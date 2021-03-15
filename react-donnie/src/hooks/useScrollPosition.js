@@ -21,7 +21,7 @@ const useScrollPosition = (props) => {
 
     const listenToScroll = () => {
         const pageYOffset = window.pageYOffset;
-        console.log({pageYOffset})
+        // console.log({pageYOffset})
         setScrollPosition({pageYOffset});
     }
 };

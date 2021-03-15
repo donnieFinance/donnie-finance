@@ -71,7 +71,7 @@ const store = [
         fg: '#584D3D'
     },
     {
-        pathname: '/portpolio',
+        pathname: '/portfolio',
         img: imgPortfolio,
         hoverImg: imgPortfolioWhite,
         alt: 'Portfolio Mgmt.',

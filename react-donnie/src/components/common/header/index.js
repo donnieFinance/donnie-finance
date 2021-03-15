@@ -31,6 +31,7 @@ const darken = keyframes`
 
 const FadeIn = styled(Flex)`
     
+    z-index: 2;
     transition: 0.3s;
     ${props => props.isLighten ? css`
         animation: ${lignten} 0.3s ease-in forwards;
@@ -57,12 +58,12 @@ export default ({height}) => {
                 {
                     size === 'lg' ?
                         <Div ml={20}>
-                            <Link to={'/'}>
+                            <Link to={'/'} display={'block'}>
                                 <Img src={LogoWhite} alt="logo" width={130}/>
                             </Link>
                         </Div> :
                         <Div ml={20}>
-                            <Link to={'/'}>
+                            <Link to={'/'} display={'block'}>
                                 <Img src={LogoWhite} alt="logo" width={80}/>
                             </Link>
                         </Div>

@@ -25,9 +25,9 @@ const PageHeading = ({title, description}) => {
     return (
         <Div
             style={{wordSpacing: 'break-word', whiteSpace: 'pre-wrap'}}
-            my={sizeValue(150, null,50)}
+            my={sizeValue(80, null,50)}
             px={sizeValue( 100, null,30)}
-
+            mb={50}
             fg={'white'}
         >
             <Title fontSize={sizeValue(60, 50,30)} bold textAlign={'center'}>{title}</Title>

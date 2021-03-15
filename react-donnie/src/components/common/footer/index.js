@@ -46,9 +46,9 @@ const Footer = (props) => {
 
     const {size} = useSize()
 
-    useEffect(() => {
-        console.log({properties})
-    }, [])
+    // useEffect(() => {
+    //     //console.log({properties})
+    // }, [])
 
     return (
         <>

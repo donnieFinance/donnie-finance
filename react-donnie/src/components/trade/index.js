@@ -1,142 +1,136 @@
 import React, {useState, useEffect} from 'react';
 import loadable from "@loadable/component";
-import BigNumber from "bignumber.js";
 import iostApi from "~/lib/iostApi";
 import {useParams, Redirect} from 'react-router-dom'
 import useSize from "~/hooks/useSize";
-import useIWallet from '~/hooks/useIWallet'
+import useWallet from '~/hooks/useWallet'
 import {Div, Flex, Button, XCenter} from "~/styledComponents/shared";
-import useTokenBalance from "~/hooks/useTokenBalance";
-import TimeCountDown from "~/components/common/layouts/TimeCountDown";
 import properties from "~/properties";
 import {withTranslation} from "react-i18next";
 import {useRecoilState} from "recoil";
 import axios from 'axios'
 import ComUtil from "~/util/ComUtil";
-import {
-    checkingCoinListSelector,
-    checkingReloadTimeSelector,
-    checkingStakeLeftTimeSelector, checkingStakeSelector,
-    myAddressSelector,
-    connectWalletModalState, checkingCoinListLoadingState
-} from "~/hooks/atomState";
+import WalletUtil from "~/util/WalletUtil"
+import {Modal} from "antd";
+import {connectWalletModalState, nowState} from "~/hooks/atomState";
 
 import coinDonyImg from '~/assets/coin_dony.png';
-import EarnCoinCard from "~/components/common/layouts/EarnCoinCard";
+import useInterval from "~/hooks/useInterval";
+import {withRouter} from 'react-router-dom'
+import useRunningStatus from "~/hooks/useRunningStatus";
+import Server from "~/properties";
 
+import {FaChevronDown, FaChevronUp} from 'react-icons/fa'
+import useModal from "~/hooks/useModal";
+import {HexEdge} from "~/styledComponents/shared/Shapes";
 
+const IWTokenBigCard = loadable(() => import('~/components/common/layouts/IWTokenBigCard'))
 const TradeBigCard = loadable(() => import('~/components/common/layouts/TradeBigCard'))
-const DepositModal = loadable( () => import("~/components/common/modals/DepositModal"));
-const WithDrawModal = loadable( () => import("~/components/common/modals/WithDrawModal"));
-const HarvestModal = loadable( () => import("~/components/common/modals/HarvestModal"));
-const HarvestWithDrawModal = loadable( () => import("~/components/common/modals/HarvestWithDrawModal"));
+const Deposit = loadable( () => import("~/components/common/contents/Deposit"));
+const Harvest = loadable( () => import("~/components/common/contents/Harvest"));
+const Withdraw = loadable( () => import("~/components/common/contents/Withdraw"));
+const HarvestWithDraw = loadable( () => import("~/components/common/contents/HarvestWithDraw"));
+const {contractList, tokenImages} = properties;
+const contractAddress = properties.address.token;
 
-export default withTranslation()((props) => {
 
-    const {t} = props;
+const Trade = withTranslation()(({t, history}) => {
 
-    const {tokenName} = useParams()
 
-    const [token] = useTokenBalance({tokenName})
+    //파라미터로 넘어온 토큰명(name)history
+    const {uniqueKey} = useParams()
+    const contract = contractList[uniqueKey] || {tokenName: null, img: null, pool: null, forcedStartTime: null, forcedEndTime: null}
+    const {tokenName: iwTokenName, isIwFlag, ercTokenName} = contractList[uniqueKey]
+    const {tokenName, img, pool} = contract
+
+    const [, setNow] = useRecoilState(nowState)
+
+    const [status, startTime, endTime, duration] = useRunningStatus(
+        {
+            pool: pool,
+            //TODO 아래는 테스트를 쉽게 하기위한 프로퍼티 입니다. 배포 전 /properties.js 의 forcedStartTime, forcedEndTime 삭제 요망 [delete]
+            forcedStartTime: contract.forcedStartTime ? contract.forcedStartTime : null,
+            forcedEndTime: contract.forcedEndTime ? contract.forcedEndTime : null
+        }
+    )
 
     const {sizeValue} = useSize()
 
-    const {contractList} = properties;
-    const contractAddress = properties.address.token;
-    const [leftTime,] = useRecoilState(checkingStakeLeftTimeSelector);
-    // const [address,] = useRecoilState(myAddressSelector);
-    const [coinList,] = useRecoilState(checkingCoinListSelector);
-    const [reloadTime,] = useRecoilState(checkingReloadTimeSelector)
-    const [stake,] = useRecoilState(checkingStakeSelector);
+    const [loading, setLoading] = useState(true)
 
-    // Checking CoinList loading 여부
-    const [loading,] = useRecoilState(checkingCoinListLoadingState)
 
     const [, setConnectWalletOpen] = useRecoilState(connectWalletModalState)
-    const {hasIWallet, isLogin, address, connectIWallet, disconnectIWallet} = useIWallet()
+    const {hasIWallet, isLogin, address, connectIWallet, disconnectIWallet} = useWallet()
 
-    const [xCoin,setXCoin] = useState(tokenName);
-    const [coinListX,setCoinListX] = useState({
-        status:0
-    });
-
-    const [coinListCallBack,setCoinListCallBack] = useState(false);
-    const [precision,setPrecision] = useState(0);
-    const [decimals,setDecimals] = useState(0);
-    const [coinImg,setCoinImg] = useState('');
-    const [isOpen,setIsOpen] = useState(true);
-
-    const [donyBalance,setDonyBalance] = useState('...');
-    const [coinBalance,setCoinBalance] = useState('...');
-    const [stakeBalance,setStakeBalance] = useState('...');
+    const [iwTokenBalance,setIwTokenBalance] = useState();
+    const [donyBalance,setDonyBalance] = useState();
+    const [stakeBalance,setStakeBalance] = useState();
 
     const [harvestWithDrawModal,setHarvestWithDrawModal] = useState(false);
-    const [loadingHarvestWithDraw,setLoadingHarvestWithDraw] = useState(false);
 
     const [harvestModal,setHarvestModal] = useState(false);
-    const [receiveDonyAmt,setReceiveDonyAmt] = useState('');
-    const [loadingHarvest,setLoadingHarvest] = useState(false);
-
+    // const [receiveDonyAmt,setReceiveDonyAmt] = useState('');
     const [withDrawModal,setWithDrawModal] = useState(false);
-    const [withDrawFormNumber,setWithDrawFormNumber] = useState('');
-    const [loadingWithDraw,setLoadingWithDraw] = useState(false);
-
     const [depositModal,setDepositModal] = useState(false);
-    const [depositModalType,setDepositModalType] = useState(1);
-    const [depositFormNumber,setDepositFormNumber] = useState('');
-    const [loadingDeposit,setLoadingDeposit] = useState(false);
+    const [intervalTime, setIntervalTime] = useState(null)
+
+
+
+    //swap state
+    const [swapOpen, setSwapOpen, selected, setSelected, setSwapState, toggleSwap] = useModal();
+
 
     useEffect(() => {
 
-        // Only once
-        if (address && !coinListCallBack) {
-            setCoinListCallBack(true);
-            getBalanceAll()
+        setNow(Date.parse(new Date))
+
+        async function fetch() {
+            await Promise.all([getAllBalance(), getIwTokenBalance()])
+            setLoading(false)
         }
-        const coinListX = coinList.filter(e => (e.name === xCoin));
-        setCoinListX(coinListX.length > 0 ? coinListX[0] : '')
 
-    }, [coinList])
-
-    useEffect(() => {
-        if(reloadTime != null) {
-            if (coinList.length > 0) {
-                getBalanceAll()
-            }
-        }
-    }, [reloadTime])
-
-
-    useEffect(() => {
-        init();
+        fetch()
     }, [])
 
-    const init = () => {
-        if (coinList.length > 0) {
-            getBalanceAll()
+    // 1초에 한번씩 global 로 사용될 now 갱신
+    useInterval(() => {
+        setNow(Date.parse(new Date))
+    }, 1000)
+
+
+    //로그인 시 5초마다 밸런스 갱신
+    //로그아웃 시 갱신 종료
+    useEffect(() => {
+
+        getAllBalance()
+
+        getIwTokenBalance()
+
+        if (address) {
+            setIntervalTime(5000)
+        }else {
+            setIntervalTime(null)
         }
-    }
+    }, [address])
 
-    const getBalanceAll = () => {
-        const v_isOpen = coinList.filter(e => (e.name === xCoin))[0].isOpen;
-        setIsOpen(v_isOpen)
-        const v_coin_img = coinList.filter(e => (e.name === xCoin))[0].img;
-        setCoinImg(v_coin_img);
-        const v_precision = coinList.filter(e => (e.name === xCoin))[0].precision;
-        setPrecision(v_precision);
-        const v_decimals = coinList.filter(e => (e.name === xCoin))[0].decimals;
+    useInterval(() => {
+        getAllBalance()
+        getIwTokenBalance()
+    }, intervalTime)
 
-        if (v_decimals) {
-            setDecimals(eval(`1e${v_decimals}`));
-            getBalance()
-        }
-    }
 
-    const getBalance = async () => {
-        if(hasIWallet()) {
-            if (isLogin()) {
+    const getAllBalance = async () => {
+        try{
 
-                getBatchContractStorage(xCoin).then( result => {
+            if (!tokenName)
+                return
+
+
+            const myWallet = WalletUtil.getMyWallet();
+            if(hasIWallet()) {
+                if (isLogin()) {
+
+                    const result = await getBatchContractStorage()
 
                     console.log('===========iost-PeriodFinish:' + result)
 
@@ -166,228 +160,124 @@ export default withTranslation()((props) => {
                     userReward = parseFloat(userReward);
 
                     let lastTimeRewardApplicable = periodFinish;  // block.time 가져와서 비교하기
+
                     if(hasIWallet()) {
                         if(isLogin()) {
-                            const iost = window.IWalletJS.newIOST(window.IOST);
+                            const iost = myWallet.wallet.newIOST(window.IOST);
                             const iostHost = iost.currentRPC._provider._host;
-                            axios.get(iostHost + "/getNodeInfo").then((data) => {
-                                let serverTime = parseFloat((data.data.server_time / (10 ** 9)).toFixed(0));
 
-                                // console.log('!!!! server_time : ', serverTime);
-                                // console.log(periodFinish);
+                            const data = await axios.get(iostHost + "/getNodeInfo")
 
-                                if (periodFinish >= serverTime) {
-                                    lastTimeRewardApplicable = serverTime;
-                                }
+                            let serverTime = parseFloat((data.data.server_time / (10 ** 9)).toFixed(0));
 
-                                // console.log("lastTimeRewardApplicable : ", lastTimeRewardApplicable);
-                                // console.log("lastUpdate: ", lastUpdate);
-                                // console.log("rewardRate: ", rewardRate);
-                                // console.log("totalSupply : ", totalSupply);
-                                // console.log("rewardPerToken : ", rewardPerToken);
-                                // console.log("userReward : ", userReward);
-                                // console.log("userRewardPerTokenPaid : ", userRewardPerTokenPaid);
+                            // console.log('!!!! server_time : ', serverTime);
+                            // console.log(periodFinish);
 
-                                let addingReward = 0;
-                                if (totalSupply > 0) {
-                                    addingReward = (lastTimeRewardApplicable - lastUpdate) * rewardRate / totalSupply;
-                                }
+                            if (periodFinish >= serverTime) {
+                                lastTimeRewardApplicable = serverTime;
+                            }
 
-                                rewardPerToken = rewardPerToken + addingReward;
-                                userBalance = userBalance * (rewardPerToken - userRewardPerTokenPaid) + userReward;
+                            // console.log("lastTimeRewardApplicable : ", lastTimeRewardApplicable);
+                            // console.log("lastUpdate: ", lastUpdate);
+                            // console.log("rewardRate: ", rewardRate);
+                            // console.log("totalSupply : ", totalSupply);
+                            // console.log("rewardPerToken : ", rewardPerToken);
+                            // console.log("userReward : ", userReward);
+                            // console.log("userRewardPerTokenPaid : ", userRewardPerTokenPaid);
+
+                            let addingReward = 0;
+                            if (totalSupply > 0) {
+                                addingReward = (lastTimeRewardApplicable - lastUpdate) * rewardRate / totalSupply;
+                            }
+
+                            rewardPerToken = rewardPerToken + addingReward;
+                            userBalance = userBalance * (rewardPerToken - userRewardPerTokenPaid) + userReward;
 //                console.log("addingReward : ", addingReward);
-                                console.log("userBalance : ", userBalance);
+                            console.log("userBalance : ", userBalance);
 //                console.log("rewardPerToken : ", rewardPerToken);
-                                setDonyBalance(parseFloat(userBalance.toFixed(4)));
 
-                            }).catch(err => {
-                                console.log(err);
-                            });
+                            if (isNaN(userBalance)) {
+                                userBalance = 0
+                            }
+
+                            setDonyBalance(parseFloat((userBalance * 0.9).toFixed(4)));
                         }
                     }
-                });
-
-                if(address != null) {
-                    if(address != '') {
-                        const data = await iostApi.getTokenBalance({address:address, tokenName:contractList[xCoin].tokenName});
-                        setCoinBalance(data);
-                    }
                 }
-
             }
+        }catch (error){
+            console.log(error)
         }
     }
 
-    const onTokenScan = () => {
-        window.open("https://www.iostabc.com/token/" + contractAddress)
+    const getIwTokenBalance = async() => {
+
+        if (!address)
+            return
+
+        const vIwTokenBalance = await iostApi.getTokenBalance({address: address, tokenName:iwTokenName})
+        console.log({address, iwTokenName, vIwTokenBalance})
+        setIwTokenBalance(vIwTokenBalance)
     }
 
     const changeConnectWallet = () => {
         setConnectWalletOpen(true);
     }
 
-    const onWithDraw = () => {
-        setWithDrawFormNumber('');
-        if (isOpen) {
+    const isPoolOpen = () => {
+        return iostApi.getPoolIsOpen(pool)
+    }
+
+    const onWithDraw = async () => {
+        if (await isPoolOpen()) {
             setWithDrawModal(true);
+            getAllBalance()
         }
     }
-    const onWithDrawClose = () => {
-        setWithDrawModal(false);
-    }
-    const onWithDrawChange = (numberVal) => {
-        console.log("onWithDrawChange==",numberVal)
-        setWithDrawFormNumber(numberVal);
-    }
-    const onWithDrawSend  = (amount) => {
-
-        let amountVal = ComUtil.numToString(new BigNumber(amount));
-
-        let contractID = contractList[xCoin].pool;
-        setLoadingWithDraw(true);
-        let txWithdraw = window.IWalletJS.iost.callABI(contractID, "withdraw", [
-            amountVal
-        ]);
-        txWithdraw.gasLimit = 100000;  // default gasLimit와 동일함
-        txWithdraw.addApprove('iost', amountVal)
-        txWithdraw.amount_limit.push({ token: "*", value: "unlimited" });
-        window.IWalletJS.iost.signAndSend(txWithdraw).on("success", (succ) => {
-            console.log("succ", succ);
-            window.$message.success('Success');
-            setLoadingWithDraw(false);
+    const onWithDrawClose = async () => {
+        if (await isPoolOpen()) {
             setWithDrawModal(false);
-        }).on("failed", (fail) => {
-            console.log("fail", fail);
-            window.$message.error('fail');
-            setLoadingWithDraw(false);
-            setWithDrawModal(false);
-            let message = JSON.parse(fail.substring(7));
-            if(message.code === 2) {
-                alert(t('message.lackOfIgas') + txWithdraw.gasLimit + '\n' + t('message.chargeIgasTime') );
-            }
-        });
+            getAllBalance()
+        }
     }
 
-    const onDeposit = () => {
-        if(coinListX.status === 0){
+    const onDepositClick = async () => {
+
+        if(status === 0){
             window.$message.warning('Not Deposit');
             return false;
         }
-        setDepositFormNumber('');
-        if (isOpen) {
+        // setDepositFormNumber('');
+        if (await isPoolOpen()) {
             setDepositModal(true);
         }
     }
+
     const onDepositClose = () => {
         setDepositModal(false);
+        getAllBalance()
     }
-    const onDepositChange = (numberVal) => {
-        console.log("onDepositChange==",numberVal)
-        setDepositFormNumber(numberVal);
-    }
-    const onDepositSend  = (amount) => {
 
-        let amountVal = ComUtil.numToString(new BigNumber(amount));
-
-        // console.log("!!! depositAuth : ", type, amount)
-        let contractID = contractList[xCoin].pool;
-        setLoadingDeposit(true);
-        console.log('stake amount:' + amountVal)
-        console.log(contractID);
-        let tx = window.IWalletJS.iost.callABI(contractID, "stake", [
-            amountVal
-        ]);
-        tx.addApprove('iost', amountVal)
-        tx.amount_limit.push({token: "*", value: "unlimited"});
-        window.IWalletJS.iost.signAndSend(tx).on("success", (succ) => {
-            console.log("succ", succ);
-            window.$message.success('Success');
-            setLoadingDeposit(false);
-            setDepositModal(false);
-
-        }).on("failed", (fail) => {
-            //errorHandler(fail);
-            console.log("fail", fail);
-            window.$message.error('fail');
-            setLoadingDeposit(false);
-            setDepositModal(false);
-        });
-    }
 
     const onHarvest = () => {
-        if (donyBalance === '...' || donyBalance == 0) {
+        if (!donyBalance) {
             return;
         }
-        setReceiveDonyAmt(donyBalance)
+        // setReceiveDonyAmt(donyBalance)
         setHarvestModal(true);
     }
     const onHarvestClose = () => {
         setHarvestModal(false);
+        getAllBalance()
     }
-    const onHarvestSend = () => {
-        //let amount = ComUtil.numToString(new BigNumber(receiveDonyAmt)); // TODO iost는 decimal 곱하지 않고 입력한 숫자 그대로 보내는게 맞는듯
 
-        setLoadingHarvest(true);
-        let contractID = contractList[xCoin].pool;
-        let txGetReward = window.IWalletJS.iost.callABI(contractID, "getReward", []);
-        txGetReward.gasLimit = 200000;  // gasLimit를 늘려줌
-        window.IWalletJS.iost.signAndSend(txGetReward).on("success", (succ) => {
-            console.log("succ", succ);
-            window.$message.success('Success');
-            setLoadingHarvest(false);
-            setHarvestModal(false);
-
-        }).on("failed", (fail) => {
-            console.log("fail", fail);
-            window.$message.error('fail');
-            setLoadingHarvest(false);
-            setHarvestModal(false);
-            if (typeof fail === 'object' && fail.status_code === "BALANCE_NOT_ENOUGH") {
-                // alert(t('message.lackOfIram'));
-                window.$message.warning(`${t('message.lackOfIram')} ${t('message.chargeIgasTime')}`)
-            } else {
-                let message = JSON.parse(fail.substring(7));
-                if (message.code === 2) {
-                    window.$message.warning(t('message.lackOfIgas') + txGetReward.gasLimit + '\n' + t('message.chargeIgasTime'));
-                    // alert(t('message.lackOfIgas') + txGetReward.gasLimit + '\n' + t('message.chargeIgasTime'))
-                }
-            }
-        });
-    }
 
     const onHarvestWithDraw = () => {
         setHarvestWithDrawModal(true);
     }
     const onHarvestWithDrawClose = () => {
         setHarvestWithDrawModal(false);
-    }
-    const onHarvestWithDrawSend = () => {
-
-        setLoadingWithDraw(true);
-
-        let contractID = contractList[xCoin].pool;
-        let txExit = window.IWalletJS.iost.callABI(contractID, "exit", []);
-        txExit.gasLimit = 300000;  // gasLimit를 늘려줌
-        window.IWalletJS.iost.signAndSend(txExit).on("success", (succ) => {
-            this.$message({
-                message: 'Success',
-                type: 'success'
-            });
-            this.loading.receiveAll = false
-            setLoadingWithDraw(false);
-            setHarvestWithDrawModal(false);
-            console.log("succ", succ);
-
-        }).on("failed", (fail) => {
-            console.log("fail", fail);
-            window.$message.error('fail');
-            setLoadingWithDraw(false);
-            setHarvestWithDrawModal(false);
-            let message = JSON.parse(fail.length >= 7 ? fail.substring(7) : '');
-            if(message.code === 2) {
-                alert(t('message.lackOfIgas') + txExit.gasLimit + '\n' + t('message.chargeIgasTime') )
-            }
-        });
+        getAllBalance()
     }
 
     const getTradeDepositWithDrawBtns = () => {
@@ -398,6 +288,9 @@ export default withTranslation()((props) => {
                 minWidth={78}
                 bg={'primary'} fg={'white'}
                 fontSize={14} mr={10} px={10}
+                disabled={
+                    (![1].includes(status)) ? true:false //종료시 disable 20200107
+                }
                 minHeight={38}
                 onClick={onWithDraw}
             >
@@ -405,16 +298,17 @@ export default withTranslation()((props) => {
             </Button>;
         }
 
-        if((parseFloat(stakeBalance) >= 0) && coinListX.status !== 3) {
+        if((parseFloat(stakeBalance) >= 0) && status !== 3) {
             btn2 = <Button
                 minWidth={78}
                 bg={'primary'} fg={'white'}
                 fontSize={14} px={10}
                 disabled={
-                    (isOpen && coinListX.status > 0) ? false:true
+                    // (isOpen && coinListX.status > 0) ? false:true
+                    (status == 1) ? false:true  //종료시(status==2) disable 20200107
                 }
                 minHeight={38}
-                onClick={onDeposit}
+                onClick={onDepositClick}
             >
                 {t('Deposit2')}
             </Button>;
@@ -423,20 +317,90 @@ export default withTranslation()((props) => {
         return <div>{btn1}{btn2}</div>;
     }
 
-    const getBatchContractStorage = async(tokenName) => {
-        return await iostApi.getTradeBalanceAll(contractList[tokenName].pool, address);
+    const getBatchContractStorage = async() => {
+        return await iostApi.getTradeBalanceAll(pool, address);
     }
+
+    if (!tokenName) return <Redirect to={'/checking'} />
 
     return (
         <Div pt={50}>
 
-            <EarnCoinCard
-                coinIcon={coinImg}
-                coinName={xCoin.toUpperCase()}
-                onTokenScan={onTokenScan}
-                contractAddress={contractAddress}
-                leftTime={leftTime}
-            />
+
+
+            <Flex justifyContent={'center'} fg={'white'} fontSize={35} minHeight={52}>
+                {
+                    status === -1 && (
+                        <Div>
+                            <Div textAlign={'center'}>Preparing</Div>
+                        </Div>
+                    )
+                }
+                {
+                    status === 0 && (
+                        <Div>
+                            <Div textAlign={'center'}>Coming soon</Div>
+                            <Div lighter>{ComUtil.countdown(ComUtil.leftTime(duration))}</Div>
+                        </Div>
+                    )
+                }
+                {
+                    status === 1 && (
+                        <Div>
+                            <Div textAlign={'center'}>Running</Div>
+                            <Div lighter>{ComUtil.countdown(ComUtil.leftTime(duration))}</Div>
+                        </Div>
+                    )
+                }
+                {
+                    status === 2 && (
+                        <Div>
+                            Finished
+                        </Div>
+                    )
+                }
+
+            </Flex>
+
+
+            {
+                isIwFlag && (
+                    <Flex justifyContent={'center'} >
+                        <Flex flexDirection={'column'}
+                            // bg={swapOpen && 'white'}
+                            // p={20}
+                            // rounded={10}
+                              width={sizeValue(450, null, '90%')}
+                              m={sizeValue(16, null, 0)}
+                        >
+                            <Button bg={'info'} fg={'white'} fontSize={18} px={15}
+                                    onClick={toggleSwap}
+                            >
+                                <Flex>Swap<Flex ml={5}>{swapOpen ? <FaChevronUp />:<FaChevronDown />}</Flex></Flex>
+                            </Button>
+
+                            {
+                                swapOpen && (
+                                    <Flex flexGrow={1} width={'100%'} flexDirection={'column'} pt={20}>
+                                        <IWTokenBigCard
+                                            uniqueKey={uniqueKey}
+                                            name={contract.tokenName}
+                                            ercTokenName={ercTokenName}
+                                            balance={iwTokenBalance?iwTokenBalance:0}
+                                            status={status}
+                                            loading={loading}
+                                        />
+                                    </Flex>
+
+                                )
+                            }
+
+                        </Flex>
+                    </Flex>
+                )
+            }
+
+
 
             <Flex flexDirection={sizeValue('row', null, 'column')} justifyContent={'center'} my={50}>
 
@@ -455,7 +419,10 @@ export default withTranslation()((props) => {
                                 bg={'primary'} fg={'white'}
                                 fontSize={14} px={10}
                                 disabled={
-                                    (donyBalance === '...' || donyBalance === 0) ? true : false
+                                    //coinListX.status == 2추가  종료시 무조건 disable 20200107 => Harvest & Withdraw 이용유도.
+                                    //Running 일 경우만 Harvest(획득) 가능
+                                    //Harvest 도니 잔액이 없을경우 버튼 비활성화 21.02.26 david
+                                    !donyBalance ? true: (![1].includes(status)) ? true:false
                                 }
                                 minHeight={38}
                                 onClick={onHarvest}
@@ -463,23 +430,43 @@ export default withTranslation()((props) => {
                                 {t('get')}
                             </Button>
                         }
+                        type={'harvest'}
                         loading={loading}
                     />
                 </Div>
                 <Div width={sizeValue(230, null, '90%')}
-                     m={sizeValue(16, null, 0)}>
+                     m={sizeValue(16, null, 0)}
+                     mb={sizeValue(16, null, 30)}
+                >
                     <TradeBigCard
-                        name={xCoin.toUpperCase()}
-                        img={coinImg}
+                        isIwFlag={contract.isIwFlag}
+                        name={contract.tokenName.toUpperCase()}
+                        img={contract.img}
                         balance={stakeBalance}
-                        explain={xCoin.toUpperCase()+' '+t('Mining')}
+                        explain={t('Depositing')}
                         childButton={getTradeDepositWithDrawBtns()}
                         loading={loading}
+                        type={'mining'}
                     />
                 </Div>
+                {/*{*/}
+                {/*    // iwBly 일경우 나오게*/}
+                {/*    uniqueKey.toUpperCase() === 'IWBLY' &&*/}
+                {/*    <Div width={sizeValue(230, null, '90%')}*/}
+                {/*         m={sizeValue(16, null, 0)}>*/}
+                {/*        <IWBlyBigCard*/}
+                {/*            uniqueKey={uniqueKey}*/}
+                {/*            name={contract.tokenName}*/}
+                {/*            balance={iwTokenBalance?iwTokenBalance:0}*/}
+                {/*            status={status}*/}
+                {/*            loading={loading}*/}
+                {/*        />*/}
+                {/*    </Div>*/}
+                {/*}*/}
             </Flex>
 
 
+            {/* 수익획득 및 코인인출 */}
             <XCenter mb={50}>
                 <Button
                     bg={'white'} bc={'donnie'} fg={'donnie'}
@@ -487,73 +474,136 @@ export default withTranslation()((props) => {
                     px={15}
                     py={10}
                     rounded={3}
-
+                    disabled={[-1, 0].includes(status)}
                     onClick={address ? onHarvestWithDraw:changeConnectWallet}
                 >
-                    {t('HarvestWithdraw')}({xCoin.toUpperCase()})
+                    {t('HarvestWithdraw')}({ComUtil.coinName(tokenName.toUpperCase())})
                 </Button>
             </XCenter>
 
-
-            {
-                depositModal &&
-                <DepositModal
-                    xCoin={xCoin}
-                    // title={t('Deposit2')+' '+xCoin.toUpperCase()}
-                    isOpen={depositModal}
-                    onClose={onDepositClose}
-                    stakeStatus={stake.status}
-                    xCoin={xCoin}
-                    balance={coinBalance}
-                    depositFormNumber={depositFormNumber}
-                    onChange={onDepositChange}
-                    onClick={onDepositSend}
-                    isLoading={loadingDeposit}
-                />
-            }
-
-            {
-                withDrawModal &&
-                <WithDrawModal
-                    xCoin={xCoin}
-                    title={t('withdraw')+' '+xCoin.toUpperCase()}
-                    isOpen={withDrawModal}
-                    onClose={onWithDrawClose}
-                    xCoin={xCoin}
-                    balance={stakeBalance}
-                    withDrawFormNumber={withDrawFormNumber}
-                    onChange={onWithDrawChange}
-                    onClick={onWithDrawSend}
-                    isLoading={loadingWithDraw}
-                />
-            }
-
-            {
-                harvestModal &&
-                <HarvestModal
-                    isOpen={harvestModal}
+            {/* 획득 harvest */}
+            <Modal
+                title={<Flex><img src={tokenImages.don} style={{display: 'block', width: 20}} /><Div lineHeight={25} ml={8} mb={-3}>{t('HarvestDONY')}</Div></Flex>}
+                visible={harvestModal}
+                onCancel={onHarvestClose}
+                // bodyStyle={{padding: 0}}
+                footer={null}
+                width={'auto'}
+                centered={true}
+                focusTriggerAfterClose={false}
+                getContainer={false}
+                maskClosable={false}
+            >
+                <Harvest
+                    uniqueKey={uniqueKey}
                     onClose={onHarvestClose}
-                    balance={donyBalance}
-                    receiveDonyAmt={receiveDonyAmt}
-                    onClick={onHarvestSend}
-                    isLoading={loadingHarvest}
-                />
-            }
-
-            {
-                harvestWithDrawModal &&
-                <HarvestWithDrawModal
-                    isOpen={harvestWithDrawModal}
-                    onClose={onHarvestWithDrawClose}
-                    stakeBalance={stakeBalance}
                     donyBalance={donyBalance}
-                    xCoin={xCoin}
-                    tokenName={window.$tokenName}
-                    onClick={onHarvestWithDrawSend}
-                    isLoading={loadingHarvestWithDraw}
                 />
+            </Modal>
+
+            {/* 인출 withdraw */}
+            <Modal
+                title={<Flex><img src={contract.img} style={{display: 'block', width: 20}} /><Div lineHeight={25} ml={8} mb={-3}>{t('withdraw')+' '+tokenName.toUpperCase()}</Div></Flex>}
+                visible={withDrawModal}
+                onCancel={onWithDrawClose}
+                // bodyStyle={{padding: 0}}
+                footer={null}
+                width={'auto'}
+                centered={true}
+                focusTriggerAfterClose={false}
+                getContainer={false}
+                maskClosable={false}
+            >
+                <Withdraw
+                    uniqueKey={uniqueKey}
+                    status={status}
+                    name={tokenName}
+                    onClose={onWithDrawClose}
+                    balance={stakeBalance}
+                />
+            </Modal>
+
+            {/* 예치 deposit */}
+            {
+                <Modal
+                    title={
+                        isIwFlag ? (
+                            <Flex>
+                                <HexEdge width={35} height={35}>
+                                    <img src={contract.img} style={{display: 'block', width: 20}} />
+                                </HexEdge>
+                                <Div lineHeight={25} ml={8} mb={-3}>{t('Deposit2')+' '+tokenName.toUpperCase()}</Div>
+                            </Flex>
+                        ) : (
+                            <Flex>
+                                <img src={contract.img} style={{display: 'block', width: 20}} />
+                                <Div lineHeight={25} ml={8} mb={-3}>{t('Deposit2')+' '+tokenName.toUpperCase()}</Div>
+                            </Flex>
+                        )
+
+                    }
+                    visible={depositModal}
+                    onCancel={onDepositClose}
+                    // bodyStyle={{padding: 0}}
+                    footer={null}
+                    width={'auto'}
+                    centered={true}
+                    focusTriggerAfterClose={false}
+                    getContainer={false}
+                    maskClosable={false}
+                >
+                    <Deposit
+                        name={tokenName}
+                        uniqueKey={uniqueKey}
+                        status={status}
+                        // tokenName={window.$tokenName}
+                        // pool={contract.pool}
+                        onClose={onDepositClose}
+                    />
+                </Modal>
+            }
+            {/* 수익획득 및 코인인출 Harvest & Withdraw*(DON) */}
+            {
+                <Modal
+                    title={
+                        <Flex>
+                            <img src={tokenImages.don} alt="don" style={{display: 'block', width: 20}}/>
+                            <Div lineHeight={25} mx={8} mb={-3}>X</Div>
+                            {
+                                isIwFlag ? (
+                                    <HexEdge width={35} height={35}>
+                                        <img src={contract.img} alt={contract.tokenName} style={{display: 'block', width: 20}}/>
+                                    </HexEdge>
+                                ) : (
+                                    <img src={contract.img} alt={contract.tokenName} style={{display: 'block', width: 20}}/>
+                                )
+                            }
+                            <Div lineHeight={25} ml={8} mb={-3}>{t('HarvestWithdraw')}</Div>
+                        </Flex>
+                    }
+                    visible={harvestWithDrawModal}
+                    onCancel={onHarvestWithDrawClose}
+                    // bodyStyle={{padding: 0}}
+                    footer={null}
+                    width={'auto'}
+                    centered={true}
+                    focusTriggerAfterClose={false}
+                    getContainer={false}
+                    maskClosable={false}
+                >
+                    <HarvestWithDraw
+                        uniqueKey={uniqueKey}
+                        // name={tokenName}
+                        tokenName={window.$tokenName}
+                        pool={contract.pool}
+                        donyBalance={donyBalance}
+                        stakeBalance={stakeBalance}
+                        onClose={onHarvestWithDrawClose}
+                    />
+                </Modal>
             }
 
         </Div>
     );
 });
+export default withTranslation()(withRouter(Trade))

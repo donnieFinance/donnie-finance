@@ -1,3 +1,4 @@
+import moment from 'moment-timezone'
 export default class ComUtil {
     static delay(ms) {
         return new Promise((resolve, reject) => {
@@ -79,54 +80,296 @@ export default class ComUtil {
         }
     }
 
-    static getCheckingAndSavingCoinInfo (coin, t) {
+    static getCheckingAndSavingCoinInfo (coin, status, t) {
 
-        const coinInfo = {
-            status: '',
-            name: '',
-            img: '',
-            explain: '',
-            mining: '',
-            total: '',
-            usd: '',
-            rate: '',
-            // loading: coin.loading
-        }
+        // console.log({ComUtilCoin: coin, status})
 
-        coinInfo.status = coin.status
-        coinInfo.name = coin.name.toUpperCase()
+        const coinInfo = {...coin}
+
+        coinInfo.status = status
+        coinInfo.name = coin.tokenName.toUpperCase()
         coinInfo.img = coin.img
 
-        // Deposit to mine
-        if([0].indexOf(coin.status) > -1) {
-            coinInfo.explain = t('Provide',{x: coin.name.toUpperCase()})
-            coinInfo.buttonText = `${t('Deposit')}`
-        }else if ([1,2].indexOf(coin.status) > -1 ) {
+        // Preparing
+        if ([-1].includes(status)) {
+            coinInfo.explain = t('Provide',{x: ComUtil.coinName(coinInfo.name.toUpperCase())})
+            coinInfo.buttonText = `${t('depositToMine')}`
+        }
+        // Coming soon
+        else if([0].indexOf(status) > -1) {
+            coinInfo.explain = t('Provide',{x: ComUtil.coinName(coinInfo.name.toUpperCase())})
+            coinInfo.buttonText = `${t('depositToMine')}`
+        }
+        // Running, Ended
+        else if ([1,2].indexOf(status) > -1 ) {
 
             coinInfo.mining = t('Mining')
-            coinInfo.buttonText = `${t('Deposit')}`
+            coinInfo.buttonText = `${t('depositToMine')}`
 
-            if (coin.total !== '...') {
+            if (status === 2 ) {
+                coinInfo.buttonText = `${t('HarvestWithdraw')}` //20200107 종료시 text만 수정.
+            }
 
+            if (coin.total !== null) {
                 coinInfo.total = coin.total.toFixed(2)
                 // console.log('==coinInfo.total:::'+coinInfo.total)
             }
 
+            //USD
             if (coin.usd) {
-                coinInfo.usd = `≈${coin.totalBalance.toFixed(2)} USD`
+                coinInfo.usd = `≈${this.addCommas(coin.totalBalance.toFixed(2))} USD`
             }
 
+            //APR
             if (coin.rate) {
+                console.log({rate: coin.rate})
                 coinInfo.rate = `${t('annualization')} : ${coin.rate.toFixed(2)} %`
 
             }
-        }else if ([3].indexOf(coin.status) > -1) {
+        }
+        // Pool ended
+        else if ([3].indexOf(status) > -1) {
             coinInfo.explain = `${t('closePool')}`
             coinInfo.buttonText = `${t('HarvestWithdraw')}`
         }
 
         //console.log({coin})
         return coinInfo
+    }
+
+    static utcToString(utcTime, formatter) {
+        try{
+
+            if (!utcTime)
+                return null
+
+            const format = formatter ? formatter : "YYYY.MM.DD"
+
+            const utcDate = moment(utcTime);
+            return utcDate.tz(moment.tz.guess()).format(format)
+        }catch (err){
+            return null
+        }
+    }
+
+    static utcUnixToString(utcTime, formatter) {
+        try{
+
+            if (!utcTime)
+                return null
+
+            const format = formatter ? formatter : "YYYY.MM.DD"
+
+            const utcDate = moment(utcTime*1000)
+            return utcDate.tz(moment.tz.guess()).format(format)
+        }catch (err){
+            return null
+        }
+    }
+
+    // Ag-Grid Cell 스타일 기본 적용 함수
+    static getCellStyle = ({cellAlign,color,textDecoration,whiteSpace}) => {
+        if(cellAlign === 'left') cellAlign='flex-start';
+        else if(cellAlign === 'center') cellAlign='center';
+        else if(cellAlign === 'right') cellAlign='flex-end';
+        else cellAlign='flex-start';
+        return {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: cellAlign,
+            color: color,
+            textDecoration: textDecoration,
+            whiteSpace: whiteSpace
+        }
+    }
+    static execCopy(text, successMsg, failedMsg) {
+        return new Promise((resolve) => {
+
+            const fallbackCopyTextToClipboard = (text) => {
+                let textArea = document.createElement("textarea");
+                textArea.value = text;
+
+                // document.body.appendChild(textArea);
+                document.body.prepend(textArea);
+
+                textArea.readOnly = true;
+                textArea.focus();
+                textArea.select();
+
+                try{
+
+                    let successful = document.execCommand('copy');
+
+                    document.body.removeChild(textArea);
+
+                    return successful
+
+                }catch (err) {
+                    return false
+                }
+            }
+
+            if (!navigator.clipboard) {
+                resolve(fallbackCopyTextToClipboard(text));
+            }
+
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    // alert("코드가 복사되었습니다");
+                    resolve(true)
+                })
+                .catch(err => {
+                    // This can happen if the user denies clipboard permissions:
+                    resolve(fallbackCopyTextToClipboard(text));
+                });
+        })
+    }
+
+    static async copyTextToClipboard(text, successMsg, failedMsg) {
+        const isCopied = await ComUtil.execCopy(text)
+        if (isCopied && successMsg) {
+            alert(successMsg)
+        }else{
+            if (failedMsg)
+                alert(failedMsg)
+        }
+
+        return isCopied
+    }
+
+    //HTTPS 에서 정상 동작합니다
+    static async pasteClipboardText() {
+        return await navigator.clipboard.readText();
+    }
+
+    static replaceDecimalNumber(amount, limitLength) {
+        const sp = amount.toString().split('.');
+        let lNum = parseFloat(sp[0]) || 0
+        let rNum = sp.length >= 2 ? sp[1] : '';
+
+        if(rNum.length > limitLength) {
+            rNum = rNum.substring(0, limitLength)
+            console.log({
+                amount,
+                lNum:lNum,
+                rNum,
+                result: lNum + '.' + rNum
+            })
+
+            return parseFloat(lNum + '.' + rNum)
+        }
+
+        return amount
+    }
+
+    static minusFee(amount, fee) {
+        const sp = amount.toString().split('.');
+
+        let lNum = parseFloat(sp[0]) || 0
+        let rNum = sp.length >= 2 ? sp[1] : '';
+
+        if(rNum.length > 8) {
+            rNum = rNum.substring(0, 8)
+        }
+
+        let remainedAmount = lNum - fee;
+
+        let returnValue;
+
+        if(rNum.length === 0) {
+            returnValue = lNum - fee
+        }else {
+            returnValue = parseFloat(remainedAmount + '.' + rNum)
+        }
+
+
+        // console.log(`${amount} - ${fee} = ${returnValue}`)
+        return returnValue;
+    }
+
+    /*******************************************************
+     금액 형식으로 리턴
+     [값이 0 보다 작으면 '' 반환]
+     @Param : 304100
+     @Return :304,100
+     *******************************************************/
+    static toCurrency(value) {
+        const number = ComUtil.toNum(value)
+        if(number >= 0)
+            return ComUtil.addCommas(number)
+        else {
+            return ''
+        }
+    }
+
+    /*******************************************************
+     숫자 및 문자(숫자)에 comma 추가
+     [잘못된 값 이외엔 항상 0 이상을 반환 하는 함수]
+     @Param : 1234567
+     @Return : 1,234,567
+     *******************************************************/
+    static addCommas(value) {
+        //숫자로 변환 불가능한 잘못된 값일 경우 null로 리턴 하도록 함
+        if((typeof value !== 'number' && !value) || isNaN(value)){
+            return null;
+        }
+        return ComUtil.toNum(value).toLocaleString(undefined, {maximumFractionDigits : 20})
+    }
+    /*******************************************************
+     string, number 판별 후 숫자가 아닌 잘못 된 값이면 0, 올바른 값이면 숫자변환
+     [계산시 에러가 나지 않도록 항상 숫자로만 리턴하는 함수]
+     @ex :
+     가나abc304100마바사 => 304100
+     '6,700' => 6700
+     undefined => 0
+     'undefined' => 0
+     null => 0
+     @Param : number or string(숫자)
+     @Return : number
+     *******************************************************/
+    static toNum(value, isParsingNumber = true) {
+        try{
+            let removedValue = value.toString().replace(/\,/g,'')     //콤마제거
+            removedValue = removedValue.replace(/\s/gi, '');			//공백제거
+            //계산 가능한 숫자인지 판별
+            if(isNaN(removedValue) || removedValue === '')
+                return 0
+            else {
+                if (isParsingNumber)
+                    return parseFloat(removedValue)
+                else
+                    return removedValue
+            }
+        }catch(e){
+            return 0
+        }
+    }
+
+    static sortByKey (array, key) {
+        return array.sort(function (a, b) {
+            let x = a[key];
+            let y = b[key];
+            return ((x > y) ? -1 : ((x > y) ? 1 : 0));
+        })
+    }
+
+    static calcAPR = (symbol, total, dony, usd) => {
+        return (((symbol / (total < 1 ? 1 : total) * dony) * 360 * 24 * 60 * 60) / usd) * 100;
+    }
+
+    static countdown (time) {
+        return `${time.day} : ${time.hour} : ${time.minutes} : ${time.seconds}`
+    }
+
+    static coinName (coinNm) {
+        if(coinNm){
+            if(coinNm.toUpperCase().includes('IW')){
+                const rCoinNm = coinNm.toUpperCase();
+                return rCoinNm.toString().replace(/\IW/g,'iw')     //replace all
+                // return rCoinNm.replaceAll('IW','iw');
+            }
+            return coinNm;
+        }
     }
 
 }
