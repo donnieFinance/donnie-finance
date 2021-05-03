@@ -57,6 +57,8 @@ const WithdrawERCContent = () => {
     const [passCodeTime, setPassCodeTime] = useState(60*5*1000); // 5분
     const [timerUI, setTimerUI] = useState("05:00");
 
+    const tMessage = t('message', {returnObjects: true})
+
     useEffect(() => {
         async function fetch() {
             const data = await iostApi.getTokenBalance({address: address, tokenName: properties.address.token});
@@ -126,12 +128,34 @@ const WithdrawERCContent = () => {
                 return;
             }
 
-
             const ircResult = await iostApi.onSendIrcDonToManagerBC(address, withdrawAmount, memo);
             if(!ircResult.isSuccess) {
                 const {failedToSend} = t('withdrawErc', {returnObjects: true});
-                alert(failedToSend)
-                return;
+                let errorMessage = failedToSend;
+                if (typeof ircResult.result === 'string') {
+                    if (ircResult.result.indexOf('{') > -1) {
+                        const error = JSON.parse(ircResult.result.substring(ircResult.result.indexOf('{'), ircResult.result.indexOf('}') + 1))
+                        if (error.code === 2) {
+                            let vFailedToSend = failedToSend;
+                            if(error.message){
+                                vFailedToSend = vFailedToSend + "/n" + error.message.toString();
+                            }
+                            errorMessage = vFailedToSend
+                        } else {
+                            errorMessage = result
+                        }
+                    }
+                } else if (typeof ircResult.result === 'object') {
+                    if (ircResult.result.status_code === 'BALANCE_NOT_ENOUGH') {
+                        errorMessage = `${tMessage.lackOfIram}`;
+                    }else if (result.status_code === 'RUNTIME_ERROR') {
+                        errorMessage = `${tMessage.failedToSend}`;
+                    } else{
+                        errorMessage = `${tMessage.jetstreamFail}`;
+                    }
+                }
+                alert(errorMessage);
+                return
             }
 
             // console.log(ircResult.result.tx_hash);

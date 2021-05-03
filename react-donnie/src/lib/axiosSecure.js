@@ -1,6 +1,5 @@
 import axios from 'axios'
-import properties from "~/properties";
-const getCsrf = () => axios(properties.restAPIHost + '/getCsrfToken', { method: "get", withCredentials: true, credentials: 'same-origin' })
+import SecureApi from "~/lib/secureApi";
 const instance = axios.create({
     xsrfHeaderName:"x-csrf-token",
     withCredentials: true,
@@ -8,7 +7,7 @@ const instance = axios.create({
 });
 instance.interceptors.request.use(
     async (config) => {
-        const {data:csrfData} = await getCsrf();
+        const csrfData = localStorage.getItem('xToken');
         if (csrfData) {
             config.headers['x-csrf-token'] = csrfData;
         }

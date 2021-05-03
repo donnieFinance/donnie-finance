@@ -6,6 +6,7 @@ import {useRecoilState} from "recoil";
 import {withTranslation} from "react-i18next";
 import {GrClose} from 'react-icons/gr'
 import {color} from "~/styledComponents/Properties";
+import useWallet from "~/hooks/useWallet";
 
 const themeColor = color.donnie
 
@@ -14,9 +15,8 @@ const CustomNavLink = ({to, onClose, children}) =>
         {children}
     </NavLink>
 
-
 const MenuModal = ({t}) => {
-
+    const {address} = useWallet()
     const [menuOpen, setMenuOpen] = useRecoilState(menuModalState)
     const {about, checking, loan, exchange, credit, payment, portfolio} = t('menu', {returnObjects: true})
 
@@ -56,15 +56,15 @@ const MenuModal = ({t}) => {
                         </Div>
                     </Div>
                     <Div mb={12}>
-                        <CustomNavLink to={'/loan'} onClose={onClose} >{loan.name}</CustomNavLink>
+                        <CustomNavLink to={'/exchange/swap'} onClose={onClose} >{exchange.name}</CustomNavLink>
                         <Div fontSize={10} fg={'secondary'} lineHeight={15}>
-                            {loan.desc}
+                            {exchange.desc}
                         </Div>
                     </Div>
                     <Div mb={12}>
-                        <CustomNavLink to={'/exchange'} onClose={onClose} >{exchange.name}</CustomNavLink>
+                        <CustomNavLink to={'/loan'} onClose={onClose} >{loan.name}</CustomNavLink>
                         <Div fontSize={10} fg={'secondary'} lineHeight={15}>
-                            {exchange.desc}
+                            {loan.desc}
                         </Div>
                     </Div>
                     <Div mb={12}>

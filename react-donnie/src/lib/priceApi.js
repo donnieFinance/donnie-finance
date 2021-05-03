@@ -14,11 +14,13 @@ export const getCmcUsd = (id) => axios(properties.restAPIHost + '/getCmcPrice', 
 
 // 공용 코인명으로 캐시된 코인원에서 USD로 가져오기. (USD는 별도 table로 환율관리)
 export const getCoinUsdPrice = (name) => axios(properties.restAPIHost + '/getCoinUsdPrice', { method: "get", params: {name}, withCredentials: true, credentials: 'same-origin' })
-
+//전체 코인 usdPrice 조회
+export const getAllCoinUsdPrice = () => axios(properties.restAPIHost + '/getAllCoinUsdPrice', { method: "get", withCredentials: true, credentials: 'same-origin' })
 
 export default {
     getCmcUsd,
     //getIostUsd,
     //getDonUsd,
-    getCoinUsdPrice
+    getCoinUsdPrice,
+    getAllCoinUsdPrice
 }

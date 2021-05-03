@@ -1,0 +1,116 @@
+{
+    "lang": "javascript",
+    "version": "1.0.0",
+    "abi": [
+        {
+            "name": "can_update",
+            "args": [
+                "string"
+            ],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
+            "name": "addPair",
+            "args": [
+                "string",
+                "string",
+                "string",
+                "string"
+            ],
+            "amountLimit": [{
+                 "token": "*",
+                 "val": "unlimited"
+             }],
+            "description": ""
+        },
+        {
+            "name": "deletePair",
+            "args": [
+                "string",
+                "string"
+            ],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
+            "name": "addPairMintLpToken",
+            "args": [
+                "string",
+                "string",
+                "string",
+                "string"
+            ],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
+            "name": "swapTokens",
+            "args": [
+                "string",
+                "string",
+                "string",
+                "string"
+            ],
+            "amountLimit": [{
+                 "token": "*",
+                 "val": "unlimited"
+             }],
+            "description": ""
+        },
+        {
+            "name": "routeSwapTokens",
+            "args": [
+                "string",
+                "string",
+                "string",
+                "string",
+                "string"
+            ],
+            "amountLimit": [{
+                 "token": "*",
+                 "val": "unlimited"
+             }],
+            "description": ""
+        },
+        {
+            "name": "addLiquidity",
+            "args": [
+                "string",
+                "string",
+                "string",
+                "string"
+            ],
+            "amountLimit": [{
+                 "token": "*",
+                 "val": "unlimited"
+             }],
+            "description": ""
+        },
+        {
+            "name": "setLpToken",
+            "args": [
+                "string",
+                "string",
+                "string",
+                "string"
+            ],
+            "amountLimit": [],
+            "description": ""
+        },
+        {
+            "name": "withdrawLiquidityWithLp",
+            "args": [
+                "string",
+                "string",
+                "string",
+                "string"
+            ],
+            "amountLimit": [{
+                 "token": "*",
+                 "val": "unlimited"
+             }],
+            "description": ""
+        }
+    ]
+}

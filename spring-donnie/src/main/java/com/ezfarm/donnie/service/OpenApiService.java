@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 
 @Slf4j
 @Service
@@ -35,12 +37,22 @@ public class OpenApiService {
     MongoTemplate mongoTemplate;
 
     @Autowired
+    IostService iostService;
+
+    @Autowired
     private ObjectMapper mapper;
 
     @Value("${const.cmcApiKey}")
     String cmcApiKey;
 
+    //CMC coinID: coinKey
+    private int CMC_DON_ID = 8814;
+    private int CMC_BNB_ID = 1839;
+    private int CMC_BTC_ID = 1;
 
+//    private int CMD_ETH_ID = 1027;
+//    private int CMD_BLY_ID = 6283;
+//    private int CMD_IOST_ID = 2405;
 
 
     /////////// 간단 cache 기능 ////////////////////////////////////////
@@ -49,24 +61,33 @@ public class OpenApiService {
         log.info("////////////getDonPriceReal 호출 ///////////");
 
         CommonController.donProcessing = true;
-        try {
-            double donWonPrice = this.getDonWonFromCoineone();
-            double WonPerUsd = this.getLateUsdExchangeRate();
 
-            String newDonPrice = String.valueOf(ComUtil.doubleDivide(donWonPrice, WonPerUsd)); //prev로 저장하면서 리턴.
+        try {
+            //CMC에서 가져오기.
+            String newDonPrice = this.getCmcPrice(CMC_DON_ID);
+
+            if (StringUtils.isEmpty(newDonPrice)) {
+                //3줄은 coinOne에서 가져오기.
+                double donWonPrice = this.getDonWonFromCoineone();
+                double WonPerUsd = this.getLateUsdExchangeRate();
+                newDonPrice = String.valueOf(ComUtil.doubleDivide(donWonPrice, WonPerUsd)); //prev로 저장하면서 리턴.
+            }
+
+
             CommonController.prevDonPrice = newDonPrice;
             return newDonPrice;
 
         } catch (Exception e){
             log.error("getDonReal" + e.toString());
+            return null;
 
         } finally {
             CommonController.donProcessing = false;
         }
-        return null;
+        //return null;
     }
 
-    @Cacheable(value="cache10min2", key="'iostPrice'")
+    @Cacheable(value="cache10min6", key="'iostPrice'")
     public String getIostPriceReal() {
         CommonController.iostProcessing = true; //1
         try {
@@ -79,10 +100,11 @@ public class OpenApiService {
 
         } catch (Exception e){
             log.error("getIostPriceReal:" + e.toString());
+            return null;
         } finally {
             CommonController.iostProcessing = false; //3
         }
-        return null;
+        //return null;
     }
 
     @Cacheable(value="cache10min3", key="'pptPrice'")
@@ -95,7 +117,8 @@ public class OpenApiService {
         //log.info("getPPTPrice==");
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+        //headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+        headers.add("user-agent", "Application");
         HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(resourceUrl, HttpMethod.GET, entity, String.class);
@@ -110,12 +133,13 @@ public class OpenApiService {
             CommonController.prevPPTRatio = retPrice;
             return retPrice;
 
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             log.error("getPPTRatioReal:" + e.toString());
+            return null; //20210322 add.
         } finally {
             CommonController.pptProcessing = false;
         }
-        return null;
+        //return null;
     }
 
 
@@ -132,11 +156,154 @@ public class OpenApiService {
 
         } catch (Exception e){
             log.error("getBlyPriceReal:" + e.toString());
+            return null;
         } finally {
             CommonController.blyProcessing = false; //3
         }
-        return null;
+        //return null;
     }
+
+    @Cacheable(value="cache10min5", key="'btcPrice'")
+    public String getBtcPriceReal() {
+        CommonController.btcProcessing = true; //1
+        try {
+            String price = this.getCmcPrice(CMC_BTC_ID);
+
+            log.info("getBtcPriceReal Caching:" + price);
+
+            CommonController.prevBtcPrice = price; //2
+            return price;
+
+        } catch (Exception e){
+            log.error("getBtcPriceReal:" + e.toString());
+            return null;
+        } finally {
+            CommonController.btcProcessing = false; //3
+        }
+        //return null;
+    }
+
+    @Cacheable(value="cache10min2", key="'bnbPrice'")
+    public String getBnbPriceReal() {
+        CommonController.bnbProcessing = true; //1
+        try {
+            String price = this.getCmcPrice(CMC_BNB_ID);
+
+            log.info("getBnbPriceReal Caching:" + price);
+
+            CommonController.prevBnbPrice = price; //2
+            return price;
+
+        } catch (Exception e){
+            log.error("getBnbPriceReal:" + e.toString());
+            return null;
+        } finally {
+            CommonController.bnbProcessing = false; //3
+        }
+        //return null;
+    }
+
+
+    //////////LP토큰 가격 추정///////////////////////////////
+
+    //donhusdlp price
+    @Cacheable(value="cache10min3", key="'donhusdlp'")
+    public String getDonHusdPrice(String pairKey, String price, String lpTokenName) {
+
+        String ret = getLpHusdPrice(pairKey,price,lpTokenName);
+        lpHusdPrev.put(pairKey, ret);
+
+        return ret;
+    }
+
+    @Cacheable(value="cache10min1", key="'iosthusdlp'")
+    public String getIostHusdPrice(String pairKey, String price, String lpTokenName) {
+
+        String ret = getLpHusdPrice(pairKey,price,lpTokenName);
+        lpHusdPrev.put(pairKey, ret);
+
+        return ret;
+    }
+
+    @Cacheable(value="cache10min5", key="'doniostlp'")
+    public String getDonIostPrice(String pairKey, String price1, String price2, String lpTokenName) {
+
+        String ret = getLpLpPrice(pairKey,price1,price2,lpTokenName);
+        lpLpPrev = ret;
+
+        return ret;
+    }
+
+    @Cacheable(value="cache10min7", key="'bnbhusdlp'")
+    public String getBnbHusdPrice(String pairKey, String price, String lpTokenName) {
+
+        String ret = getLpHusdPrice(pairKey,price,lpTokenName);
+        lpHusdPrev.put(pairKey, ret);
+
+        return ret;
+    }
+
+
+    //lpValue의 상태 및 이전값 관리
+    public static HashMap<String, Boolean> lpHusdInProcessing = new HashMap<>();
+    public static HashMap<String, String> lpHusdPrev = new HashMap<>();
+
+
+    //lp_husd가격 산출,.  AmountData(don:100, husd:300), supply 600개이면
+    //donAD * donPrice + husdAD / 600 공식.
+    private String getLpHusdPrice(String pairKey, String price, String lpTokenName) {
+
+        lpHusdInProcessing.put(pairKey, true);
+
+        try {
+            String[] amountData = iostService.getLpPairAmountData(pairKey);
+            String token1Ad = amountData[0];
+            String husdAd = amountData[1];
+
+            String supply = iostService.getTokenCurrentSupply(lpTokenName);
+
+            return String.valueOf(ComUtil.roundDown2((Double.valueOf(token1Ad) * Double.valueOf(price) + Double.valueOf(husdAd)) / Double.valueOf(supply))) ;
+
+        }catch (Exception e) {
+            log.error(e.toString());
+        }finally {
+            lpHusdInProcessing.put(pairKey, false);
+        }
+
+        return "1.0"; //default
+    }
+
+
+    //doniostlp 전용 함수.
+    public static boolean lpLpInProcessing = false;
+    public static String lpLpPrev = "1.0";
+
+    //don_iost가격 산출,.  AmountData(don:10, iost:600), supply 600개이면
+    //donAD * donPrice + iostAD * iostPrice / 600 공식.
+    private String getLpLpPrice(String pairKey, String price1, String price2, String lpTokenName) {
+
+        lpLpInProcessing = true;
+
+        try {
+            String[] amountData = iostService.getLpPairAmountData(pairKey);
+
+            String token1Ad = amountData[0];
+            String token2Ad = amountData[1];
+
+            String supply = iostService.getTokenCurrentSupply(lpTokenName);
+
+            return String.valueOf(ComUtil.roundDown2((Double.valueOf(token1Ad) * Double.valueOf(price1) + Double.valueOf(token2Ad) * Double.valueOf(price2) ) / Double.valueOf(supply))) ;
+
+        }catch (Exception e) {
+            log.error(e.toString());
+        }finally {
+            lpLpInProcessing=false;
+        }
+
+        return "1.0"; //default
+    }
+
+
 
 //    //cache지우기 10분 배치 함수. - 7개로 분리.
 //    @CacheEvict(value = { "cache10min_donPrice", "cache10min_iostPrice" }, allEntries = true)
@@ -189,12 +356,20 @@ public class OpenApiService {
     }
 
 
+    @CacheEvict(value = {"cache30min"}, allEntries = true)
+    public void removeCache30min() {
+        //log.info("cache10min7  removed");
+    }
 
 
 
 
     //////////////////// 아래는 공통 함수 //////////////////////////////////////////////
 
+    //coinKey조회: https://pro-api.coinmarketcap.com/v1/cryptocurrency/map 로 전체 토큰key 조회 가능.
+    //BTC = 1
+    //BNB = 1839
+    //DON = 8814
 
     public String getCmcPrice(int id) {
 

@@ -15,12 +15,18 @@ export const getIwMinimumDeposit = (iwTokenName) => axiosSecure(properties.restA
 export const getIwWithdrawFee = (iwTokenName) => axiosSecure(properties.restAPIHost + '/swap/getIwWithdrawFee', { method: "get", params:{iwTokenName}, withCredentials: true, credentials: 'same-origin' })
 
 // swap출금 iwbly용 (iwallet출금완료 후 backend 호출하기)
-export const withdrawIwErc = ({iwTokenName, ircAccount}) => axiosSecure(properties.restAPIHost + '/swap/iwErcWithdraw', { method: "post", params:{iwTokenName:iwTokenName, ircAccount:ircAccount}, withCredentials: true, credentials: 'same-origin' })
+export const withdrawIwErc = ({iwTokenName, ircAccount}) => axios(properties.restAPIHost + '/swap/iwErcWithdraw', { method: "post", params:{iwTokenName:iwTokenName, ircAccount:ircAccount}, withCredentials: true, credentials: 'same-origin' })
 
 //swap 출금? 미시용 목표.
 export const swapIrcToErc = (data) => axiosSecure(properties.restAPIHost + '/swap/swapIrcToErc', { method: "post", data:data, withCredentials: true, credentials: 'same-origin'})
 export const getNewSwapPassCode =(ircAccount) => axiosSecure(properties.restAPIHost + '/swap/getNewSwapPassCode', { method: "post", params:{ircAccount}, withCredentials: true, credentials: 'same-origin' })
 export const isValidSwapPassCode = (ircAccount, passCode) => axiosSecure(properties.restAPIHost + '/swap/isValidSwapPassCode', { method: "get", params:{ircAccount, passCode}, withCredentials: true, credentials: 'same-origin' })
+
+// bnb입금계좌
+export const allocateBnbSwapAccount = (ircAccount) => axiosSecure(properties.restAPIHost + '/swap/allocateBnbSwapAccount', { method: "post", params:{ircAccount}, withCredentials: true, credentials: 'same-origin' })
+export const updateLastCheckDayBnbAccount = (ircAccount, ercAccount) => axiosSecure(properties.restAPIHost + '/swap/updateLastCheckDayBnbAccount' , { method: "post", params:{ircAccount, ercAccount}, withCredentials: true, credentials: 'same-origin' })
+export const getBnbMinimumDeposit = () => axiosSecure(properties.restAPIHost + '/swap/getBnbMinimumDeposit', { method: "get", withCredentials: true, credentials: 'same-origin' })
+export const bnbWithdraw = (ircAccount) => axios(properties.restAPIHost + '/swap/bnbWithdraw', { method: "post", params:{ircAccount:ircAccount}, withCredentials: true, credentials: 'same-origin' })
 
 export default {
     getSwapErcAccount,
@@ -36,5 +42,9 @@ export default {
     getNewSwapPassCode,
     isValidSwapPassCode,
 
-    withdrawIwErc
+    withdrawIwErc,
+    allocateBnbSwapAccount,
+    updateLastCheckDayBnbAccount,
+    getBnbMinimumDeposit,
+    bnbWithdraw
 }

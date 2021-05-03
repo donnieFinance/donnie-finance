@@ -40,6 +40,7 @@ const store = [
         name: '정보관리',
         children: [
             {to: '/admin/home', name:'대시보드'},
+            {to: '/admin/exchange', name:'Exchange'},
             {to: '/admin/properties', name:'Properties'},
             {to: '/admin/ercDonDepositSwap', name:'DON토큰입금'},
             // {to: '/admin/ercDonWithdrawSwap', name:'DON토큰출금'}, //사용하지 않음
@@ -47,6 +48,15 @@ const store = [
             // {to: '/admin/iwlinkWithdrawSwap', name:'iwlink토큰출금'},
             // {to: '/admin/notice', name:'menu 3'},
             // {to: '/admin/faq', name:'menu 4'},
+        ]
+    },
+    {
+        key: 'submenu_iwBLY',
+        icon: <BiCoinStack/>,
+        name: 'iwBLY 토큰 관리',
+        children: [
+            {to: '/admin/iwblyDepositSwap', name:'iwBLY토큰입금'},
+            {to: '/admin/iwblyWithdrawSwap', name:'iwBLY토큰출금'}
         ]
     },
     {
@@ -59,23 +69,23 @@ const store = [
         ]
     },
     {
-        key: 'submenu_iwETH',
+        key: 'submenu_BNB',
         icon: <BiCoinStack/>,
-        name: 'iwETH 토큰 관리',
+        name: 'BNB 토큰 관리',
         children: [
-            {to: '/admin/iwethDepositSwap', name:'iwETH토큰입금'},
-            {to: '/admin/iwethWithdrawSwap', name:'iwETH토큰출금'}
+            {to: '/admin/bnbDepositSwap', name:'BNB토큰입금'},
+            {to: '/admin/bnbWithdrawSwap', name:'BNB토큰출금'}
         ]
     },
-    {
-        key: 'submenu_iwBLY',
-        icon: <BiCoinStack/>,
-        name: 'iwBLY 토큰 관리',
-        children: [
-            {to: '/admin/iwblyDepositSwap', name:'iwBLY토큰입금'},
-            {to: '/admin/iwblyWithdrawSwap', name:'iwBLY토큰출금'}
-        ]
-    }
+    // {
+    //     key: 'submenu_iwETH',
+    //     icon: <BiCoinStack/>,
+    //     name: 'iwETH 토큰 관리',
+    //     children: [
+    //         {to: '/admin/iwethDepositSwap', name:'iwETH토큰입금'},
+    //         {to: '/admin/iwethWithdrawSwap', name:'iwETH토큰출금'}
+    //     ]
+    // },
 ]
 
 
@@ -176,7 +186,6 @@ const AdminTemplate = (props) => {
                 <SSider width={200}>
                     <Menu
                         theme={'light'}
-
                         mode="inline"
                         defaultOpenKeys={openKeys}  //메뉴펼치기
                         // defaultSelectedKeys={[to]} //parent 및 menu 선택

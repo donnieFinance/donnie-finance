@@ -18,6 +18,7 @@
     "iost": "^0.1.22",
     "moment-timezone": "^0.5.32",
     "react": "^17.0.1",
+    "react-device-detect": "^1.17.0",
     "react-dom": "^17.0.1",
     "react-helmet-async": "^1.0.7",
     "react-https-redirect": "^1.1.0",
@@ -28,6 +29,7 @@
     "react-scripts": "4.0.1",
     "recoil": "^0.1.2",
     "styled-components": "^5.2.1",
+    "tp-js-sdk": "^3.4.2",
     "web-vitals": "^0.2.4"
   },
   "scripts": {

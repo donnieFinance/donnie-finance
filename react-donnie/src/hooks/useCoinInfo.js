@@ -4,24 +4,64 @@ import BigNumber from "bignumber.js";
 import iostApi from "~/lib/iostApi";
 import priceApi from "~/lib/priceApi";
 import useInterval from "~/hooks/useInterval";
+import {useRecoilState} from "recoil";
+import {usdPriceState} from "~/hooks/atomState";
+import ComUtil from "~/util/ComUtil";
 
 const useCoinInfo = ({delay = null}) => {
+
+    const [usdPrice] = useRecoilState(usdPriceState)
+
     const [coinInfo, setCoinInfo] = useState({
         totalUsd: 0,
         totalHarvestedDonBalance: 0,
         list: []
     })
+
     const [loading, setLoading] = useState(true)
+    //usdPrice 가 있는지 확인하기 위한 딜레이
+    const [checkUsdInterval, setCheckUsdInterval] = useState(100)
+    //얼마 간격으로 갱신할지 딜레이
+    const [refreshInterval, setRefreshInterval] = useState(null);
+
     useEffect(() => {
-        refresh().then(() => {
-            setLoading(false)
-        })
+        //캐시된 시간이 1시간 이전이면.. 기본값을 캐시데이터로 우선시함
+        if (ComUtil.isCached()){
+            const cachedData = localStorage.getItem('coinInfo')
+            if (cachedData) {
+
+                //에러가 났을경우 아무행동을 하지 않게끔 함, 대신 다음 인터벌에서 알아서 localStorage 값이 업데이트 됨(정상적으로)
+                try{
+                    setCoinInfo(JSON.parse(cachedData))
+                    setLoading(false)
+                }catch (err){
+
+                }
+            }
+        }
     }, [])
 
-    //props 로 delay 가 넘어오면 자동으로 인터벌 수행 하도록 함
+    //usdPrice 가 조회 될때까지 확인해서 조회가 되면 코인을 3초마다 갱신 하도록 함
     useInterval(() => {
+        if (usdPrice) {
+            //최초 갱신
+            refresh().then(() => setLoading(false))
+
+            //현재 인터벌 종료
+            setCheckUsdInterval(null)
+
+            //기본 딜레이 : 1분(파라미터가 없을경우)
+            const defaultDealy = 1000 * 60
+
+            //앞으로 1분마다 갱신
+            setRefreshInterval(delay ? delay : defaultDealy)
+        }
+    }, checkUsdInterval)
+
+    //1분마다 갱신
+    useInterval(async() => {
         refresh()
-    }, delay)
+    }, refreshInterval);
 
     const refresh = async () => {
 
@@ -55,10 +95,11 @@ const useCoinInfo = ({delay = null}) => {
                 usd = new BigNumber(v_total).times(v_usd).toNumber();
             }
 
+            const tempCoin = coins[index]
 
-            coins[index].total = v_total
-            coins[index].usd = usd
-            coins[index].harvestedDonBalance = v_harvestedDonBalance
+            tempCoin.total = v_total
+            tempCoin.usd =  usd
+            tempCoin.harvestedDonBalance = v_harvestedDonBalance
 
             //합계
             totalUsd = totalUsd + usd
@@ -66,19 +107,22 @@ const useCoinInfo = ({delay = null}) => {
 
         })
 
-
-        console.log({
+        const _coinInfo = {
             totalUsd: totalUsd,                                 //usd 합계
             totalHarvestedDonBalance: totalHarvestedDonBalance, //현재까지 수확된 토큰수 합계(DON)
             list: coins                                         //상세 리스트
-        })
+        }
 
+        // console.log({
+        //     totalUsd: totalUsd,                                 //usd 합계
+        //     totalHarvestedDonBalance: totalHarvestedDonBalance, //현재까지 수확된 토큰수 합계(DON)
+        //     list: coins                                         //상세 리스트
+        // })
 
-        setCoinInfo({
-            totalUsd: totalUsd,
-            totalHarvestedDonBalance: totalHarvestedDonBalance,
-            list: coins
-        })
+        setCoinInfo(_coinInfo)
+
+        //캐싱할 정보 저장
+        localStorage.setItem('coinInfo', JSON.stringify(_coinInfo))
 
         // setCoins(coins)
         // setTotalUsd(totalUsd)
@@ -104,25 +148,28 @@ const useCoinInfo = ({delay = null}) => {
             return null
         }
 
-        const totalSupply = isNaN(total) ? 0 : parseFloat(total)
+        const totalSupply = isNaN(total) ? 0 : new BigNumber(total).toNumber()
         return totalSupply
     }
 
     const getCoinUsdPrice = async (tokenName) => {
-        let coinUsdPrice = 0.03; //default value, in case of error.
-        try {
-            //let {data: res} = await priceApi.getCmcUsd(2405);
-            let {data: coinUsdPrice} = await priceApi.getCoinUsdPrice(tokenName);
-            if (coinUsdPrice && !isNaN(coinUsdPrice)) {
-                coinUsdPrice = parseFloat(coinUsdPrice);
-                return new BigNumber(coinUsdPrice).toNumber()
-            }
 
-        }catch (error) {
-            console.log(error);
-            return coinUsdPrice;
-        }
-        return coinUsdPrice
+        return usdPrice[tokenName]
+
+        // let coinUsdPrice = 0.03; //default value, in case of error.
+        // try {
+        //     //let {data: res} = await priceApi.getCmcUsd(2405);
+        //     let {data: coinUsdPrice} = await priceApi.getCoinUsdPrice(tokenName);
+        //     if (coinUsdPrice && !isNaN(coinUsdPrice)) {
+        //         coinUsdPrice = parseFloat(coinUsdPrice);
+        //         return new BigNumber(coinUsdPrice).toNumber()
+        //     }
+        //
+        // }catch (error) {
+        //     console.log(error);
+        //     return coinUsdPrice;
+        // }
+        // return coinUsdPrice
     }
 
     //풀의 현재까지 수확된 토큰수(DON)
@@ -137,7 +184,7 @@ const useCoinInfo = ({delay = null}) => {
                 tokenName: tokenName
             })
 
-            return totalDon - remainedBalance
+            return new BigNumber(totalDon).minus(remainedBalance).toNumber()
         }
 
         return 0

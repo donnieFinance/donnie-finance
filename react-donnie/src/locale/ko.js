@@ -46,7 +46,7 @@ const locale = {
     depositToMine: '예치하고 채굴',
     information: '이벤트 상세 보기',
     activityNoStart: '시작할수없습니다!',
-    Mining: '채굴 중',
+    Mining: 'Staked',
     Depositing: '예치 중',
     StagePhase: '곧 다음 서비스 시작...',
 
@@ -100,13 +100,17 @@ const locale = {
         lackOfIgas: 'iGAS가 부족합니다. 필요한 iGAS : ',
         chargeIgasTime: 'iGAS는 시간이 지나면 자동 충전됩니다.',
         lackOfIram: 'iRAM을 0.1KB 구입 후 이용해주세요',
-        jetstreamOnlyIost: 'Jetstream wallet으로는 IOST만 예치가 가능합니다.'
+        failedToSend:'전송에 실패했습니다. 다시 시도해주세요.',
+        failedToSendSwap:'다른 동시거래로 인해 변환에 실패했습니다. 다시 시도해주세요.',
+        jetstreamOnlyIost: 'Jetstream wallet으로는 IOST만 예치가 가능합니다.',
+        jetstreamFail: 'igas:1,000,000 & iram:0.1KB 확인 해주세요.'
     },
 
 
     depositErc:{
         confirmMsgTitle:'ERC 주소는 바뀔 수 있으므로 입금시마다 확인이 필요합니다.',
         confirmMsgTitle2:' 최소 입금수량: 10 DON, 입금처리 시간: 약 30분',
+        confirmMsgTitle3:'ERC DON Token 입금이 맞습니까?',
         addressTitle:'입금용 DON(ERC) 주소',
         addressTitle2:'입금용 {{x}}ERC 주소',
         addressCopy:'주소복사',
@@ -136,6 +140,7 @@ const locale = {
     depositIWErc:{
         confirmMsgTitle:'{{x}} 주소는 바뀔 수 있으므로 입금시마다 확인이 필요합니다.',
         confirmMsgTitle2:"최소 입금수량 {{x}}, 입금처리 시간 약 30분",
+        confirmMsgTitle3:'{{x}} Token 입금이 맞습니까?',
         addressTitle:'입금용 ETH 주소',
         addressTitle2:'입금용 {{x}} 주소',
         addressCopy:'주소복사',
@@ -144,7 +149,7 @@ const locale = {
         loginCheckMsg:'브라우저 새로고침 등을 통해, 지갑 로그인을 다시 확인해 주세요'
     },
     withdrawIWErc:{
-        confirmMsgTitle:'출금 전 ETH address를 한번 더 확인 해 주세요!',
+        confirmMsgTitle:'출금 전 {{x}} address를 한번 더 확인 해 주세요!',
         fee: '수수료',
         all: '전체',
         memo: '메모',
@@ -154,7 +159,7 @@ const locale = {
         availableAmount:'사용 가능 금액',
         withdrawAmount:'출금 금액',
         realWithdrawAmount:'실제 입금 금액',
-        receptionErcAddress:'수취 ERC 주소',
+        receptionErcAddress:'수취 {{x}} 주소',
         withdraw: '출금',
         withdrawAmountConfirmMsg:'출금 금액을 확인해주세요.',
         withdrawAmountLimitConfirmMsg:'출금 금액은 최소 {{x}} 을 초과 하여야 합니다.',
@@ -163,6 +168,75 @@ const locale = {
         withdrawRequestMsg:'출금신청이 요청되었습니다. 다소 시간이 걸립니다.',
         withdrawRequestComplateMsg:'출금신청이 완료되었습니다'
     },
+    depositBNB:{
+        confirmMsgTitle:'{{x}} 주소는 바뀔 수 있으므로 입금시마다 확인이 필요합니다.',
+        confirmMsgTitle2:"최소 입금수량 {{x}}, 입금처리 시간 약 30분",
+        confirmMsgTitle3:'BNB(BEP20-BSC) Token 입금이 맞습니까?',
+        addressTitle:'입금용 BNB(BEP20-BSC) 주소',
+        addressTitle2:'입금용 {{x}} 주소',
+        addressCopy:'주소복사',
+        addressCopyMsg:'주소가 복사 되었습니다',
+        addressCopyFailMsg:'주소 복사를 실패하였습니다.',
+        loginCheckMsg:'브라우저 새로고침 등을 통해, 지갑 로그인을 다시 확인해 주세요'
+    },
+    withdrawBNB:{
+        confirmMsgTitle:'출금 전 BNB(BEP20-BSC) address를 한번 더 확인 해 주세요!',
+        fee: '수수료',
+        all: '전체',
+        memo: '메모',
+        address: '주소',
+        copy: '복사하기',
+        paste: '붙여넣기',
+        availableAmount:'사용 가능 금액',
+        withdrawAmount:'출금 금액',
+        realWithdrawAmount:'실제 입금 금액',
+        receptionBepAddress:'수취 BNB(BEP20-BSC) 주소',
+        withdraw: '출금',
+        withdrawAmountConfirmMsg:'출금 금액을 확인해주세요.',
+        withdrawAmountLimitConfirmMsg:'출금 금액은 최소 {{x}} 을 초과 하여야 합니다.',
+        receptionBepAddressConfirmMsg:'수취 BNB(BEP20-BSC) 주소를 확인해주세요.',
+        failedToSend:'IOST {{x}} 전송에 실패했습니다. 다시 시도해주세요.',
+        withdrawRequestMsg:'출금신청이 요청되었습니다. 다소 시간이 걸립니다.',
+        withdrawRequestComplateMsg:'출금신청이 완료되었습니다'
+    },
+    exchange:{
+        swap: '변환하기',
+        supply: '공급하기',
+        addLiquidity:'유동성 공급 추가',
+        removeLiquidity:'유동성 공급 반환',
+    },
+    warning: '주의 안내',
+    attemptTitle: '사칭주의!',
+    attempt: 'DON 컨트랙트 주소를 확인해 주세요',
+    contactUs: '이메일 info@donnie.finance 로 문의 부탁드립니다.',
+
+    swapDesc:'간편하게 토큰간 거래를 수행하세요',
+    selectToken: '토큰을 선택해 주세요',
+    enterAmount: '값을 입력해 주세요',
+    minimumAmount: '최소 {{x}} 이상 되어야 합니다',
+    swap: '변환하기',
+    supply: '공급',
+    insufficientTokenBalance: '{{x}}이 충분하지 않습니다',
+    swapPrice: '적용가격',
+    minReceiveAmountErr: '받는 토큰값이 최소값보다 작습니다. 금액을 증가해서 다시 시도하세요',
+    slippageTolerance: '허용오차',
+    minimumReceived:'최소수령값',
+    minimumReceivedInfo: '허용오차로 인해 설정된 가격입니다. 다른 거래와 동시발생으로 인하여, 설정된 최소수령값 밑으로 거래발생시 거래가 취소됩니다.',
+    priceImpact:'가격영향도',
+    priceImpactInfo:'가격영향도가 양수이면 시장가격 대비 이익을 보며 교환, 음수이면 시장가격보다 높은 가격을 지불하고 교환됩니다.',
+    transactionFee:'수수료',
+    transactionFeeInfo:'총 {{x}}%의 수수료가 From토큰 내에서 차감 됩니다 ({{y}}%-유동성 풀에 적립해서 공급자에게 제공, {{z}}%-플랫폼 수수료)',
+
+    addLiquidityDesc: '2가지 토큰으로 유동성을 공급하고 LP Token을 받으세요.',
+    myLiquidity: '나의 유동성',
+    myLpToken: 'LP토큰 잔고',
+    poolShare: '나의 지분',
+    totalPool: '전체 유동성',
+    lpTokenDesc: 'LP Token은 유동성을 공급할 때마다 총 유동성에 비례하여 발급됩니다. LP Token의 보유량으로 총 유동성 pool내에서의 나의 지분이 결정됩니다.',
+    myShareDesc: '나의 잔고 내에서 지분은 사용자들의 swap에 따라 토큰간 비율이 변동됩니다. 또한 사용자들의 swap에 따라 수수료가 누적되면서 증가합니다.',
+    lpTokenWalletDesc: '내 지갑의 LP Token',
+    depositLpToken: 'LP Token 예치',
+    bep20bscDesc: 'BEP20(BSC) - 바이낸스 스마트 체인 네트워크',
 }
 
 export default locale;

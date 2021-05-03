@@ -11,12 +11,15 @@ import ComUtil from "~/util/ComUtil";
 import {AiFillCopy} from 'react-icons/ai'
 import {BsArrowRightShort, BsBoxArrowInDown} from 'react-icons/bs'
 import properties from "~/properties";
+import ImgBnb from "~/assets/coin_bnb_wine.svg";
+import ImgWbtc from "~/assets/coin_wbtc.png";
 
-const ModalContent = () => {
+const DepositIWERCModalContent = () => {
     const {t} = useTranslation()
     const [depositIWERCState, setDepositIWERCState] = useRecoilState(depositIWERCModalState)
     const {address, hasIWallet, isLogin} = useWallet()
     const [ercAddress, setErcAddress] = useState("");
+    const [erc20AddressConfirm, setErc20AddressConfirm] = useState(false);
     const [xMin, setXMin] = useState('');
 
     // myDonOpen 모달 오픈이 되었을 경우 잔액 가져오기 API 실행
@@ -49,13 +52,39 @@ const ModalContent = () => {
         const {addressCopyMsg,addressCopyFailMsg} = t('depositIWErc', {returnObjects: true});
         ComUtil.copyTextToClipboard(ercAddress, addressCopyMsg, addressCopyFailMsg);
     }
-    const {confirmMsgTitle2,confirmMsgTitle, addressTitle, addressTitle2, loginCheckMsg,addressCopy} = t('depositIWErc', {returnObjects: true});
+    const {confirmMsgTitle, confirmMsgTitle2, confirmMsgTitle3, addressTitle, addressTitle2, loginCheckMsg,addressCopy} = t('depositIWErc', {returnObjects: true});
     const contract = depositIWERCState.uniqueKey && properties.contractList[depositIWERCState.uniqueKey];
 
+    if(!contract.ercTokenName) return null;
+
+    if(contract.ercTokenName && contract.ercTokenName.toUpperCase() === 'WBTC' && !erc20AddressConfirm){
+        return (
+            <Div p={24}>
+                <Div p={16} shadow={'md'} bc={'light'}>
+                    <Flex justifyContent={'center'} mb={10}>
+                        <Img width={60} src={ImgWbtc} />
+                    </Flex>
+                    <Div textAlign={'center'} fg={'danger'}>
+                        {t(confirmMsgTitle3, {x:contract.ercTokenName+'(ERC)'})}
+                    </Div>
+                    <Div textAlign={'center'} fg={'danger'} bold>
+                        WBTC = Wrapped Bitcoin
+                    </Div>
+                    <Flex justifyContent='center' my={20} fontSize={16}>
+                        <Button mr={10} bg={'primary'} fg={'white'} rounded={3} px={10} py={5} onClick={() => setDepositIWERCState({uniqueKey:'',tokenName:'',isOpen:false})}>
+                            No
+                        </Button>
+                        <Button bg={'primary'} fg={'white'} rounded={3} px={10} py={5} onClick={() => setErc20AddressConfirm(true)}>
+                            Yes
+                        </Button>
+                    </Flex>
+                </Div>
+            </Div>
+        );
+    }
     return (
         <Div minWidth={260}>
             <Div p={10} bg={'danger'} fg={'white'} textAlign={'center'}>
-                {/*{confirmMsgTitle}<br/>*/}
                 {t(confirmMsgTitle,{x:contract.ercTokenName})}<br/>
                 {t(confirmMsgTitle2,{x:xMin})}
             </Div>
@@ -105,7 +134,6 @@ const ModalContent = () => {
                     </Div>
                 </Div>
             </Div>
-
         </Div>
     )
 
@@ -147,7 +175,7 @@ const DepositIWERCModal = () => {
             destroyOnClose={true}
             bodyStyle={{padding:0}}
         >
-            <ModalContent />
+            <DepositIWERCModalContent />
         </Modal>
     );
 };

@@ -1,14 +1,13 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import iostApi from "~/lib/iostApi";
 import useWallet from "~/hooks/useWallet";
 import {useRecoilState} from "recoil";
 import {myTokenSelector, tokenState} from '~/hooks/atomState'
 
-const useTokenBalance = ({tokenName}) => {
-
-    const [token, setBalance] = useRecoilState(myTokenSelector({tokenName}))
+const useTokenBalance = (tokenName) => {
 
     const {address} = useWallet()
+    const [balance, setBalance] = useState()//useRecoilState(myTokenSelector({tokenName}))
 
     useEffect(() => {
         if (address){
@@ -21,9 +20,7 @@ const useTokenBalance = ({tokenName}) => {
             address,
             tokenName
         })
-
         setBalance(data)
-
     }
 
     /* return value is..
@@ -32,7 +29,7 @@ const useTokenBalance = ({tokenName}) => {
             balance: 0
         }
     */
-    return [token]
+    return [balance, fetchBalance]
 };
 
 export default useTokenBalance;

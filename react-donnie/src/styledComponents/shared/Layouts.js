@@ -263,3 +263,17 @@ export const XCenter = styled(Div)`
     left: 50%;
     transform: translateX(-50%);
 `;
+
+export const SymbolIcon = styled(Img)`
+    background-color: ${color.white};
+    border: 1px solid ${color.secondary};
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.2);
+    border-radius: 50%;
+    padding: 3px;
+    object-fit: fill;
+    &:hover {
+        transform: scale(1.4);
+        z-index:1;
+    }
+// marginLeft: -6;
+`;

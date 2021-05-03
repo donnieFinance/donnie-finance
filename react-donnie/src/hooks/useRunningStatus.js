@@ -7,6 +7,7 @@ import iostApi from "~/lib/iostApi";
 import useInterval from "~/hooks/useInterval";
 
 const useRunningStatus = ({
+                              uniqueKey,
                               pool = null,
                               //forcedStartTime, forcedEndTime 에 값이 있으면 pool 의 smart-contract 의 시간보다 우선 합니다
                               forcedStartTime = null,
@@ -50,11 +51,19 @@ const useRunningStatus = ({
     // ** 내부 인터벌 대신 globalTimeNow를 이용 할 경우 장점은 모든 시간이 동기화 된다는것이지만, 단점은 아래 useEffect가 1초마다 호출되게 된다는것. **
     useEffect(() => {
         if (globalTimeNow && startTime && endTime && watching) {
-            refreshTime()
+            refreshTime(startTime, endTime)
         }
     }, [globalTimeNow]) //1초마다 갱신
 
-    const initPoolTime = async () => {
+    //1분에 한번씩 startTime, endTime 캐시 업데이트
+    useInterval(() => {
+        getPoolTimes().then(result => {
+            console.log('1분에 한번 startTime, endTime 업데이트 됨')
+            setCachedData(result.startTime, result.endTime)
+        })
+    }, 1000 * 60)
+
+    const initPoolTime_bak = async () => {
 
         //시작시간, 종료시간 조회
         const res = await Promise.all([
@@ -66,8 +75,95 @@ const useRunningStatus = ({
         setEndTime(res[1])
     }
 
+    const initPoolTime = async () => {
+
+        let _startTime;
+        let _endTime;
+
+        try{
+            //캐싱되어 있다면 캐싱된 데이터 우선으로 처리
+            if (ComUtil.isCached() && localStorage.getItem('coinStatus')) {
+                let coinStatus = localStorage.getItem('coinStatus')
+                if (coinStatus) {
+                    coinStatus = JSON.parse(coinStatus)
+                    if (coinStatus[uniqueKey] && coinStatus[uniqueKey].startTime && coinStatus[uniqueKey].endTime) {
+                        _startTime = coinStatus[uniqueKey].startTime
+                        _endTime = coinStatus[uniqueKey].endTime
+                    }
+                }
+            }
+
+            //만약 시작, 마감시간이 하나라도 없다면 새로 조회
+            if (!_startTime || !_endTime) {
+
+                //시작시간, 종료시간 조회
+                const res = await getPoolTimes()
+
+                _startTime = res.startTime
+                _endTime = res.endTime
+            }
+
+        }catch (err) { //에러 났을 경우 컨트랙트 시간을 우선 사용
+            //만약 시작, 마감시간이 하나라도 없다면 새로 조회
+            if (!_startTime || !_endTime) {
+
+                //시작시간, 종료시간 조회
+                const res = await getPoolTimes()
+
+                _startTime = res.startTime
+                _endTime = res.endTime
+            }
+        }
+
+        //캐싱할 정보 저장
+        setCachedData(_startTime, _endTime)
+
+        //state 업데이트
+        setStartTime(_startTime)
+        setEndTime(_endTime)
+
+        //status 계산하여 적용
+        refreshTime(_startTime, _endTime)
+    }
+
+    //localStorage 에 coinStatus 정보 저장
+    const setCachedData = async (startTime, endTime) => {
+        try{
+            //캐싱할 정보 저장
+            let cachedData = localStorage.getItem('coinStatus') ? JSON.parse(localStorage.getItem('coinStatus')) : {}
+            cachedData[uniqueKey] = {startTime: startTime, endTime: endTime}
+            localStorage.setItem('coinStatus', JSON.stringify(cachedData))
+        }catch (err){
+            //에러 났을 경우 해당 스토리지 클리어
+            localStorage.removeItem('coinStatus')
+
+            //다시(제대로 된 데이터) 세팅
+            const timeInfo = {
+                [uniqueKey]: {
+                    startTime: startTime, endTime: endTime
+                }
+            }
+            localStorage.setItem('coinStatus', JSON.stringify(timeInfo))
+        }
+    }
+
+
+
+
+    const getPoolTimes = async () => {
+        const res = await Promise.all([
+            getPoolStartTime(),
+            getPoolPeriodFinish()
+        ])
+
+        return {
+            startTime: res[0],
+            endTime: res[1]
+        }
+    }
+
     /* 진행상태 관련 */
-    const refreshTime = async() => {
+    const refreshTime = async(startTime, endTime) => {
 
         const now = globalTimeNow
 

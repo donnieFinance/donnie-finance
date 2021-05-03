@@ -4,8 +4,8 @@ const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
 const STAKE_TOKEN = 'husd';
 const HUSD_ADDRESS = 'Contract3zCNX76rb3LkiAamGxCgBRCNn6C5fXJLaPPhZu2kagY3';
 
-const START_TIME = 1614729600;      // 20210303:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:ContractDPZmnXKC7GpPnnnn6Xzt353mwSn9caFas14p4af5dYy7
-const DURATION = 24 * 3600 * 30;    // 30일, in Seconds
+const START_TIME = 1620086400;      // 20210504:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:ContractB6RmuvfZy2YskreyMaewsdUSPdvhjNSqueZdbuhNS7AE
+const DURATION = 24 * 3600 * 56;    // 30일, in Seconds
 // const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;
 const TO_FIXED = 4;   //소수점 4자리까지 저장.

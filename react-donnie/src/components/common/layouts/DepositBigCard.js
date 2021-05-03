@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Button, Div, Flex, Img, RoundedCard} from "~/styledComponents/shared";
+import {Button, Div, Flex, Img, RoundedCard, SymbolIcon} from "~/styledComponents/shared";
 import {HexEdge} from '~/styledComponents/shared/Shapes'
 import ComUtil from "~/util/ComUtil";
 import styled from "styled-components";
@@ -9,6 +9,9 @@ import { Skeleton } from 'antd';
 import {color} from "~/styledComponents/Properties";
 import {BsChevronDown, BsChevronUp} from 'react-icons/bs'
 import ImgHexEdgeLine from '~/assets/hex_edge.svg'
+
+import properties from "~/properties";
+import {SymbolGroup} from "~/components/exchange/Components";
 const Content = styled(Flex)`
     opacity: 0;
     animation: 0.2s ${aniKey.fadeIn} ease-in forwards;
@@ -18,11 +21,12 @@ const Content = styled(Flex)`
 const Circle = ({bg}) => <Div bg={bg} width={10} height={10} rounded={'50%'} mr={10}></Div>
 
 const DepositBigCard = ({
-                            isIwFlag,
+                            tokenName,
                             status, startTime, endTime, duration,
-                            name, img, mining, explain, total, usd, rate, buttonText, loading,
+                            name, img, tokenType, mining, explain, total, usd, rate, buttonText, loading,
                             myStaked = true,
                             totalDon,
+                            period,
                             onDepositClick = () => null
                         }) => {
 
@@ -32,13 +36,27 @@ const DepositBigCard = ({
         setShowDetail(!showDetail)
     }
 
+    const Symbol = () => {
+        if (tokenType === 'iw') {
+            return(
+                <HexEdge>
+                    <Img src={img} width={30} height={30} alt={ComUtil.coinName(name)}/>
+                </HexEdge>
+            )
+        }else if (tokenType === 'lp') {
+            const lpTokenNames = ComUtil.getLpTokenNames(tokenName)
+            return <SymbolGroup symbol1={lpTokenNames[0]} symbol2={lpTokenNames[1]} size={40} />
+        }else {
+            return <Img src={img} width={40} height={40} alt={ComUtil.coinName(name)}/>
+        }
+    }
+
     return (
         <Div relative width={220} m={16}>
 
             <RoundedCard relative shadow={'lg'}>
 
-
-                <Div bg={'light'}>
+                <Div bg={[2].includes(status)?'lightgray':'light'}>
                     <Flex
                         pl={15}
                         fledDirection={'column'}
@@ -85,23 +103,14 @@ const DepositBigCard = ({
                         }
                     </Flex>
                     <Flex flexDirection={'column'} justifyContent={'center'} height={130}>
-
-                        {
-                            isIwFlag ? (
-                                <HexEdge>
-                                    <Img src={img} width={30} height={30} alt={ComUtil.coinName(name)}/>
-                                </HexEdge>
-                            ) : (
-                                <Img src={img} width={40} height={40} alt={ComUtil.coinName(name)}/>
-                            )
-                        }
-
-
-                        <Div fontSize={20} mt={5} bold>{ComUtil.coinName(name)}</Div>
+                        <Symbol />
+                        <Div fontSize={20} mt={5} bold>{
+                            ComUtil.coinName(name)
+                        }</Div>
                     </Flex>
                 </Div>
 
-                <Div bg={'white'}>
+                <Div bg={[2].includes(status)?'light':'white'}>
                     <Flex p={15} minHeight={186} flexDirection={'column'}>
                         {
                             loading ? <Skeleton active /> :
@@ -115,7 +124,7 @@ const DepositBigCard = ({
                                             ([-1,0,3].includes(status) && explain) && <Content fontSize={14} textAlign={'center'} flexGrow={1}>{explain}</Content>
                                         }
                                         {
-                                            ([1,2].includes(status) && total) && <Content fontSize={30} textAlign={'center'} bold>{total}</Content>
+                                            ([1,2].includes(status) && total) && <Content fontSize={30} fg={[2].includes(status)?'gray':'black'} textAlign={'center'} bold>{total}</Content>
                                         }
                                         {
                                             ([1].includes(status) && usd) && <Content fontSize={14} textAlign={'center'}>{usd}</Content>
@@ -150,7 +159,10 @@ const DepositBigCard = ({
                         {
                             showDetail && (
                                 <Div px={20} pb={20} textAlign={'center'}>
-                                    Total : {`${ComUtil.addCommas(totalDon)} DON`}
+                                    { period ?
+                                        `${ComUtil.addCommas(totalDon)} DON / ${period}` :
+                                        `${ComUtil.addCommas(totalDon)} DON / 4 Week`
+                                    }
                                 </Div>
                             )
                         }

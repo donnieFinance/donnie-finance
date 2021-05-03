@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import {Div, Flex, Span} from '~/styledComponents/shared'
+import {Div, Flex, Right, Span} from '~/styledComponents/shared'
 import styled from 'styled-components'
 import {color} from '~/styledComponents/Properties'
 import {getValue} from "~/styledComponents/Util";
-import {Button} from 'antd'
+import {Button, Input} from 'antd'
 import ComUtil from '~/util/ComUtil'
 import {AgGridReact} from 'ag-grid-react';
 import AdminApi from '~/lib/adminApi'
@@ -48,6 +48,11 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
     // 총 출금합계
     const [total, setTotal] = useState(0);
 
+    const [withdrawSequence, setWithdrawSequence] = useState(0);
+
+    // 수동 erc 출금
+    const [manualWithdrawSeq, setWithdrawSeq] = useState(0);
+
     //[이벤트] 그리드 로드 후 callback 이벤트 API init
     const onGridReady = params => {
         setGridApi(params.api);
@@ -66,7 +71,7 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
                 headerName: "No", field: "withdrawSeq", width: 80, sort:'desc'
             },
             {
-                headerName: "IRC계정", field: "ircAccount", width: 100
+                headerName: "IRC계정", field: "ircAccount", width: 200, cellRenderer: 'ircAccountRenderer'
             },
             {
                 headerName: "IRC 출금요청시간", field: "requestTime",
@@ -111,6 +116,7 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
             }
         ],
         frameworkComponents: {
+            ircAccountRenderer: ircAccountRenderer,
             approveRenderer: approveRenderer,
             ethAccountRenderer: ethAccountRenderer,
             ircStatusRenderer: ircStatusRenderer,
@@ -122,13 +128,22 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
     useEffect(() => {
         search();
         managerBalance();
-        if(gridApi) {
-            gridApi.setColumnDefs([]);
-            gridApi.setColumnDefs(gridOptions.columnDefs);
-        }
-        setIwTokenNm(iwTokenName);
-        setErcTokenNm(ercTokenName);
-    }, [iwTokenName])
+        // if(gridApi) {
+        //     gridApi.setColumnDefs([]);
+        //     gridApi.setColumnDefs(gridOptions.columnDefs);
+        // }
+    }, [])
+
+    // useEffect(() => {
+    //     search();
+    //     managerBalance();
+    //     if(gridApi) {
+    //         gridApi.setColumnDefs([]);
+    //         gridApi.setColumnDefs(gridOptions.columnDefs);
+    //     }
+    //     setIwTokenNm(iwTokenName);
+    //     setErcTokenNm(ercTokenName);
+    // }, [iwTokenName])
 
 
     function ethAccountRenderer ({value}) {
@@ -161,6 +176,20 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
 
         return status
     }
+
+    function ircAccountRenderer({value, data:rowData}) {
+        return (
+            <div>
+                <Span>
+                    <Button size={'small'} type={'secondary'}
+                            onClick={() => rowData.checkTotalSwapAmount()}> swap금액확인
+                    </Button>
+                </Span>
+                <Span ml={10}>{rowData.ircAccount}</Span>
+            </div>
+        )
+    }
+
     function approveRenderer({value, data:rowData}) {
         return (
             <div>
@@ -236,6 +265,10 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
 
     async function search() {
         setLoading(true);
+
+        const {data:sequence} = await AdminApi.getIwMaxWithdrawSequence(iwTokenName)
+        setWithdrawSequence(sequence);
+
         const {data} = await AdminApi.iwIrcWithdrawSwap(iwTokenName);
 
         data.map(item => {
@@ -249,8 +282,13 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
 
         // return
         if(data) {
-            data.map(item => item.approveAllowanceClick = function () {
-                userApproveAmt(iwTokenName, item);
+            data.map(item => {
+                item.approveAllowanceClick = function () {
+                    userApproveAmt(iwTokenName, item);
+                }
+                item.checkTotalSwapAmount = function () {
+                    checkTotalSwap(iwTokenName, item);
+                }
             })
         }
 
@@ -261,6 +299,7 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
                 totalWithdraw = totalWithdraw + parseFloat(item.amount);
                 // console.log(item);
             })
+            totalWithdraw = totalWithdraw.toFixed(8);
         }
         setTotal(totalWithdraw);
         setLoading(false);
@@ -271,8 +310,30 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
         alert("Approve:"+approveAmt);
     }
 
+    async function checkTotalSwap(iwTokenName, item) {
+        const {data:result} = await AdminApi.getIwSwapTotalAmount(iwTokenName, item.ircAccount);
+        console.slog({result});
+        let resultText = result.ircAccount + "\n" + result.iwTokenName
+            + "\ntotalDeposit : " + result.totalDeposit
+            + "\ntotalWithdraw : " + result.totalWithdraw
+            + "\ntotalFee : " + result.totalFee
+            + "\navailableWithdraw : " + result.availableWithdraw;
+        alert(resultText);
+    }
+
     function copy ({value}) {
         ComUtil.copyTextToClipboard(value, '', '');
+    }
+
+    const onChangeWithdrawSeq = ({target}) => {
+        const {name, value} = target
+        setWithdrawSeq(value);
+    }
+
+    async function onWithdrawManual() {
+        console.log(manualWithdrawSeq, iwTokenName);
+        const {data:resultStr} = await AdminApi.sendUserIwErcToExtAccountManual(manualWithdrawSeq, iwTokenName);
+        alert(resultStr);
     }
 
     return (
@@ -285,16 +346,16 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
                         <Div ml={5}>
                             <Flex>
                                 <Div mr={10}>
-                                    SwapManager ETH : <Span fg="blue">{ComUtil.toCurrency(swapManagerEth.toFixed(2))}</Span> <br/>
+                                    SwapManager ETH : <Span fg="blue">{ComUtil.toCurrency(swapManagerEth && swapManagerEth.toFixed(2))}</Span> <br/>
                                 </Div>
                                 <Div ml={20}>
-                                    donmanager igas : <Span fg="blue">{ComUtil.toCurrency(managerIGas.toFixed(2))}</Span> <br/>
+                                    donmanager igas : <Span fg="blue">{ComUtil.toCurrency(managerIGas && managerIGas.toFixed(2))}</Span> <br/>
                                 </Div>
                                 <Div ml={20}>
-                                    donmanager iram : <Span fg="blue">{ComUtil.toCurrency(managerIRam.toFixed(2))}</Span> <br/>
+                                    donmanager iram : <Span fg="blue">{ComUtil.toCurrency(managerIRam && managerIRam.toFixed(2))}</Span> <br/>
                                 </Div>
                                 <Div ml={20}>
-                                    ethGasGwei : <Span fg="blue">{ComUtil.toCurrency(ethGasGwei.toFixed(2))}</Span>
+                                    ethGasGwei : <Span fg="blue">{ComUtil.toCurrency(ethGasGwei && ethGasGwei.toFixed(2))}</Span>
                                 </Div>
                             </Flex>
                         </Div>
@@ -304,6 +365,18 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
                         <Div mr={5}>
                             <Button loading={loading} onClick={search}>검색</Button>
                         </Div>
+                        <Right>
+                            <Flex>
+                                <Div mr={15}>
+                                    withdrawSequence : {withdrawSequence}
+                                </Div>
+                                <Div mr={5}>
+                                    <Input style={{fontSize:14.7}} size={'large'} onChange={onChangeWithdrawSeq} value={manualWithdrawSeq}/>
+                                </Div>
+                                <Button onClick={onWithdrawManual}>수동erc송금</Button>
+                            </Flex>
+                        </Right>
+
                     </Flex>
                 </Div>
 

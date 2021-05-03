@@ -19,12 +19,17 @@ if (process.env.NODE_ENV === 'development') {
 } else if (process.env.NODE_ENV === 'production') {
     process.env.GENERATE_SOURCEMAP = "false";
 }
-
+/*
+다른 옵션으로는 [hash]나 [chunkhash]가 있습니다. [hash]는 매번 웹팩 컴파일 시 랜덤한 문자열을 붙여줍니다.
+따라서 캐시 삭제 시 유용합니다. [hash]가 컴파일할 때마다 랜덤 문자열을 붙여준다면 [chunkhash]는 파일이 달라질 때에만 랜덤 값이 바뀝니다.
+이것을 사용하면 변경되지 않은 파일들은 계속 캐싱하고 변경된 파일만 새로 불러올 수 있는 장점이 있습니다.
+*/
 const publicPathPlugin = (config, env) => {
+    const isEnvProduction = env === 'production';
     config.output = {
         ...config.output, // copy all settings
-        filename: "static/js/[name].[hash:8].js",
-        chunkFilename: "static/js/[name].[hash:8].async.js",
+        filename: isEnvProduction ? "static/js/[name].[chunkhash].js":"static/js/[name].[hash:8].js",
+        chunkFilename: isEnvProduction ? "static/js/[name].[chunkhash].async.js":"static/js/[name].[hash:8].async.js",
     }
     return config
 }

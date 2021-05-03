@@ -32,7 +32,7 @@ const TestDiv = styled(Div)`
         height: 30px;
     }
 `;
-const WithdrawBlyERCContent = () => {
+const WithdrawIWERCContent = () => {
 
     const [, setLoadingStatus] = useRecoilState(loadingState)
 
@@ -63,6 +63,7 @@ const WithdrawBlyERCContent = () => {
     const [realWithdrawAmount, setRealWithdrawAmount] = useState(0)
 
     // lang (en or ko)
+    const tMessage = t('message', {returnObjects: true})
     const lang = t('withdrawIWErc', {returnObjects: true})
 
     useEffect(() => {
@@ -73,12 +74,24 @@ const WithdrawBlyERCContent = () => {
             //토큰에 해당하는 금액 표시
 
             const v_UniqueKey = withdrawIWERCState.uniqueKey;
-            const {tokenName, ircTokenName, ercTokenName} = properties.contractList[v_UniqueKey];
+            const {tokenName, ircTokenName, ercTokenName, tokenType} = properties.contractList[v_UniqueKey];
             setAmtLabel(ercTokenName);
             setCoinLabel(ircTokenName);
 
             // 해당 풀의 잔액 (iwBly ...)
-            const data = await iostApi.getTokenBalance({address: address, tokenName: tokenName});
+            let data = await iostApi.getTokenBalance({address: address, tokenName: tokenName});
+
+
+            //iw 일 경우 destroy amount
+            if (tokenType === 'iw') {
+                if (tokenName === 'iwbly') {
+                    data = new BigNumber(data).minus(ComUtil.getDestroyBlyAmount(address)).toNumber()
+                }
+                else if (tokenName === 'iwbtc') {
+                    data = new BigNumber(data).minus(ComUtil.getDestroyBtcAmount(address)).toNumber()
+                }
+            }
+
             setBalance(data);
 
             const {data:feeAmt} = await swapApi.getIwWithdrawFee(tokenName);
@@ -119,6 +132,7 @@ const WithdrawBlyERCContent = () => {
 
     const onWithdrawErc = async() => {
 
+
         const iwFee = coinFee;
         if (hasIWallet() && isLogin()) {
 
@@ -144,39 +158,61 @@ const WithdrawBlyERCContent = () => {
 
             setLoadingStatus('confirmation')
 
-            const ircResult = await iostApi.onIwSwapWithdrawBC(gasLimit, contract.tokenAddress, withdrawAmount, ercAccount);
+            const {result, isSuccess} = await iostApi.onIwSwapWithdrawBC(gasLimit, contract.tokenAddress, withdrawAmount, ercAccount, contract.tokenName);
 
             setLoadingStatus('pending')
 
 
             //res.result res.isSuccess 로 데이터 결과값 사용가능
-            if(!ircResult.isSuccess) {
+            if(!isSuccess) {
                 setLoadingStatus('failed')
-                alert(t(lang.failedToSend,{x:coinLabel}))
-                return;
-            }
-
-            const data = {
-                iwTokenName: withdrawIWERCState.tokenName.toLowerCase(),
-                ircAccount: address
+                let errorMessage = t(lang.failedToSend,{x:coinLabel});
+                if (typeof result === 'string') {
+                    if (result.indexOf('{') > -1) {
+                        const error = JSON.parse(result.substring(result.indexOf('{'), result.indexOf('}') + 1))
+                        if (error.code === 2) {
+                            let vFailedToSend = t(lang.failedToSend,{x:coinLabel});
+                            if(error.message){
+                                vFailedToSend = vFailedToSend + "\n" + error.message.toString();
+                            }
+                            errorMessage = vFailedToSend
+                        } else {
+                            errorMessage = result
+                        }
+                    }
+                } else if (typeof result === 'object') {
+                    if (result.status_code === 'BALANCE_NOT_ENOUGH') {
+                        errorMessage = `${tMessage.lackOfIram}`;
+                    }else if (result.status_code === 'RUNTIME_ERROR') {
+                        errorMessage = `${tMessage.failedToSend}`;
+                    } else{
+                        errorMessage = `${tMessage.jetstreamFail}`;
+                    }
+                }
+                alert(errorMessage);
+                return
             }
 
             try{
+                const data = {
+                    iwTokenName: withdrawIWERCState.tokenName.toLowerCase(),
+                    ircAccount: address
+                }
                 //iwTokenName, ircAccount
                 let {data: result} = await swapApi.withdrawIwErc(data);
                 if (result) {
-                    const {withdrawRequestMsg} = t('withdrawIWErc', {returnObjects: true});
                     setLoadingStatus('success')
-                    alert(withdrawRequestMsg);
+                    alert(lang.withdrawRequestMsg);
                     setWithdrawIWERCState({uniqueKey:'',tokenName:'',isOpen:false})
                 }else {
                     setLoadingStatus('failed')
-                    alert("Error");
+                    alert(t('contactUs'));
                     setWithdrawIWERCState({uniqueKey:'',tokenName:'',isOpen:false})
                 }
             }catch (err){
                 console.slog(err)
                 setLoadingStatus('failed')
+                alert(t('contactUs'));
             }
 
         }
@@ -228,9 +264,9 @@ const WithdrawBlyERCContent = () => {
             {/*}}>출금</button>*/}
 
             <Div p={16} shadow={'md'} bc={'light'}>
-                <h3>IOST</h3>
-                <Div mt={15} mb={5}>
-                    <Div>Account</Div>
+                {/*<h3>IOST</h3>*/}
+                <Div mt={10} mb={5}>
+                    <Div><b>IOST</b> Account</Div>
                     <Div textAlign={'center'} fontSize={16}>{address}</Div>
                 </Div>
                 <Div mt={10} mb={15}>
@@ -266,7 +302,7 @@ const WithdrawBlyERCContent = () => {
             </Flex>
 
             <Div p={16} my={20} shadow={'md'} bc={'light'}>
-                <h3>ETH</h3>
+                <h3>{amtLabel}(ERC)</h3>
 
                 <Div mt={10}>
                     <Flex mb={5} alignItems={'flex-end'}>
@@ -275,8 +311,8 @@ const WithdrawBlyERCContent = () => {
                             <Button bg={'primary'} fg={'white'} px={8} py={5} rounded={3} onClick={onPasteClick} fontSize={13}>{lang.paste}</Button>
                         </Right>
                     </Flex>
-                    <Input name={'erc'} style={{fontSize:14.7}} placeholder={lang.receptionErcAddress} size={'large'} onChange={onErcAccount} value={ercAccount}/>
-                    <Div fg={'danger'} textAlign={'center'} mt={4} fontSize={12}>{lang.confirmMsgTitle}</Div>
+                    <Input name={'erc'} style={{fontSize:14.7}} placeholder={t(lang.receptionErcAddress,{x:amtLabel+'(ERC)'})} size={'large'} onChange={onErcAccount} value={ercAccount}/>
+                    <Div fg={'danger'} textAlign={'center'} mt={4} fontSize={12}>{t(lang.confirmMsgTitle,{x:amtLabel+'(ERC)'})}</Div>
                 </Div>
             </Div>
 
@@ -361,7 +397,7 @@ const WithdrawIWERCModal = () => {
                 setWithdrawIWERCState({uniqueKey:'',tokenName:'',isOpen:false})
             }}
         >
-            <WithdrawBlyERCContent />
+            <WithdrawIWERCContent />
         </Modal>
     );
 };

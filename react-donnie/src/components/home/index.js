@@ -35,15 +35,6 @@ const store = [
         fg: '#33658A'
     },
     {
-        pathname: '/loan',
-        img: imgLoan,
-        hoverImg: imgLoanWhite,
-        alt: 'Loan',
-        title: 'Loan',
-        desc: 'Borrow and Lend any cryptocurrency with an Algorithmic & Autonomous Interest Rate.',
-        fg: '#86BBD8'
-    },
-    {
         pathname: '/exchange',
         img: imgExchange,
         hoverImg: imgExchangeWhite,
@@ -51,6 +42,15 @@ const store = [
         title: 'Exchange',
         desc: 'Trade Cryptocurrency-to-Cryptocurrency with Automated Liquidity Provision.',
         fg: '#758E4F'
+    },
+    {
+        pathname: '/loan',
+        img: imgLoan,
+        hoverImg: imgLoanWhite,
+        alt: 'Loan',
+        title: 'Loan',
+        desc: 'Borrow and Lend any cryptocurrency with an Algorithmic & Autonomous Interest Rate.',
+        fg: '#86BBD8'
     },
     {
         pathname: '/credit',

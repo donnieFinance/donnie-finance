@@ -31,6 +31,8 @@ const BasicInput = styled.input`
         outline: none;
     }
 
+    color: ${props => props.fg ? color[props.fg] || props.fg : 'inherit'};
+
     ${padding}
     ${margin}
     
@@ -52,7 +54,7 @@ export const Input = styled(BasicInput)`
         border-left: 0;
     `}    
     ${props => props.readOnly && `
-        background-color: #f8f8f8;
+        // background-color: #f8f8f8;
     `}
 
     ${props => props.block && `

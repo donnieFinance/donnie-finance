@@ -12,6 +12,7 @@ import 'antd/dist/antd.min.css';
 
 //redux 대체용 전역 state 관리
 import {RecoilRoot} from 'recoil';
+import BigNumber from "bignumber.js";
 
 // 캐시 버스터
 //import CacheBuster from './CacheBuster';
@@ -22,6 +23,12 @@ const isKoKR = (localStorage.getItem("ko-KR")||"en_US") === 'ko-KR' ? true:false
 
 function App() {
     useEffect(() => {
+
+        //BigNumber테스트용, 나중에 지우기..
+        if (properties.isTestMode === true) {
+            window.BigNumber = BigNumber;
+        }
+
         window.clog = function() {
             if(properties.isTestMode === true) {
                 var i;

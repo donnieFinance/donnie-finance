@@ -3,18 +3,21 @@ import iostApi from "~/lib/iostApi";
 import priceApi from "~/lib/priceApi";
 import BigNumber from "bignumber.js";
 
-import coinInfo from "~/lib/combined/coinInfo";
 import properties from "~/properties";
 import {Div, Flex, Img, Right} from "~/styledComponents/shared";
 import ComUtil from "~/util/ComUtil";
 import useCoinInfo from "~/hooks/useCoinInfo";
 import useInterval from "~/hooks/useInterval";
 import {Space} from "antd";
+import useUsdPrice from "~/hooks/useUsdPrice";
 
 const DonImage = properties.tokenImages.don
 
 const Home = (props) => {
 
+    //useUsdPrice() 와 useCoinInfo 는 같이 사용 해야함
+    //useCoinInfo 내부에서 전역 변수인 useUsdPrice 값이 세팅 되면 coinInfo 정보를 가져오기 시작함
+    useUsdPrice()
     const {coinInfo, refresh, loading} = useCoinInfo({delay:5000})
 
     const {totalUsd, totalHarvestedDonBalance, list: coins} = coinInfo

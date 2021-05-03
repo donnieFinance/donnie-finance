@@ -55,21 +55,22 @@ const ModalContent = () => {
             </Div>
 
 
-            <GridColumns repeat={2} colGap={10}>
+            <GridColumns repeat={1} colGap={10}>
                 <Button bg='white'
                         bc={'primary'}
-                        py={15}
-                        px={6}
+                        // py={15}
+                        // px={6}
+                        block
                         onClick={() => window.open("https://www.iostabc.com/account/" + address)}
                 >
                     {t('ViewonEtherscan')}
                 </Button>
-                <Button bg='white'
-                        bc={'primary'}
-                        py={15}
-                        px={6}
-                        onClick={onDisconnectClick}
-                >{t('disconnected')}</Button>
+                {/*<Button bg='white'*/}
+                {/*        bc={'primary'}*/}
+                {/*        py={15}*/}
+                {/*        px={6}*/}
+                {/*        onClick={onDisconnectClick}*/}
+                {/*>{t('disconnected')}</Button>*/}
             </GridColumns>
         </Div>
     )

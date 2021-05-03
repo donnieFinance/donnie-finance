@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import useCoinInfo from "~/hooks/useCoinInfo";
 import {Div, Hr} from "~/styledComponents/shared";
 import styled from "styled-components";
 import useSize from "~/hooks/useSize";
 import ComUtil from "~/util/ComUtil";
+import moment from "moment-timezone";
 
 const Box = styled(Div)`
     
@@ -32,7 +33,7 @@ const TotalHarvestedDon = (props) => {
 
     const {coinInfo, refresh, loading} = useCoinInfo({delay:10000})
     const {totalUsd, totalHarvestedDonBalance, list: coins} = coinInfo
-
+    
     return (
 
         <Box fg={'white'} py={25}

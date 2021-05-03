@@ -13,9 +13,10 @@ import {withTranslation} from "react-i18next";
 import SpinnerWrap from '~/components/common/spinnerWrap'
 import PopoverSelectLanguage from "~/components/common/header/PopoverSelectLanguage";
 import useScrollPosition from "~/hooks/useScrollPosition";
+import { useLocation, useRouteMatch } from 'react-router-dom';
 
-const CustomNavLink = ({to, fg, children}) =>
-    <NavLink to={to} fg={fg} activeStyle={{color: color.white}}>
+const CustomNavLink = ({to, fg, children, pathName, isActive}) =>
+    <NavLink to={to} fg={fg} activeStyle={{color: color.white}} isActive={isActive}>
         {children}
     </NavLink>
 
@@ -28,6 +29,11 @@ const WebHeader = (props) => {
 
     const {about, checking, loan, exchange, credit, payment, portfolio} = t('menu', {returnObjects: true})
 
+    // extract pathname from location
+    const { pathname } = useLocation();
+
+    //exchange 라우터에 포함되는 경우
+    const match = useRouteMatch('/exchange')
 
     return (
         <Flex
@@ -50,18 +56,23 @@ const WebHeader = (props) => {
                 </CustomNavLink>
             </Div>
             <Div>
+                <CustomNavLink to={'/exchange/swap'} fg={fg} pathName={pathname}
+                    isActive={() =>{
+                        return match ? true : false
+                    }}
+                >
+                    <Tooltip title={exchange.desc} placement="bottom">
+                        {exchange.name}
+                    </Tooltip>
+                </CustomNavLink>
+            </Div>
+            <Div>
                 <CustomNavLink to={'/loan'} fg={fg}>
                     <Tooltip title={loan.desc} placement="bottom">
                         {loan.name}
                     </Tooltip>
                 </CustomNavLink>
             </Div>
-            <Div>
-                <CustomNavLink to={'/exchange'} fg={fg}>
-                    <Tooltip title={exchange.desc} placement="bottom">
-                        {exchange.name}
-                    </Tooltip>
-                </CustomNavLink></Div>
             <Div>
                 <CustomNavLink to={'/credit'} fg={fg}>
                     <Tooltip title={credit.desc} placement="bottom">

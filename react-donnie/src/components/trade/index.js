@@ -4,7 +4,7 @@ import iostApi from "~/lib/iostApi";
 import {useParams, Redirect} from 'react-router-dom'
 import useSize from "~/hooks/useSize";
 import useWallet from '~/hooks/useWallet'
-import {Div, Flex, Button, XCenter} from "~/styledComponents/shared";
+import {Div, A, Flex, Span, Button, XCenter, Img} from "~/styledComponents/shared";
 import properties from "~/properties";
 import {withTranslation} from "react-i18next";
 import {useRecoilState} from "recoil";
@@ -23,6 +23,8 @@ import Server from "~/properties";
 import {FaChevronDown, FaChevronUp} from 'react-icons/fa'
 import useModal from "~/hooks/useModal";
 import {HexEdge} from "~/styledComponents/shared/Shapes";
+import BigNumber from "bignumber.js";
+import {SymbolGroup} from "~/components/exchange/Components";
 
 const IWTokenBigCard = loadable(() => import('~/components/common/layouts/IWTokenBigCard'))
 const TradeBigCard = loadable(() => import('~/components/common/layouts/TradeBigCard'))
@@ -40,13 +42,14 @@ const Trade = withTranslation()(({t, history}) => {
     //파라미터로 넘어온 토큰명(name)history
     const {uniqueKey} = useParams()
     const contract = contractList[uniqueKey] || {tokenName: null, img: null, pool: null, forcedStartTime: null, forcedEndTime: null}
-    const {tokenName: iwTokenName, isIwFlag, ercTokenName} = contractList[uniqueKey]
-    const {tokenName, img, pool} = contract
+    const {tokenName, tokenName: iwTokenName, ercTokenName, tokenType, img, pool} = contract//contractList[uniqueKey]
+    // const {tokenName, tokenType, img, pool} = contracttokenType, img, pool
 
     const [, setNow] = useRecoilState(nowState)
 
     const [status, startTime, endTime, duration] = useRunningStatus(
         {
+            uniqueKey: uniqueKey,
             pool: pool,
             //TODO 아래는 테스트를 쉽게 하기위한 프로퍼티 입니다. 배포 전 /properties.js 의 forcedStartTime, forcedEndTime 삭제 요망 [delete]
             forcedStartTime: contract.forcedStartTime ? contract.forcedStartTime : null,
@@ -210,13 +213,25 @@ const Trade = withTranslation()(({t, history}) => {
         }
     }
 
+
     const getIwTokenBalance = async() => {
 
         if (!address)
             return
 
-        const vIwTokenBalance = await iostApi.getTokenBalance({address: address, tokenName:iwTokenName})
+        let vIwTokenBalance = await iostApi.getTokenBalance({address: address, tokenName:iwTokenName})
         console.log({address, iwTokenName, vIwTokenBalance})
+
+        //iw 일 경우 destroy amount
+        if (tokenType === 'iw') {
+            if (contract.tokenName === 'iwbly') {
+                vIwTokenBalance = new BigNumber(vIwTokenBalance).minus(ComUtil.getDestroyBlyAmount(address)).toNumber()
+            }
+            else if (contract.tokenName === 'iwbtc') {
+                vIwTokenBalance = new BigNumber(vIwTokenBalance).minus(ComUtil.getDestroyBtcAmount(address)).toNumber()
+            }
+        }
+
         setIwTokenBalance(vIwTokenBalance)
     }
 
@@ -321,6 +336,28 @@ const Trade = withTranslation()(({t, history}) => {
         return await iostApi.getTradeBalanceAll(pool, address);
     }
 
+    const Symbol = () => {
+        if (tokenType === 'iw') {
+            return(
+                <HexEdge width={60} height={60}>
+                    <Img src={img} width={32} height={32} alt={ComUtil.coinName(tokenName)}/>
+                </HexEdge>
+            )
+        }else if (tokenType === 'lp') {
+            const lpTokenNames = ComUtil.getLpTokenNames(tokenName)
+            return (
+                <SymbolGroup symbol1={lpTokenNames[0]} symbol2={lpTokenNames[1]} size={40} />
+                // <Flex>
+                //     <SymbolIcon src={img} alt="" width={size} zIndex={1}/>
+                //     <SymbolIcon src={img2} alt="" width={size} ml={-7}/>
+                // </Flex>
+            )
+        }else {
+            return <Img src={img} width={40} height={40} alt={ComUtil.coinName(tokenName)}/>
+        }
+    }
+
+
     if (!tokenName) return <Redirect to={'/checking'} />
 
     return (
@@ -362,10 +399,30 @@ const Trade = withTranslation()(({t, history}) => {
 
             </Flex>
 
+            {
+                (tokenType === 'iw' && contract.tokenAddress) && (
+                    <Flex justifyContent={'center'}  mt={20} mb={20} >
+                        <Div fg={'white'} textAlign={'center'}
+                             width={sizeValue('unset', null, '90%')}
+                             fontSize={15} py={5} px={10}
+                             bc={'info'}
+                            // bg={'rgba(255,255,255, 0.9)'}
+                             rounded={7}
+                             style={{wordBreak: 'break-word'}}
+                        >
+                            <Span mr={10}>{contract.ircTokenName} Contract Address is</Span>
+                            <A fg={'white'} target={'_blank'} href={`https://www.iostabc.com/contract/${contract.tokenAddress}`}>
+                                <b>{contract.tokenAddress}</b>
+                            </A>
+                        </Div>
+                    </Flex>
+                )
+            }
+
 
             {
-                isIwFlag && (
-                    <Flex justifyContent={'center'} >
+                tokenType === 'iw' && (
+                    <Flex flexDirection={'column'} justifyContent={'center'} >
                         <Flex flexDirection={'column'}
                             // bg={swapOpen && 'white'}
                             // p={20}
@@ -376,7 +433,7 @@ const Trade = withTranslation()(({t, history}) => {
                             <Button bg={'info'} fg={'white'} fontSize={18} px={15}
                                     onClick={toggleSwap}
                             >
-                                <Flex>Swap<Flex ml={5}>{swapOpen ? <FaChevronUp />:<FaChevronDown />}</Flex></Flex>
+                                <Flex>{ercTokenName && ercTokenName.toUpperCase()} Swap<Flex ml={5}>{swapOpen ? <FaChevronUp />:<FaChevronDown />}</Flex></Flex>
                             </Button>
 
                             {
@@ -394,11 +451,11 @@ const Trade = withTranslation()(({t, history}) => {
 
                                 )
                             }
-
                         </Flex>
                     </Flex>
                 )
             }
+
 
 
 
@@ -439,9 +496,12 @@ const Trade = withTranslation()(({t, history}) => {
                      mb={sizeValue(16, null, 30)}
                 >
                     <TradeBigCard
-                        isIwFlag={contract.isIwFlag}
+                        tokenName={contract.tokenName}
+                        // isIwFlag={contract.isIwFlag}
                         name={contract.tokenName.toUpperCase()}
                         img={contract.img}
+                        // img2={contract.img2}
+                        tokenType={contract.tokenType}
                         balance={stakeBalance}
                         explain={t('Depositing')}
                         childButton={getTradeDepositWithDrawBtns()}
@@ -503,7 +563,7 @@ const Trade = withTranslation()(({t, history}) => {
 
             {/* 인출 withdraw */}
             <Modal
-                title={<Flex><img src={contract.img} style={{display: 'block', width: 20}} /><Div lineHeight={25} ml={8} mb={-3}>{t('withdraw')+' '+tokenName.toUpperCase()}</Div></Flex>}
+                title={<Flex><img src={contract.img} style={{display: 'block', width: 20}} /><Div lineHeight={25} ml={8} mb={-3}>{t('withdraw')}</Div></Flex>}
                 visible={withDrawModal}
                 onCancel={onWithDrawClose}
                 // bodyStyle={{padding: 0}}
@@ -527,17 +587,22 @@ const Trade = withTranslation()(({t, history}) => {
             {
                 <Modal
                     title={
-                        isIwFlag ? (
+                        tokenType === 'iw' ? (
                             <Flex>
                                 <HexEdge width={35} height={35}>
                                     <img src={contract.img} style={{display: 'block', width: 20}} />
                                 </HexEdge>
-                                <Div lineHeight={25} ml={8} mb={-3}>{t('Deposit2')+' '+tokenName.toUpperCase()}</Div>
+                                <Div lineHeight={25} ml={8} mb={-3}>{t('Deposit2')}</Div>
+                            </Flex>
+                        ) : tokenType === 'lp' ? (
+                            <Flex>
+                                <SymbolGroup symbol1={'don'} symbol2={'husd'} size={30} />
+                                <Div lineHeight={25} ml={8} mb={-3}>{t('Deposit2')}</Div>
                             </Flex>
                         ) : (
                             <Flex>
                                 <img src={contract.img} style={{display: 'block', width: 20}} />
-                                <Div lineHeight={25} ml={8} mb={-3}>{t('Deposit2')+' '+tokenName.toUpperCase()}</Div>
+                                <Div lineHeight={25} ml={8} mb={-3}>{t('Deposit2')}</Div>
                             </Flex>
                         )
 
@@ -570,10 +635,12 @@ const Trade = withTranslation()(({t, history}) => {
                             <img src={tokenImages.don} alt="don" style={{display: 'block', width: 20}}/>
                             <Div lineHeight={25} mx={8} mb={-3}>X</Div>
                             {
-                                isIwFlag ? (
+                                tokenType === 'iw' ? (
                                     <HexEdge width={35} height={35}>
                                         <img src={contract.img} alt={contract.tokenName} style={{display: 'block', width: 20}}/>
                                     </HexEdge>
+                                ) : tokenType === 'lp' ? (
+                                    <SymbolGroup symbol1={'don'} symbol2={'husd'} size={30} />
                                 ) : (
                                     <img src={contract.img} alt={contract.tokenName} style={{display: 'block', width: 20}}/>
                                 )

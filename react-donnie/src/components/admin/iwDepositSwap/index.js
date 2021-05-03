@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import {Div, Flex, Span} from '~/styledComponents/shared'
+import {Div, Flex, Right, Span} from '~/styledComponents/shared'
 import styled from 'styled-components'
 import {color} from '~/styledComponents/Properties'
 import {getValue} from "~/styledComponents/Util";
-import {Button} from 'antd'
+import {Button, Input} from 'antd'
 
 import ComUtil from '~/util/ComUtil'
 
@@ -15,6 +15,7 @@ import useModal from '~/hooks/useModal'
 import {AgGridReact} from 'ag-grid-react';
 
 import AdminApi from '~/lib/adminApi'
+import ApproveRenderer from './ApproveRenderer'
 
 const SearchBox = styled.div`
     background-color: ${color.white};
@@ -63,6 +64,8 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
 
     const [iostabcContractUrl, setIostabcContractUrl] = useState("");
 
+    const [depositIOSTAccountId, setDepositIOSTAccountId] = useState("");
+
     //[이벤트] 그리드 로드 후 callback 이벤트 API init
     const onGridReady = params => {
         setGridApi(params.api);
@@ -81,16 +84,16 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                 headerName: "No", field: "iwSwapDepositNo", width: 80
             },
             {
-                headerName: "irc계정", field: "ircAccount", width: 120
+                headerName: "IRC계정", field: "ircAccount", width: 200, cellRenderer: 'ircAccountRenderer'
             },
             {
                 headerName: "swap계정", field: "swapAccount", width: 200, cellRenderer: 'ethAccountRenderer'
             },
             {
-                headerName: "입금erc"+ercTokenName, field: "ercTokenAmount", width: 140
+                headerName: "입금erc"+ercTokenName, field: "ercTokenAmount", width: 100
             },
             {
-                headerName: "swap 시작시간", field: "recordCreateTime", width: 120,
+                headerName: "swap 시작시간", field: "recordCreateTime", width: 140,
                 cellStyle:ComUtil.getCellStyle({cellAlign: 'center'}),
                 valueGetter: function(params){
                     const v_Date = params.data.recordCreateTime ? ComUtil.utcToString(params.data.recordCreateTime, 'YYYY.MM.DD HH:mm') : null;
@@ -98,11 +101,11 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                 }
             },
             {
-                headerName: "approve상태", field: "approved", width: 200,
+                headerName: "approve상태", field: "approved", width: 300,
                 cellStyle:ComUtil.getCellStyle({cellAlign: 'center'}), cellRenderer: "approveRenderer"
             },
             {
-                headerName: "승인 완료시간", field: "approvedTime", width: 120,
+                headerName: "승인 완료시간", field: "approvedTime", width: 140,
                 cellStyle:ComUtil.getCellStyle({cellAlign: 'center'}),
                 valueGetter: function(params){
                     const v_Date = params.data.approvedTime ? ComUtil.utcToString(params.data.approvedTime, 'YYYY.MM.DD HH:mm') : null;
@@ -111,7 +114,7 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
             },
 
             {
-                headerName: "ircToken전송", field: "ircTokenPaid", width: 130,
+                headerName: "ircToken전송", field: "ircTokenPaid",
                 cellRenderer: 'sudongSendRenderer'
 
             },
@@ -124,17 +127,21 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                 }
             },
             {
-                headerName: "eth 잔고", field: "ethBalance", width: 100
+                headerName: "eth 잔고", field: "ethBalance", width: 100,
+                cellStyle:ComUtil.getCellStyle({cellAlign: 'left'}), cellRenderer: "ethBalanceRenderer"
             },
             {
-                headerName: ercTokenName + " 잔고", field: "ercTokenBalance", width: 150, cellRenderer: 'balanceCheckRenderer'
+                headerName: ercTokenName + " 잔고", field: "ercTokenBalance", cellRenderer: 'balanceCheckRenderer'
             }
         ],
         frameworkComponents: {
+            ircAccountRenderer: ircAccountRenderer,
             approveRenderer: approveRenderer,
             ethAccountRenderer: ethAccountRenderer,
             balanceCheckRenderer: balanceCheckRenderer,
-            sudongSendRenderer:sudongSendRenderer
+            sudongSendRenderer:sudongSendRenderer,
+            //approveRenderer: ApproveRenderer,
+            ethBalanceRenderer: ethBalanceRenderer
         }
     }
 
@@ -150,30 +157,48 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
         setErcTokenNm(ercTokenName);
     }, [iwTokenName])
 
+    function ircAccountRenderer({value, data:rowData}) {
+        return (
+            <div>
+                <Span>
+                    <Button size={'small'} type={'secondary'}
+                            onClick={() => rowData.checkTotalSwapAmount()}> swap금액확인
+                    </Button>
+                </Span>
+                <Span ml={10}>{rowData.ircAccount}</Span>
+            </div>
+        )
+    }
+
     function approveRenderer({value, data:rowData}) {
         let status = '미승인';
         const managerStatus = rowData.approved;
 
         if (managerStatus === 0) {
-            status = '미승인'
+            status = '0.미승인'
         } else if (managerStatus === 1) {
-            status = '승인 중'
+            status = '1.승인중'
         } else if (managerStatus === 2) {
-            status = '승인완료'
+            status = '2.승인완료'
         }
 
         return (
-            managerStatus === 1 ?
+            managerStatus <= 1 ?
                 <div>
                     {status}
                     <Span ml={10}>
                         <Button size={'small'} type={'primary'}
-                                onClick={() => rowData.transferOkClick()}> 승인처리
+                                onClick={() => rowData.approveAllowanceClick()}> 조회
                         </Button>
                     </Span>
                     <Span ml={10}>
                         <Button size={'small'} type={'primary'}
-                                onClick={() => rowData.approveAllowanceClick()}> Approve확인
+                                onClick={() => rowData.manualApprove()}> 수동Approve
+                        </Button>
+                    </Span>
+                    <Span ml={10}>
+                        <Button size={'small'} type={'primary'}
+                                onClick={() => rowData.transferOkClick()}> status2로변경.
                         </Button>
                     </Span>
                 </div>
@@ -182,7 +207,7 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                     {status}
                     <Span ml={10}>
                         <Button size={'small'} type={'primary'}
-                                onClick={() => rowData.approveAllowanceClick()}> Approve확인
+                                onClick={() => rowData.approveAllowanceClick()}> Approve금액조회
                         </Button>
                     </Span>
                 </div>
@@ -196,6 +221,40 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
             ethScanUrl = ropstenEthScanUrl;
         }
         return value && <><a href={`${ethScanUrl}${value}`} target={'_blank'} fg={'primary'} ml={10} ><u>EthScan</u></a> <span>{value}</span></>
+    }
+
+    function ethBalanceRenderer(props) {
+        const rowData = props.data;
+        // const onHandleClick = async() => {
+        //     console.slog("eth don 잔액조회");
+        //     let {data:result} = await AdminApi.sendWeiWithGasPrice(rowData.swapAccount);
+        //     alert(result);
+        // }
+        const onRetrivalClick = async() => {
+            console.slog("eth don 회수");
+            let {data:result} = await AdminApi.iwErcAccountWeiRetrieval(iwTokenName, rowData.swapAccount);
+            alert(result);
+        }
+        // let status = false;
+        // if(rowData.managerTransfered === 1) {
+        //     status = true;
+        // }
+        return(
+            // status ?
+            //     <div>
+            //         {rowData.ethBalance}
+            //         <Span ml={10}>
+            //             <button onClick={onHandleClick}>fee수동전송</button>
+            //         </Span>
+            //     </div>
+            //     :
+                <div>
+                    {rowData.ethBalance}
+                    <Span ml={10}>
+                        <button onClick={onRetrivalClick}>wei회수</button>
+                    </Span>
+                </div>
+        )
     }
 
     function sudongSendRenderer(props) {
@@ -216,13 +275,28 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                 }
             }
         }
+        const onHandleComplateClick = async() => {
+            if(window.confirm(rowData.ircAccount+'의 '+ rowData.ercTokenAmount +'토큰을 수동완료처리 하시겠습니까?')) {
+                const params = {
+                    iwSwapDepositNo: rowData.iwSwapDepositNo,
+                    iwTokenName: iwTokenName,
+                    ircAccount: rowData.ircAccount
+                }
+                //approve된 Iw ERC토큰 수동 전송 기능
+                let {data: result} = await AdminApi.issueIwIrcToUserFinish(params);
+                alert(result);
+                if (window.confirm('다시 재 검색하시겠습니까?')) {
+                    search();
+                }
+            }
+        }
         let ircTokenPaidStat = 'false';
         if(rowData.ircTokenPaid){
             ircTokenPaidStat = 'true'
         }
         let v_memo = null;
         if(rowData.memo){
-            v_memo = "("+rowData.memo+")";
+            v_memo = rowData.memo;
         }
 
         return(
@@ -230,8 +304,14 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                 {ircTokenPaidStat}
                 {
                     !rowData.ircTokenPaid &&
-                    <Span ml={10}>
+                    <Span ml={5}>
                         <button onClick={onHandleClick}>수동전송</button>
+                    </Span>
+                }
+                {
+                    !rowData.ircTokenPaid &&
+                    <Span ml={5}>
+                        <button onClick={onHandleComplateClick}>수동완료</button>
                     </Span>
                 }
                 {v_memo}
@@ -243,7 +323,7 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
         const rowData = props.data;
         const onHandleClick = async() => {
             let {data:result} = await AdminApi.getIwEthErcBalance(iwTokenName, rowData.swapAccount);
-            alert(`${rowData.swapAccount} Eth: ${result[0]} \n ${ercTokenNm} 잔고: ${result[1]}`);
+            alert(`${rowData.swapAccount} \n Eth: ${result[0]} \n ${ercTokenNm} 잔고: ${result[1]}`);
         }
 
         return(
@@ -301,8 +381,17 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                 userApproveOk(iwTokenName, item);
             })
 
-            data.map(item => item.approveAllowanceClick = function () {
-                userApproveAmt(iwTokenName, item);
+            data.map(item => {
+                item.iwTokenName = iwTokenName
+                item.approveAllowanceClick = function () {
+                    userApproveAmt(iwTokenName, item);
+                }
+                item.checkTotalSwapAmount = function () {
+                    checkTotalSwap(iwTokenName, item);
+                }
+                item.manualApprove = function () {
+                    manualErcApprove(iwTokenName, item);
+                }
             })
 
         }
@@ -314,6 +403,7 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                 totalDeposit = totalDeposit + parseFloat(item.ercTokenAmount);
                 // console.log(item);
             })
+            totalDeposit = totalDeposit.toFixed(8);
         }
         setTotal(totalDeposit);
         setLoading(false);
@@ -331,6 +421,26 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
         const {data:approveAmt} = await AdminApi.getIwErcTokenApproved(iwTokenName, item.ircAccount);
         alert("Approve:"+approveAmt);
     }
+
+    async function checkTotalSwap(iwTokenName, item) {
+        const {data:result} = await AdminApi.getIwSwapTotalAmount(iwTokenName, item.ircAccount);
+        // console.log(result);
+        let resultText = result.ircAccount + "\n" + result.iwTokenName
+            + "\ntotalDeposit : " + result.totalDeposit
+            + "\ntotalWithdraw : " + result.totalWithdraw
+            + "\ntotalFee : " + result.totalFee
+            + "\navailableWithdraw : " + result.availableWithdraw;
+        alert(resultText);
+    }
+
+    //20210407 추가.
+    async function manualErcApprove(iwTokenName, item) {
+        console.slog("수동 approve 요청");
+        const {data:approveResult} = await AdminApi.manualErcApprove(iwTokenName, item.iwSwapDepositNo);
+        console.slog({approveResult});
+        alert("Approve Result:"+approveResult);
+    }
+
 
     async function searchWithEth() {
         setLoading(true);
@@ -350,6 +460,18 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
         ComUtil.copyTextToClipboard(value, '', '');
     }
 
+    const onDepositChangeIOSTAccountId = ({target}) => {
+        const {name, value} = target
+        setDepositIOSTAccountId(value);
+    }
+    async function onApproveManual() {
+        if(window.confirm("계정:"+depositIOSTAccountId+" "+iwTokenName+"토큰 수동전송하시겠습니까?")) {
+            console.log(depositIOSTAccountId, iwTokenName);
+            const {data} = await AdminApi.manualApprove0x34(iwTokenName, depositIOSTAccountId);
+            alert(data);
+        }
+    }
+
     return (
         <>
         <SearchBox>
@@ -360,18 +482,16 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                     <Div>
                         <Flex ml={10}>
                             <Div mr={10}>
-                                SwapManager ETH : <Span fg="blue">{ComUtil.toCurrency(swapManagerEth.toFixed(2))}</Span> <br/>
-                                {/*SwapManager DON : <Span fg="blue">{ComUtil.toCurrency(swapManagerDon.toFixed(0))} </Span> <br/>*/}
+                                SwapManager ETH : <Span fg="blue">{ComUtil.toCurrency(swapManagerEth && swapManagerEth.toFixed(2))}</Span> <br/>
                             </Div>
                             <Div ml={20}>
-                                donmanager igas : <Span fg="blue">{ComUtil.toCurrency(managerIGas.toFixed(2))}</Span> <br/>
-                                {/*donswap Don : <Span fg="blue">{ComUtil.toCurrency(managerIrcDon.toFixed(2))} </Span> <br/>*/}
+                                donmanager igas : <Span fg="blue">{ComUtil.toCurrency(managerIGas && managerIGas.toFixed(2))}</Span> <br/>
                             </Div>
                             <Div ml={20}>
-                                donmanager iram : <Span fg="blue">{ComUtil.toCurrency(managerIRam.toFixed(2))}</Span> <br/>
+                                donmanager iram : <Span fg="blue">{ComUtil.toCurrency(managerIRam && managerIRam.toFixed(2))}</Span> <br/>
                             </Div>
                             <Div ml={20}>
-                                ethGasGwei : <Span fg="blue">{ComUtil.toCurrency(ethGasGwei.toFixed(2))}</Span>
+                                ethGasGwei : <Span fg="blue">{ComUtil.toCurrency(ethGasGwei && ethGasGwei.toFixed(2))}</Span>
                             </Div>
                         </Flex>
                     </Div>
@@ -387,6 +507,14 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                     <Div>
                         <Button loading={loading} onClick={searchWithErc}>Eth, {ercTokenName} 잔고출력</Button>
                     </Div>
+                    {/*<Right> 38계좌 해킹 장애복구용 */}
+                    {/*    <Flex>*/}
+                    {/*        <Div mr={15}>*/}
+                    {/*            <Input style={{fontSize:14.7}} size={'large'} placeHolder={'IOST Account ID'} onChange={onDepositChangeIOSTAccountId} value={depositIOSTAccountId}/>*/}
+                    {/*        </Div>*/}
+                    {/*        <Button onClick={onApproveManual}>수동Approve(0x34)</Button>*/}
+                    {/*    </Flex>*/}
+                    {/*</Right>*/}
                 </Flex>
             </Div>
 

@@ -82,7 +82,7 @@ const Withdraw = ({
                 let contractID = contract.pool;
                 setLoading(true);
 
-                const gasLimit = 120000;
+                const gasLimit = 300000; // 기존 120000 -> 토큰포켓에 가스 비용 300000 사용됨
                 const {result, isSuccess} = await IostApi.onWithDrawSendBC(gasLimit, contractID, amountVal);
                 console.log({isSuccess: isSuccess, result:result});
                 if (isSuccess) {
@@ -90,12 +90,28 @@ const Withdraw = ({
                     onClose()
                 } else {
                     window.$message.error('fail');
+                    let errorMessage = `${tMessage.failedToSend}`;
                     if (typeof result === 'string') {
-                        let error = JSON.parse(result.substring(result.indexOf('{'), result.indexOf('}') + 1))
-                        if (error.code === 2) {
-                            alert(`${tMessage.lackOfIgas} ${gasLimit} \n${tMessage.chargeIgasTime}`)
+                        if (result.indexOf('{') > -1) {
+                            let error = JSON.parse(result.substring(result.indexOf('{'), result.indexOf('}') + 1))
+                            if (error.code === 2) {
+                                let vFailedToSend = `${tMessage.lackOfIgas} ${gasLimit} \n${tMessage.chargeIgasTime}`;
+                                if (error.message) {
+                                    vFailedToSend = vFailedToSend + "\n" + error.message.toString();
+                                }
+                                errorMessage = vFailedToSend
+                            } else {
+                                errorMessage = result
+                            }
+                        }
+                    }else if(typeof result === 'object') {
+                        if(result.status_code === 'BALANCE_NOT_ENOUGH') {
+                            errorMessage = `${tMessage.lackOfIram}`;
+                        }else{
+                            errorMessage = `${tMessage.jetstreamFail}`;
                         }
                     }
+                    alert(errorMessage)
                 }
                 setLoading(false);
                 // setWithDrawModal(false);

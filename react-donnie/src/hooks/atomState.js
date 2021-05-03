@@ -163,6 +163,22 @@ export const withdrawERCModalState = atom({
 })
 
 
+// Bridge Deposit modal state
+export const bridgeDepositModalState = atom({
+    key: 'bridgeDepositModalState',
+    default: {
+        tokenName:'', isOpen:false
+    }
+})
+// Bridge Withdraw modal state
+export const bridgeWithdrawModalState = atom({
+    key: 'bridgeWithdrawModalState',
+    default: {
+        tokenName:'', isOpen:false
+    }
+})
+
+
 // Deposit IW (ERC to IRC) modal state
 export const depositIWERCModalState = atom({
     key: 'depositIWERCModalState',
@@ -172,9 +188,28 @@ export const depositIWERCModalState = atom({
         isOpen:false
     }
 })
-// Withdraw iwBly(IRC) to Bly(ERC) modal state
+// Withdraw iw (IRC to ERC) modal state
 export const withdrawIWERCModalState = atom({
     key: 'withdrawIWERCModalState',
+    default: {
+        uniqueKey:'',
+        tokenName:'',
+        isOpen:false
+    }
+})
+
+// Deposit BNB(BEP) to iwBNB(IRC) modal state
+export const depositBNBModalState = atom({
+    key: 'depositBNBModalState',
+    default: {
+        uniqueKey:'',
+        tokenName:'',
+        isOpen:false
+    }
+})
+// Withdraw iwBNB(IRC) to BNB(BEP) modal state
+export const withdrawBNBModalState = atom({
+    key: 'withdrawBNBModalState',
     default: {
         uniqueKey:'',
         tokenName:'',
@@ -198,12 +233,35 @@ export const nowState = atom({
 });
 
 // 로딩상태
-// start, stop
+/*
+* confirmation
+* pending
+* success
+* failed
+*/
 export const loadingState = atom({
     key: 'loadingState', // unique ID (with respect to other atoms/selectors)
     default: null, // default value (aka initial value)
 });
 
+//notice modal
+export const noticeModalState = atom({
+    key: 'noticeModalState', // unique ID (with respect to other atoms/selectors)
+    default: null, // default value (aka initial value)
+});
+
+// USD Price
+export const usdPriceState = atom({
+    key: 'usdPriceState', // unique ID (with respect to other atoms/selectors)
+    default: null
+});
+
+//swapPairState
+// ["don_husd", "don_iost", ...]
+export const swapPairsState = atom({
+    key: 'swapPairsState', // unique ID (with respect to other atoms/selectors)
+    default: null
+})
 
 /*
     사용법 [useRecoilValue]

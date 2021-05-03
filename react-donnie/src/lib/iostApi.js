@@ -4,6 +4,8 @@ import WalletUtil from "~/util/WalletUtil";
 import ComUtil from "~/util/ComUtil";
 import BigNumber from "bignumber.js";
 
+const {EXCHANGE_CONTRACT_ID} = properties;
+
 const donTokenAddress = properties.address.tokenAddress;
 const donTokenName = properties.address.token;
 
@@ -15,8 +17,8 @@ export const getTokenBalance = async ({address, tokenName}) => {
             // const iost = myWallet.wallet.newIOST(window.IOST);
             // const iostHost = iost.currentRPC._provider._host;
             axios.get(properties.IOST_ADDR + "/getTokenBalance/" + address + "/" + tokenName + "/1").then(({data}) => {
-                // console.log("getTokenBalance======999=======",data)
-                resolve(data.balance)
+                 //console.log("getTokenBalance======999=======",new BigNumber(data.balance).toString())
+                resolve(new BigNumber(data.balance).toString())
             }).catch(err => {
                 console.log(err);
                 resolve(0)
@@ -37,11 +39,11 @@ export const getPoolTokenBalance = async ({pool, tokenName}) => {
         const {data} = await axios.get(properties.IOST_ADDR + "/getTokenBalance/" + pool + "/" + 'don' + "/1")
 
         if (data) {
-            balance = parseFloat(data.balance)
+            balance = new BigNumber(data.balance).toString();
 
             if(tokenName.startsWith("don")) {
                 let totalSupply = await getPoolTotalSupply(pool);
-                balance = parseFloat(data.balance) - parseFloat(totalSupply);
+                balance = new BigNumber(data.balance).minus(totalSupply).toString();
             }
         }
 
@@ -222,7 +224,7 @@ export const onDepositSendBC = async(gasLimit, contractID, amountVal, tokenName)
     tx.addApprove('iost', amountVal)
     // console.log({contractID:contractID})
     // console.log({tokenName:tokenName})
-    if(tokenName !== 'iost') {
+    if(tokenName !== 'iost') {                //jetstream 때문에 넣음1
         tx.addApprove(tokenName, amountVal)
     }
     tx.amount_limit.push({token: "*", value: "unlimited"});
@@ -253,10 +255,14 @@ export const onHarvestWithDrawSendBC = async(gasLimit, contractID) => {
 }
 
 // iwWithdraw 출금
-export const onIwSwapWithdrawBC = async(gasLimit, contractID, amountStr, ercAccount) => {
+export const onIwSwapWithdrawBC = async(gasLimit, contractID, amountStr, ercAccount, tokenName) => {
     const myWallet = WalletUtil.getMyWallet();
     const iost = myWallet.wallet.newIOST(window.IOST)
     let txWithdraw = iost.callABI(contractID, "swapWithdraw", [amountStr.toString(), ercAccount]);
+
+    txWithdraw.addApprove('iost', amountStr.toString())
+    txWithdraw.addApprove(tokenName, amountStr.toString()) //jetstream 때문에 넣음2
+
     txWithdraw.gasLimit = gasLimit;
     txWithdraw.amount_limit.push({ token: "*", value: "unlimited" });
     const res = await signAndSend(txWithdraw)
@@ -291,6 +297,355 @@ const signAndSend = (tx) => new Promise((resolve) => {
 })
 
 
+/* ==== exchange Function =========== */
+
+// exchange swapToken
+//const EXCHANGE_CONTRACT_ID = properties.js getExchangeContractId()로 이동.
+
+
+export const getLpTokenList = async () => {
+    let list = []
+    const swapPairsData = await getSwapPairs();
+    const promises = swapPairsData.map(async (swapPairKey, i) => {
+
+        const swapSymbol = swapPairKey.split('_');
+        const symbol1 = swapSymbol[0];
+        const symbol2 = swapSymbol[1];
+
+        const lpTokenName = await getLpTokenName(swapPairKey);
+        const dpLpTokenName = ComUtil.getDPLpTokenName(lpTokenName);
+
+        // 전체 토큰 발행량
+        const allData = await getAmountData(swapPairKey);
+
+        // lpToken의 현재 발행량 가져오기
+        const currentSupply = await getTokenCurrentSupply(lpTokenName);
+
+        console.log("allData===",allData)
+        console.log("allData==currentSupply=",currentSupply)
+
+        list.push({
+            dpLpTokenName: dpLpTokenName,
+            lpTokenName: lpTokenName,
+            symbol1: symbol1,
+            symbol2: symbol2,
+            swapPairKey:swapPairKey,
+            currentSupply: currentSupply,
+        });
+
+    });
+    await Promise.all(promises);
+    ComUtil.sortByKey(list, 'dpLpTokenName')
+    return list
+}
+
+// 내 지갑의 LpTokenList
+export const getMyLpTokenList = async (address) => {
+    const myWallet = WalletUtil.getMyWallet();
+    if(myWallet.wallet && myWallet.address && address) {
+        let list = []
+        let listDataBalanceChk = 0;
+        const swapPairsData = await getSwapPairs();
+        const promises = swapPairsData.map(async (swapPairKey, i) => {
+
+            const swapSymbol = swapPairKey.split('_');
+            const symbol1 = swapSymbol[0];
+            const symbol2 = swapSymbol[1];
+
+            const lpTokenName = await getLpTokenName(swapPairKey);
+
+            // 전체 토큰 발행량
+            const allData = await getAmountData(swapPairKey);
+
+            // lpToken의 현재 발행량 가져오기
+            const currentSupply = await getTokenCurrentSupply(lpTokenName);
+
+            console.log("allData===",allData)
+            console.log("allData==currentSupply=",currentSupply)
+
+            //console.log("lpTokenName===",lpTokenName)
+            await axios.get(properties.IOST_ADDR + "/getTokenBalance/" + address + "/" + lpTokenName + "/1").then(async ({data}) => {
+                //console.log("getMyLpTokenListBalance======999=======",data)
+                //  i___h___tst, d__i___tst, d__h___tst
+                const dpLpTokenName = ComUtil.getDPLpTokenName(lpTokenName);
+                const myBalance = data.balance;
+
+                // 전체공급량에서 자기 지분 토큰량 계산
+                const symbol1Balance = new BigNumber(myBalance).div(currentSupply).multipliedBy(allData[symbol1]).toFixed(8)
+                const symbol2Balance = new BigNumber(myBalance).div(currentSupply).multipliedBy(allData[symbol2]).toFixed(8)
+
+                //if(data.balance > 0) {
+
+                if(myBalance > 0){
+                    listDataBalanceChk = listDataBalanceChk + 1;
+                }
+                list.push({
+                    dpLpTokenName: dpLpTokenName,
+                    lpTokenName: lpTokenName,
+                    symbol1: symbol1,
+                    symbol2: symbol2,
+                    lpTokenBalance: myBalance,
+                    symbol1Balance:symbol1Balance,
+                    symbol2Balance:symbol2Balance,
+                    symbol1Total:allData[symbol1],
+                    symbol2Total:allData[symbol2],
+                    swapPairKey:swapPairKey,
+                    currentSupply: currentSupply,
+                    lpTokenBalanceRate: (myBalance / currentSupply) * 100
+                });
+                //}
+            }).catch(err => {
+                console.log(err);
+            })
+        });
+        await Promise.all(promises);
+
+        if(list.length > 0){
+            if(listDataBalanceChk > 0) {
+                list = ComUtil.sortByKey(list, 'lpTokenBalance')
+            }else{
+                list = ComUtil.sortByKey(list, 'dpLpTokenName')
+            }
+        }else{
+            list = null;
+        }
+
+        return list;
+    }else{
+        return null
+    }
+}
+
+export const getMyLpToken = async (address, swapPairKey) => {
+    const myWallet = WalletUtil.getMyWallet();
+    return new Promise((async resolve => {
+        if (myWallet.wallet && myWallet.address && address) {
+            // const iost = myWallet.wallet.newIOST(window.IOST);
+            // const iostHost = iost.currentRPC._provider._host;
+
+            const swapSymbol = swapPairKey.split('_');
+            const symbol1 = swapSymbol[0];
+            const symbol2 = swapSymbol[1];
+
+            const lpTokenName = await getLpTokenName(swapPairKey);
+
+            // 전체 토큰 발행량
+            const allData = await getAmountData(swapPairKey);
+
+            // lpToken의 현재 발행량 가져오기
+            const currentSupply = await getTokenCurrentSupply(lpTokenName);
+
+            console.log("allData===",allData)
+            console.log("allData==currentSupply=",currentSupply)
+
+            axios.get(properties.IOST_ADDR + "/getTokenBalance/" + address + "/" + lpTokenName + "/1").then(({data}) => {
+                // console.log("getTokenBalance======999=======",data)
+                const returnResult = {
+                    dpLpTokenName: "",
+                    lpTokenName: "",
+                    symbol1: "",
+                    symbol2: "",
+                    lpTokenBalance: 0,
+                    symbol1Balance:0,
+                    symbol2Balance:0,
+                    symbol1Total:0,
+                    symbol2Total:0,
+                    swapPairKey:swapPairKey
+                }
+                const dpLpTokenName = ComUtil.getDPLpTokenName(lpTokenName);
+
+                const myBalance = data.balance;
+
+                // 전체공급량에서 자기 지분 토큰량 계산
+                const symbol1Balance = new BigNumber(myBalance).div(currentSupply).multipliedBy(allData[symbol1]).toFixed(8)
+                const symbol2Balance = new BigNumber(myBalance).div(currentSupply).multipliedBy(allData[symbol2]).toFixed(8)
+
+                returnResult.dpLpTokenName = dpLpTokenName;
+                returnResult.lpTokenName = lpTokenName;
+                returnResult.symbol1 = symbol1;
+                returnResult.symbol2 = symbol2;
+                returnResult.lpTokenBalance = myBalance;
+                returnResult.symbol1Balance = symbol1Balance;
+                returnResult.symbol2Balance = symbol2Balance;
+                returnResult.symbol1Total = allData[symbol1];
+                returnResult.symbol2Total = allData[symbol2];
+
+                resolve(returnResult)
+            }).catch(err => {
+                console.log(err);
+                resolve(null)
+            })
+        } else {
+            resolve(null)
+        }
+    }))
+}
+
+export const exchangeSwapTokens = async(symbol1, symbol2, amount, amountOutMin) => {
+
+    const myWallet = WalletUtil.getMyWallet();
+    const iost = myWallet.wallet.newIOST(window.IOST)
+    let tx = iost.callABI(EXCHANGE_CONTRACT_ID, "swapTokens", [symbol1, symbol2, amount.toString(), amountOutMin.toString()]);
+
+    tx.addApprove('iost', amount.toString())
+    if(symbol1 !== 'iost') {                          //jetstream 때문에 넣음
+        tx.addApprove(symbol1, amount.toString())
+    }
+
+    tx.gasLimit = 300000;
+    tx.amount_limit.push({ token: "*", value: "unlimited" });
+
+    const res = await signAndSend(tx)
+    console.log(res)  // res.result res.isSuccess 로 데이터 결과값 사용가능
+    return res;
+}
+
+// routeSwapTokens(symbol1, symbol2, amountStr, routeHusdAmountStr, amountOutMinStr) {
+export const routeSwapTokens = async(symbol1, symbol2, amount, routeHusdAmount, amountOutMin) => {
+
+    const myWallet = WalletUtil.getMyWallet();
+    const iost = myWallet.wallet.newIOST(window.IOST)
+    let tx = iost.callABI(EXCHANGE_CONTRACT_ID, "routeSwapTokens", [symbol1, symbol2, amount.toString(), routeHusdAmount.toString(), amountOutMin.toString()]);
+
+    tx.addApprove('iost', amount.toString())
+    if(symbol1 !== 'iost') {                          //jetstream 때문에 넣음
+        tx.addApprove(symbol1, amount.toString())
+    }
+    tx.addApprove("husd", routeHusdAmount.toString()) //jetstream 때문에 넣음
+
+    tx.gasLimit = 400000;
+    tx.amount_limit.push({ token: "*", value: "unlimited" });
+
+    const res = await signAndSend(tx)
+    console.log(res)  // res.result res.isSuccess 로 데이터 결과값 사용가능
+    return res;
+}
+
+
+export const exchangeAddLiquidity = async(symbol1, symbol2, symbol1Amount, symbol2Amount) => {
+
+    const myWallet = WalletUtil.getMyWallet();
+    const iost = myWallet.wallet.newIOST(window.IOST)
+    let tx = iost.callABI(EXCHANGE_CONTRACT_ID, "addLiquidity", [symbol1, symbol2, symbol1Amount.toString(), symbol2Amount.toString()]);
+
+    if(symbol2 !== 'iost') {
+        tx.addApprove('iost', symbol1Amount.toString())
+    }
+    if(symbol1 !== 'iost') {                          //jetstream 때문에 넣음
+        tx.addApprove(symbol1, symbol1Amount.toString())
+    }
+    if(myWallet.walletType === 'Jetstream'){
+        tx.addApprove(symbol2, symbol2Amount.toString())  //jetstream 때문에 넣음
+    }
+    tx.gasLimit = 300000;
+    tx.amount_limit.push({ token: "*", value: "unlimited" });
+    const res = await signAndSend(tx)
+    console.log(res)  // res.result res.isSuccess 로 데이터 결과값 사용가능
+    return res;
+}
+
+// UI에서 반납할 lpToken개수를 입력받아야 함.
+export const exchangeWithdrawLiquidityWithLp = async(swapPairKey, amount) => {
+
+    let swapSymbol = swapPairKey.split('_');
+    const symbol1 = swapSymbol[0];
+    const symbol2 = swapSymbol[1];
+
+    // don_iost
+    let lpTokenName = await getLpTokenName(swapPairKey);
+
+    const myWallet = WalletUtil.getMyWallet();
+    const iost = myWallet.wallet.newIOST(window.IOST)
+    let tx = iost.callABI(EXCHANGE_CONTRACT_ID, "withdrawLiquidityWithLp", [symbol1, symbol2, lpTokenName, amount.toString()]);
+
+    tx.addApprove('iost', amount.toString())
+    tx.addApprove(lpTokenName, amount.toString())  //jetstream 때문에 넣음
+
+    tx.gasLimit = 300000;
+    tx.amount_limit.push({ token: "*", value: "unlimited" });
+
+    const res = await signAndSend(tx)
+    console.log(res)  // res.result res.isSuccess 로 데이터 결과값 사용가능
+    return res;
+}
+
+// exchangeSwap
+export const getSwapPairs = async () => {
+    try{
+        const res = await axios.post(properties.IOST_ADDR + "/getBatchContractStorage", {
+            id:EXCHANGE_CONTRACT_ID,
+            key_fields:[{key:"swapPairs"}],
+            by_longest_chain:true});
+        const arrJsonTokenNames = JSON.parse(res.data.datas[0]);
+        // if(symbol1 && symbol2){
+        //     return arrJsonTokenNames.filter((item)=>{
+        //         if(item === (symbol1 + '_' + symbol2) || item === (symbol2 + '_' + symbol1)){
+        //             console.log(symbol1+"___"+symbol2)
+        //             return item
+        //         }
+        //     })[0];
+        // }
+        return arrJsonTokenNames;
+    }catch (err){
+        console.log(err.message)
+        return null
+    }
+}
+
+export const getAmountData = async (pairKey) => {
+    try{
+        const tokenPairKey = pairKey;
+        const res = await axios.post(properties.IOST_ADDR + "/getBatchContractStorage", {
+            id:EXCHANGE_CONTRACT_ID,
+            key_fields: [
+                {key: tokenPairKey, field:"amountData"},
+            ],
+            by_longest_chain:true});
+        // console.log("========getRewardRate:");
+        // console.log(res);
+        return JSON.parse(res.data.datas[0]);
+    }catch (err){
+        console.log(err.message)
+        return null
+    }
+}
+
+export const getLpTokenName = async (pairKey) => {
+    try{
+        const tokenPairKey = pairKey;
+        const res = await axios.post(properties.IOST_ADDR + "/getBatchContractStorage", {
+            id:EXCHANGE_CONTRACT_ID,
+            key_fields: [
+                {key: tokenPairKey, field:"lpTokenName"},
+            ],
+            by_longest_chain:true});
+        // console.log("========lpTokenName:");
+        // console.log(res);
+        return res.data.datas[0];
+    }catch (err){
+        console.log(err.message)
+        return null
+    }
+}
+
+
+export const getTokenCurrentSupply = async (tokenName) => {
+
+    return new Promise(( resolve => {
+        axios.get(properties.IOST_ADDR + "/getTokenInfo/" + tokenName + "/1").then(({data}) => {
+            // console.log("getTokenInfo ============ ",data)
+            // data.current_supply 이 숫자를 int로 바꾼 후 10^8 으로 나눠서 리턴해야 함.
+            const supply = parseInt(data.current_supply) / 100000000;
+            resolve(supply)
+        }).catch(err => {
+            console.log(err);
+            resolve(0)
+        })
+    }))
+}
+
+
+
 export default {
     getTokenBalance,
     getPoolTokenBalance,
@@ -306,5 +661,21 @@ export default {
     onDepositSendBC,
     onHarvestSendBC,
     onHarvestWithDrawSendBC,
-    onIwSwapWithdrawBC
+    onIwSwapWithdrawBC,
+
+    //exchange Function
+    exchangeSwapTokens,
+    routeSwapTokens,
+    exchangeAddLiquidity,
+    exchangeWithdrawLiquidityWithLp,
+
+    getSwapPairs,
+    getAmountData,
+    getLpTokenName,
+    getTokenCurrentSupply,
+
+    getLpTokenList,
+    getMyLpTokenList,
+    getMyLpToken
+
 }

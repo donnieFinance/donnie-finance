@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Div, Flex, Img, RoundedCard} from "~/styledComponents/shared";
+import {Button, Div, Flex, Img, RoundedCard, SymbolIcon} from "~/styledComponents/shared";
 import aniKey from "~/styledComponents/Keyframes";
 import useWallet from '~/hooks/useWallet'
 import useSize from "~/hooks/useSize";
@@ -10,6 +10,7 @@ import {connectWalletModalState} from "~/hooks/atomState";
 import {useRecoilState} from "recoil";
 import ComUtil from "~/util/ComUtil";
 import {HexEdge} from "~/styledComponents/shared/Shapes";
+import {SymbolGroup} from "~/components/exchange/Components";
 
 
 const Content = styled(Div)`
@@ -18,8 +19,9 @@ const Content = styled(Div)`
 `;
 
 const TradeBigCard = ({
-                          isIwFlag,
+                          tokenName,
                           img = '',
+                          tokenType,
                           name = '',
                           balance,
                           explain,
@@ -36,24 +38,47 @@ const TradeBigCard = ({
         setConnectWalletOpen(true);
     }
 
+    const Symbol = () => {
+        if (tokenType === 'iw') {
+            return(
+                <HexEdge width={60} height={60}>
+                    <Img src={img} width={32} height={32} alt={ComUtil.coinName(name)}/>
+                </HexEdge>
+            )
+        }else if (tokenType === 'lp') {
+            const lpTokenNames = ComUtil.getLpTokenNames(tokenName)
+            return (
+                <SymbolGroup symbol1={lpTokenNames[0]} symbol2={lpTokenNames[1]} size={40} />
+                // <Flex>
+                //     <SymbolIcon src={img} alt="" width={size} zIndex={1}/>
+                //     <SymbolIcon src={img2} alt="" width={size} ml={-7}/>
+                // </Flex>
+            )
+        }else {
+            return <Img src={img} width={40} height={40} alt={ComUtil.coinName(name)}/>
+        }
+    }
+
+
     return (
         <RoundedCard relative shadow={'lg'} >
             <Flex bg={'light'} flexDirection={'column'} justifyContent={'center'} height={140}>
-                {
-                    isIwFlag ? (
-                        <HexEdge width={60} height={60}>
-                            <Img src={img} width={32} height={32} alt={name}/>
-                        </HexEdge>
-                    ) : (
-                        <Img src={img} width={50} alt={name}/>
-                    )
-                }
+                <Symbol />
+                {/*{*/}
+                {/*    tokenType === 'iw' ? (*/}
+                {/*        <HexEdge width={60} height={60}>*/}
+                {/*            <Img src={img} width={32} height={32} alt={name}/>*/}
+                {/*        </HexEdge>*/}
+                {/*    ) : (*/}
+                {/*        <Img src={img} width={50} alt={name}/>*/}
+                {/*    )*/}
+                {/*}*/}
 
                 <Div fontSize={20} mt={8} bold>{ComUtil.coinName(name)}</Div>
             </Flex>
             <Flex p={15} bg={'white'} minHeight={140} flexDirection={'column'} justifyContent={'center'} relative>
                 {
-                    loading ? <Skeleton /> : (
+                    loading ? <Skeleton active /> : (
                         <>
 
                             {

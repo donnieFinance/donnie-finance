@@ -31,9 +31,20 @@ const Deposit = ({
     }, [])
 
     const getTokenBalance = async () => {
-        if(address != null) {
-            if(address != '') {
-                const data = await iostApi.getTokenBalance({address:address, tokenName: contract.tokenName});
+        if(address !== null) {
+            if(address !== '') {
+
+                let data = await iostApi.getTokenBalance({address:address, tokenName: contract.tokenName});
+
+                //iw 일 경우 destroy amount
+                if (contract.tokenType === 'iw') {
+                    if (contract.tokenName === 'iwbly') {
+                        data = new BigNumber(data).minus(ComUtil.getDestroyBlyAmount(address)).toNumber()
+                    }
+                    else if (contract.tokenName === 'iwbtc') {
+                        data = new BigNumber(data).minus(ComUtil.getDestroyBtcAmount(address)).toNumber()
+                    }
+                }
                 setCoinBalance(data);
             }
         }
@@ -51,6 +62,11 @@ const Deposit = ({
 
     const onDepositSend  = async() => {
         try {
+
+            // if(contract.isIwFlag){
+            //     alert("Temporarily Stoped Deposit.")
+            //     return;
+            // }
 
             const isValidateChk = validateNumber(depositFormNumber);
             if(!isValidateChk){
@@ -72,15 +88,28 @@ const Deposit = ({
                 onClose()
             } else {
                 window.$message.error('fail');
+                let errorMessage = `${tMessage.failedToSend}`;
                 if (typeof result === 'string') {
-                    let error = JSON.parse(result.substring(result.indexOf('{'), result.indexOf('}') + 1))
-                    if (error.code === 2) {
-                        //alert(`${tMessage.lackOfIram} ${gasLimit} \n${tMessage.chargeIgasTime}`)
-                        alert(`${tMessage.lackOfIgas} ${gasLimit} \n${tMessage.chargeIgasTime}`)
+                    if (result.indexOf('{') > -1) {
+                        let error = JSON.parse(result.substring(result.indexOf('{'), result.indexOf('}') + 1))
+                        if (error.code === 2) {
+                            let vFailedToSend = `${tMessage.lackOfIgas} ${gasLimit} \n${tMessage.chargeIgasTime}`;
+                            if (error.message) {
+                                vFailedToSend = vFailedToSend + "\n" + error.message.toString();
+                            }
+                            errorMessage = vFailedToSend
+                        } else {
+                            errorMessage = result
+                        }
                     }
-                }else{
-                    alert(`${tMessage.lackOfIram}`);
+                }else if(typeof result === 'object') {
+                    if(result.status_code === 'BALANCE_NOT_ENOUGH') {
+                        errorMessage = `${tMessage.lackOfIram}`;
+                    }else{
+                        errorMessage = `${tMessage.jetstreamFail}`;
+                    }
                 }
+                alert(errorMessage)
             }
             setLoading(false);
             // setDepositModal(false);

@@ -38,18 +38,28 @@ const Harvest = ({
                     onClose();
                 } else {
                     window.$message.error('fail');
-
-
+                    let errorMessage = `${tMessage.failedToSend}`;
                     if (typeof result === 'string') {
-                        let error = JSON.parse(result.substring(result.indexOf('{'), result.indexOf('}') + 1))
-                        if (error.code === 2) {
-                            alert(`${tMessage.lackOfIgas} ${gasLimit} \n${tMessage.chargeIgasTime}`)
+                        if (result.indexOf('{') > -1) {
+                            let error = JSON.parse(result.substring(result.indexOf('{'), result.indexOf('}') + 1))
+                            if (error.code === 2) {
+                                let vFailedToSend = `${tMessage.lackOfIgas} ${gasLimit} \n${tMessage.chargeIgasTime}`;
+                                if (error.message) {
+                                    vFailedToSend = vFailedToSend + "\n" + error.message.toString();
+                                }
+                                errorMessage = vFailedToSend;
+                            } else {
+                                errorMessage = result;
+                            }
                         }
                     } else if(typeof result === 'object') {
                         if(result.status_code === 'BALANCE_NOT_ENOUGH') {
-                            alert(`${tMessage.lackOfIram}`)
+                            errorMessage = `${tMessage.lackOfIram}`;
+                        } else{
+                            errorMessage = `${tMessage.jetstreamFail}`;
                         }
                     }
+                    alert(errorMessage)
                 }
                 setLoading(false);
                 // onClose(false);

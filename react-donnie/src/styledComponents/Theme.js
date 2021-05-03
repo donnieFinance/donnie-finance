@@ -8,7 +8,8 @@ export const White = createGlobalStyle`
 `
 export const Gray = createGlobalStyle`
     body {
-        background-color: ${color.background};
+        // background: ${color.secondary};
+        background: #899A9C;
     }
 `
 export default {

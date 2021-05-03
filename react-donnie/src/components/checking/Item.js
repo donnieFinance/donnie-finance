@@ -15,24 +15,21 @@ const DepositSmallCard = loadable(() => import('~/components/common/layouts/Depo
 
 
 const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
-    const {pool, forcedStartTime, forcedEndTime, totalDon, isIwFlag } = contract
+    const {tokenName, pool, forcedStartTime, forcedEndTime, totalDon, tokenType, img, period } = contract
 
     const {hasIWallet, isLogin, address, connectIWallet, disconnectIWallet} = useWallet()
 
     const [coin, refresh, setRefreshInterval] = useCoin(uniqueKey)
     const [status, startTime, endTime, duration] = useRunningStatus({
+        uniqueKey: uniqueKey,
         pool: pool,
         //TODO 아래는 테스트를 쉽게 하기위한 프로퍼티 입니다. 배포 전 /properties.js 의 forcedStartTime, forcedEndTime 삭제 요망 [delete]
         forcedStartTime: forcedStartTime ? forcedStartTime : null,
         forcedEndTime: forcedEndTime ? forcedEndTime : null
     })
 
-    const {name, img, mining, explain, total, usd, rate, buttonText, loading} = ComUtil.getCheckingAndSavingCoinInfo(coin, status, t)
-
-
+    const {name, mining, explain, total, usd, rate, buttonText, loading} = ComUtil.getCheckingAndSavingCoinInfo(coin, status, t)
     const [myStaked, setMyStaked] = useState(false)
-
-
 
     useEffect(() => {
         if(address)
@@ -40,7 +37,7 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
     }, [address])
 
     useEffect(() => {
-        //진행중
+        //진행중일 경우만 계속 조회하도록 함
         if (status === 1) {
             refresh()                          //코인정보 갱신
             setRefreshInterval(3000)    //3초마다 코인정보 interval
@@ -162,7 +159,7 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
     if (size === 'big') {
         return (
             <DepositBigCard
-                isIwFlag={isIwFlag}
+                tokenName={tokenName}
                 status={status}
                 startTime={startTime}
                 endTime={endTime}
@@ -171,6 +168,7 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
                 // endTime={endTime}
                 name={name}
                 img={img}
+                tokenType={tokenType}
                 mining={mining}
                 explain={explain}
                 total={total}
@@ -180,13 +178,14 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
                 loading={loading}
                 myStaked={myStaked}
                 totalDon={totalDon}
+                period={period}
                 onDepositClick={onGoTrade}
             />
         )
     }else {
         return(
             <DepositSmallCard
-                isIwFlag={isIwFlag}
+                tokenName={tokenName}
                 status={status}
                 startTime={startTime}
                 endTime={endTime}
@@ -196,6 +195,7 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
                 // endTime={endTime}
                 name={name}
                 img={img}
+                tokenType={tokenType}
                 mining={mining}
                 explain={explain}
                 total={total}
@@ -204,7 +204,7 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
                 buttonText={buttonText}
                 loading={loading}
                 myStaked={myStaked}
-                totalDon={contract.totalDon}
+                totalDon={totalDon}
                 onDepositClick={onGoTrade}
             />
         )

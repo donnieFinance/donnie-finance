@@ -1,4 +1,11 @@
 import moment from 'moment-timezone'
+import {isMobileOnly} from "react-device-detect";
+import properties from "~/properties";
+
+import iconLpDonHusd from '~/assets/icon_lp_don_husd.png'
+import iconLpDonIost from '~/assets/icon_lp_don_iost.png'
+import iconLpIostHusd from '~/assets/icon_lp_iost_husd.png'
+
 export default class ComUtil {
     static delay(ms) {
         return new Promise((resolve, reject) => {
@@ -60,6 +67,15 @@ export default class ComUtil {
         return num.toFixed(Math.max(0, (m[1] || '').length - m[2]));
     }
 
+    // 모바일 Devices 여부
+    static isMobileDevices = () => {
+        if (isMobileOnly) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     // 모바일 여부
     static isMobile = () => {
         let sUserAgent = navigator.userAgent.toLowerCase();
@@ -85,7 +101,6 @@ export default class ComUtil {
         // console.log({ComUtilCoin: coin, status})
 
         const coinInfo = {...coin}
-
         coinInfo.status = status
         coinInfo.name = coin.tokenName.toUpperCase()
         coinInfo.img = coin.img
@@ -122,7 +137,7 @@ export default class ComUtil {
 
             //APR
             if (coin.rate) {
-                console.log({rate: coin.rate})
+                // console.log({rate: coin.rate})
                 coinInfo.rate = `${t('annualization')} : ${coin.rate.toFixed(2)} %`
 
             }
@@ -288,6 +303,34 @@ export default class ComUtil {
     }
 
     /*******************************************************
+     소수점 자리수 버림
+     @Param : number, midPointRoundingNumber(소수점 자릿수)
+     @Return : number
+     *******************************************************/
+    static roundDown(number, midPointRoundingNumber){
+        return this.decimalAdjust('floor', number, midPointRoundingNumber * (-1));
+    }
+
+    static decimalAdjust(type, value, exp){
+        // If the exp is undefined or zero...
+        if (typeof exp === 'undefined' || +exp === 0) {
+            return Math[type](value);
+        }
+        value = +value;
+        exp = +exp;
+        // If the value is not a number or the exp is not an integer...
+        if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+            return NaN;
+        }
+        // Shift
+        value = value.toString().split('e');
+        value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+        // Shift back
+        value = value.toString().split('e');
+        return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+    }
+
+    /*******************************************************
      금액 형식으로 리턴
      [값이 0 보다 작으면 '' 반환]
      @Param : 304100
@@ -363,13 +406,108 @@ export default class ComUtil {
 
     static coinName (coinNm) {
         if(coinNm){
+
+            if (coinNm.length >= 8) {
+                return ComUtil.getDPLpTokenName(coinNm.toLowerCase())
+            }
+
             if(coinNm.toUpperCase().includes('IW')){
                 const rCoinNm = coinNm.toUpperCase();
-                return rCoinNm.toString().replace(/\IW/g,'iw')     //replace all
+                return rCoinNm.toString().replace(/IW/g,'iw')     //replace all
                 // return rCoinNm.replaceAll('IW','iw');
             }
             return coinNm;
         }
     }
 
+    static ethGbNm (tokenNm) {
+        if(tokenNm){
+            if(tokenNm.toUpperCase() === 'BNB'){
+                return 'BEP20-BSC';
+            }
+            return 'ERC';
+        }
+    }
+
+    static getDestroyBlyAmount = (destroyAddress) => {
+        if (properties.destroyBlyAmount[destroyAddress]) {
+            return properties.destroyBlyAmount[destroyAddress]
+        }
+        return 0
+    }
+
+
+
+    static getDestroyBtcAmount = (destroyAddress) => {
+        if (properties.destroyBtcAmount[destroyAddress]) {
+            return properties.destroyBtcAmount[destroyAddress]
+        }
+        return 0
+    }
+
+    //SwapPair 명칭 리턴 ex) don_husd
+    static findSwapPair = (swapPairs, symbol1, symbol2) => {
+        try{
+            return swapPairs.find(item => item.pairKey === `${symbol1}_${symbol2}` || item.pairKey === `${symbol2}_${symbol1}`)
+        }catch (err) {
+            return null
+        }
+    }
+
+    static getLpTokenIcon = (symbol1,symbol2) => {
+        if(symbol1 === 'don' && symbol2==='husd'){
+            return iconLpDonHusd
+        } else if (symbol1 === 'iost' && symbol2==='husd'){
+            return iconLpIostHusd
+        } else if (symbol1 === 'don' && symbol2==='iost'){
+            return iconLpDonIost
+        }
+        return null;
+    }
+
+    //for exchange : iwbnb => iwBNB
+    static getDisplayTokenName = (tokenName) => {
+        return tokenName.toUpperCase().replace(/^IW/, 'iw');
+    }
+
+    static getDPLpTokenName = (lpTokenName) => {
+        const dpLpTokenName = lpTokenName.toString()
+            .replace(/don/g,'Don').replace(/husd/g,'Husd').replace(/iost/g,'Iost').replace(/bnb/g,'Bnb')
+            .replace(/lp$/g,'LP')  //production
+            .replace(/tt$/g,'TT'); //stage
+        return dpLpTokenName;
+    }
+
+    //exchange image 세팅용도
+    static getLpTokenNames = (lpTokenName) => {
+        const dpLpTokenName = lpTokenName.toString();
+        if(dpLpTokenName.includes('donhusd')){
+            return ['don','husd']
+        }
+        if(dpLpTokenName.includes('doniost')){
+            return ['don','iost']
+        }
+        if(dpLpTokenName.includes('iosthusd')){
+            return ['iost','husd']
+        }
+        if(dpLpTokenName.includes('bnbhusd')){
+            return ['bnb','husd']
+        }
+        return null;
+    }
+
+    //[Checking & Saving 페이지 캐시된 날짜체크(60분 이내 재접속인지)
+    static isCached = () => {
+        const t1 = moment(localStorage.getItem('updateTime'))
+        // const t1 = moment('2021-04-01 00:00:00')
+        const t2 = moment()
+
+        //최종 업데이트 된(checking 페이지 접속한) 시간차(분)
+        const diffMinutes = moment.duration(t2.diff(t1)).asMinutes()
+
+        if (diffMinutes <= 60) {
+            return true
+        }
+        return false
+    }
 }

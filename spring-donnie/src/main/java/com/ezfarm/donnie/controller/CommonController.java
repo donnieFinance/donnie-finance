@@ -1,8 +1,11 @@
 package com.ezfarm.donnie.controller;
 
 import com.ezfarm.donnie.config.SecureUtil;
+import com.ezfarm.donnie.config.SessionUtil;
 import com.ezfarm.donnie.dataclass.CSRTokenRes;
 import com.ezfarm.donnie.service.OpenApiService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -25,6 +29,9 @@ public class CommonController {
     @Autowired
     OpenApiService openApiService;
 
+    @Autowired
+    SessionUtil sessionUtil;
+
     @Value("${const.cmcApiKey}")
     String cmcApiKey;
 
@@ -33,36 +40,50 @@ public class CommonController {
 
     //////////////////////////////////////////////////////////////////////////////////////
 
+
+
+    //호출횟수 감소용 새로 추가. - 20210322
+    @ResponseBody
+    @GetMapping(value = "/restapi/getAllCoinUsdPrice")
+    public Map<String, String> getAllCoinUsdPrice() {
+
+        Map<String, String> priceMap = new HashMap<>();
+
+        //전체 코인별 가격, 하나씩 조회해서 추가.
+        // "don": "0.5"
+        // "husd": "1.0"
+        //... 형태로 모두 추가.
+
+        for (String coinName : ALL_COIN_NAME) {
+
+            priceMap.put(coinName, getCoinUsdPrice(coinName));
+        }
+
+        return priceMap;
+    }
+
+    /////총 7개 coin + 3개 LP 관리 중.//////////////
+    public static List<String> ALL_COIN_NAME = Arrays.asList("don", "iost", "ppt", "husd", "iwbly", "iwbtc", "iwbnb", "donhusdlp", "iosthusdlp", "doniostlp", "bnbhusdlp");
+
+
+
     /**
      * 코인마켓캡에서 가격 가져오기.
-     * blocery.com. AdminController에서 복사해 옴..
      */
     // not using - 밑에함수로 통일.
-//    @ResponseBody
 //    @GetMapping(value = "/restapi/getIostPrice")
-//    public String getIostPrice() {
-//
-//        return openApiService.getIostPrice();
-//    }
-
-
-    /**
-     * 코인원에서 Don 가격 USD로 가져오기. (USD는 별도 table로 환율관리)
-     */
-    // not using - 밑에함수로 통일.
-//    @ResponseBody
 //    @GetMapping(value = "/restapi/getDonPrice")
-//    public String getDonPrice() {
-//
-//        return openApiService.getDonPrice();
-//    }
 
-    //defaultValue:서버구동시 사용.
-    public static String DON_DEFAULT_PRICE = "2.5";
-    public static String IOST_DEFAULT_PRICE = "0.048";
-    public static String PPT_DEFAULT_RATIO = "5.2";
 
-    public static String BLY_DEFAULT_PRICE = "0.1";
+
+    //defaultValue:서버구동시 사용. front에선 properties.js/////////////////////////////
+    public static String DON_DEFAULT_PRICE = "2.0";
+    public static String IOST_DEFAULT_PRICE = "0.06";
+    public static String PPT_DEFAULT_RATIO = "6.2";
+
+    public static String BLY_DEFAULT_PRICE = "0.2";
+    public static String BTC_DEFAULT_PRICE = "53000";
+    public static String BNB_DEFAULT_PRICE = "530";
 
 
     ////코인 가격들 local 캐시 한번 더 함.//////////////////////////////////////////////////////////////////
@@ -105,7 +126,7 @@ public class CommonController {
     public synchronized String getPPTRatio() {
 
         if (pptProcessing)  {
-            log.info("pptProcessing");
+            //log.info("pptProcessing");
             return prevPPTRatio; //default or prev is Better
         }
         return openApiService.getPPTRatioReal();
@@ -127,13 +148,54 @@ public class CommonController {
         return openApiService.getBlyPriceReal();
     }
 
+    /////////btc ////////////////
+    public static boolean btcProcessing = false;
+    public static String prevBtcPrice = CommonController.BTC_DEFAULT_PRICE;
+
+    //get작업중이면 prev리턴.
+    public synchronized String getBtcPrice() {
+
+        if (btcProcessing)  {
+            log.info("btcProcessing");
+            return prevBtcPrice; //default or prev is Better
+        }
+
+        //log.info("////////////getBlyPriceReal 호출 ///////////");
+        return openApiService.getBtcPriceReal();
+    }
+
+    /////////bnb ////////////////
+    public static boolean bnbProcessing = false;
+    public static String prevBnbPrice = CommonController.BNB_DEFAULT_PRICE;
+
+    //get작업중이면 prev리턴.
+    public synchronized String getBnbPrice() {
+
+        if (bnbProcessing)  {
+            log.info("bnbProcessing");
+            return prevBnbPrice; //default or prev is Better
+        }
+
+        //log.info("////////////getBlyPriceReal 호출 ///////////");
+        return openApiService.getBnbPriceReal();
+    }
+
+
 
     /**
      * 공용 코인명으로 캐시된 코인원에서 USD로 가져오기. (USD는 별도 table로 환율관리)
+     *
+     * 미사용 예정. -> 캐시들 제거기간 거친후 block예정.
      */
-    @ResponseBody
-    @GetMapping(value = "/restapi/getCoinUsdPrice")
-    public String getCoinUsdPrice(@RequestParam String name) {
+//    @ResponseBody
+//    @GetMapping(value = "/restapi/getCoinUsdPrice")
+//    public String getCoinUsdPriceApi(@RequestParam String name) {
+//
+//        return getCoinUsdPrice(name);
+//    }
+
+
+    private String getCoinUsdPrice(String name) {
 
         String coinUsdPrice = "0";
 
@@ -172,12 +234,90 @@ public class CommonController {
                     coinUsdPrice = String.valueOf( Double.valueOf(PPT_DEFAULT_RATIO) * Double.valueOf(iostPrice) );
                 }
 
-            } if(name.startsWith("iwbly")) { //_t1 가능.
+            }else if(name.startsWith("iwbly")) { //_t1 가능.
                 coinUsdPrice = this.getBlyPrice();
                 if (StringUtils.isEmpty(coinUsdPrice)) {
                     coinUsdPrice = BLY_DEFAULT_PRICE;
                 }
+            }else if(name.startsWith("iwbtc")) { //_t1 가능.
+                coinUsdPrice = this.getBtcPrice();
+                if (StringUtils.isEmpty(coinUsdPrice)) {
+                    coinUsdPrice = BTC_DEFAULT_PRICE;
+                }
+            }else if(name.startsWith("iwbnb")) { //_t1 가능.
+                coinUsdPrice = this.getBnbPrice();
+                if (StringUtils.isEmpty(coinUsdPrice)) {
+                    coinUsdPrice = BNB_DEFAULT_PRICE;
+                }
 
+            }else { ///LP 토큰들 가격 추정.///////////////////////////////
+                if (sessionUtil.isStage()) { //stage는 로그만 찍음
+                    name = name.replaceAll("lp$", "tt");
+                    //log.info("stage - lptoken name:" + name);
+                }
+
+                if(name.startsWith("donhusd")) {
+
+                    String pairKey = "don_husd";
+                    String donPrice = this.getDonPrice();
+
+                    if (Boolean.TRUE == OpenApiService.lpHusdInProcessing.get(pairKey)) { //caching 안되게 하려고 여기서 processing체크.
+                        return OpenApiService.lpHusdPrev.containsKey(pairKey)? OpenApiService.lpHusdPrev.get(pairKey) : "1.0";
+                    }
+
+                    //lp AmountData(don:100, husd:300), supply 600개이면
+                    //donAD * donPrice + husdAD / 600 공식.
+                    String lpPrice =  openApiService.getDonHusdPrice(pairKey, donPrice, name);
+                    log.info("lpPrice:" + lpPrice + ", name:" + name);
+
+                    return lpPrice;
+                }
+                if(name.startsWith("iosthusd")) {
+
+                    String pairKey = "iost_husd";
+                    String iostPrice = this.getIostPrice();
+
+                    if (Boolean.TRUE == OpenApiService.lpHusdInProcessing.get(pairKey)) { //caching 안되게 하려고 여기서 processing체크.
+                        return OpenApiService.lpHusdPrev.containsKey(pairKey)? OpenApiService.lpHusdPrev.get(pairKey) : "1.0";
+                    }
+
+                    String lpPrice = openApiService.getIostHusdPrice(pairKey, iostPrice, name);
+                    log.info("lpPrice:" + lpPrice + ", name:" + name);
+
+                    return lpPrice;
+                }
+                if(name.startsWith("bnbhusd")) {
+
+                    String pairKey = "iwbnb_husd";
+                    String bnbPrice = this.getBnbPrice();
+
+                    if (Boolean.TRUE == OpenApiService.lpHusdInProcessing.get(pairKey)) { //caching 안되게 하려고 여기서 processing체크.
+                        return OpenApiService.lpHusdPrev.containsKey(pairKey)? OpenApiService.lpHusdPrev.get(pairKey) : "1.0";
+                    }
+
+                    String lpPrice = openApiService.getBnbHusdPrice(pairKey, bnbPrice, name);
+                    log.info("lpPrice:" + lpPrice + ", name:" + name);
+
+                    return lpPrice;
+                }
+                //token_token LP의 경우 - 향후 추가 안될확률이 높아서 lplp로 변수명 설정.
+                if(name.startsWith("doniost")) {
+
+                    String pairKey = "don_iost";
+                    String donPrice = this.getDonPrice();
+                    String iostPrice = this.getIostPrice();
+
+                    if (OpenApiService.lpLpInProcessing) { //caching 안되게 하려고 여기서 processing체크.
+                        return OpenApiService.lpLpPrev;
+                    }
+
+                    String lpPrice = openApiService.getDonIostPrice(pairKey, donPrice, iostPrice, name);
+                    log.info("lpPrice:" + lpPrice + ", name:" + name);
+
+                    return lpPrice;
+                }
+
+                return "1.0"; //LP토큰들 기본가격 1.0 달러.
             }
 
 
@@ -268,11 +408,11 @@ public class CommonController {
     public void setCsrfToken()  {
         ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         CsrfToken rCSRTokenRes = SecureUtil.setCurrentCsrfToken(attr.getRequest());
-        String ajaxResult = "";
-        if(rCSRTokenRes != null) {
-            ajaxResult = "HeaderName:" + rCSRTokenRes.getHeaderName() + " ParameterName:" + rCSRTokenRes.getParameterName() + " Token:" + rCSRTokenRes.getToken();
-        }
-        log.info("LOGIN ==setCurrentCsrfToken=== "+ajaxResult);
+//        String ajaxResult = "";
+//        if(rCSRTokenRes != null) {
+//            ajaxResult = "HeaderName:" + rCSRTokenRes.getHeaderName() + " ParameterName:" + rCSRTokenRes.getParameterName() + " Token:" + rCSRTokenRes.getToken();
+//        }
+        //log.info("LOGIN ==setCurrentCsrfToken=== "+ajaxResult);
     }
 
     /*

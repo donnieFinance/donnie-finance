@@ -98,7 +98,7 @@ const MyDon = ({t}) => {
                                onClick={onDepositERCClick}
                 >
                     <Div lineHeight={14}>
-                        <Div fontSize={14} textAlign={'center'}>Swap</Div>
+                        <Div fontSize={14} textAlign={'center'}>DON Swap</Div>
                         <Div fontSize={13} textAlign={'center'}>ERC to IRC</Div>
                     </Div>
                 </RoundedButton>
