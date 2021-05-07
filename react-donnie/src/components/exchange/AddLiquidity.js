@@ -773,7 +773,7 @@ const AddLiquidity = ({history}) => {
 
 
     return (
-        <Div width={sizeValue(436, null, '90%')}>
+        <Div width={sizeValue(436, null, '95%')}>
             <Div bg={'white'} minHeight={400} rounded={10} shadow={'lg'}>
 
                 {/* Card */}

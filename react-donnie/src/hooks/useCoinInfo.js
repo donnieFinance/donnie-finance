@@ -27,15 +27,21 @@ const useCoinInfo = ({delay = null}) => {
     useEffect(() => {
         //캐시된 시간이 1시간 이전이면.. 기본값을 캐시데이터로 우선시함
         if (ComUtil.isCached()){
-            const cachedData = localStorage.getItem('coinInfo')
-            if (cachedData) {
+
+            const storageData = localStorage.getItem('coinInfo')
+            if (storageData) {
 
                 //에러가 났을경우 아무행동을 하지 않게끔 함, 대신 다음 인터벌에서 알아서 localStorage 값이 업데이트 됨(정상적으로)
                 try{
-                    setCoinInfo(JSON.parse(cachedData))
-                    setLoading(false)
-                }catch (err){
 
+                    const cachedData = JSON.parse(storageData)
+
+                    //밸리데이션 체크
+                    if (cachedData.hasOwnProperty('totalUsd') && cachedData.hasOwnProperty('totalHarvestedDonBalance')) {
+                        setCoinInfo(cachedData)
+                        setLoading(false)
+                    }
+                }catch (err){
                 }
             }
         }

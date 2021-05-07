@@ -7,11 +7,12 @@ import {withTranslation} from "react-i18next";
 import {GrClose} from 'react-icons/gr'
 import {color} from "~/styledComponents/Properties";
 import useWallet from "~/hooks/useWallet";
+import {useRouteMatch} from "react-router-dom";
 
 const themeColor = color.donnie
 
-const CustomNavLink = ({to, onClose, children}) =>
-    <NavLink to={to} fg={'dark'} fontSize={15} activeStyle={{color: themeColor}} onClick={()=>setTimeout(() => onClose(), 150)}>
+const CustomNavLink = ({to, isActive, onClose, children}) =>
+    <NavLink to={to} isActive={isActive} fg={'dark'} fontSize={15} activeStyle={{color: themeColor}} onClick={()=>setTimeout(() => onClose(), 150)}>
         {children}
     </NavLink>
 
@@ -19,6 +20,8 @@ const MenuModal = ({t}) => {
     const {address} = useWallet()
     const [menuOpen, setMenuOpen] = useRecoilState(menuModalState)
     const {about, checking, loan, exchange, credit, payment, portfolio} = t('menu', {returnObjects: true})
+    //exchange 라우터에 포함되는 경우
+    const match = useRouteMatch('/exchange')
 
     const onClose = () => {
         setMenuOpen(false)
@@ -56,7 +59,11 @@ const MenuModal = ({t}) => {
                         </Div>
                     </Div>
                     <Div mb={12}>
-                        <CustomNavLink to={'/exchange/swap'} onClose={onClose} >{exchange.name}</CustomNavLink>
+                        <CustomNavLink to={'/exchange/swap'}
+                                       isActive={() =>{
+                                           return match ? true : false
+                                       }}
+                                       onClose={onClose} >{exchange.name}</CustomNavLink>
                         <Div fontSize={10} fg={'secondary'} lineHeight={15}>
                             {exchange.desc}
                         </Div>
@@ -80,7 +87,7 @@ const MenuModal = ({t}) => {
                         </Div>
                     </Div>
                     <Div>
-                        <CustomNavLink to={'portfolio'} onClose={onClose} >{portfolio.name}</CustomNavLink>
+                        <CustomNavLink to={'/portfolio'} onClose={onClose} >{portfolio.name}</CustomNavLink>
                         <Div fontSize={10} fg={'secondary'} lineHeight={15}>
                             {portfolio.desc}
                         </Div>

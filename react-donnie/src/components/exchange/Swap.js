@@ -827,7 +827,7 @@ const Swap = (props) => {
     }
 
     return (
-        <Div width={sizeValue(436, null, '90%')} minHeight={721}>
+        <Div width={sizeValue(436, null, '95%')} minHeight={721}>
             <Div bg={'white'} minHeight={400} rounded={10} shadow={'lg'}>
                 {/* Card */}
                 <Div>

@@ -41,7 +41,7 @@ export const getPoolTokenBalance = async ({pool, tokenName}) => {
         if (data) {
             balance = new BigNumber(data.balance).toString();
 
-            if(tokenName.startsWith("don")) {
+            if(tokenName === "don") {
                 let totalSupply = await getPoolTotalSupply(pool);
                 balance = new BigNumber(data.balance).minus(totalSupply).toString();
             }
@@ -177,6 +177,32 @@ export const getTradeBalanceAll = async (contractPool, address) => {
     }catch (err){
         console.log(err.message)
         return null
+    }
+}
+
+export const getTradeUserStakeBalance = async (contractPool, address) => {
+    try{
+        // const myWallet = WalletUtil.getMyWallet();
+        // const tempIost = myWallet.newIOST(window.IOST);
+        // const iostHost = tempIost.currentRPC._provider._host;
+        let res = await axios.post(properties.IOST_ADDR + "/getBatchContractStorage", {
+            id: contractPool,
+            key_fields: [
+                {key: "userbalance", field:address},
+            ],
+
+            by_longest_chain: true
+        });
+
+        const balance = res.data.datas[0]
+
+        if (balance === 'null' || Number.isNaN(balance)) {
+            return 0;
+        }
+        return new BigNumber(balance).toNumber()
+    }catch (err){
+        console.log(err.message)
+        return 0
     }
 }
 /* ==== Trade Function - Iost get storage call ==== END */
@@ -339,6 +365,30 @@ export const getLpTokenList = async () => {
     return list
 }
 
+//tokenNames = ['iost', 'don'...]
+const getMyStakedBalance = async (tokenName, address) => {
+
+    const contracts = Object.values(properties.contractList).filter(contract =>
+        contract.tokenName === tokenName
+        // if (contract.tokenName === tokenName) {
+        //     list.push(contract.pool)
+        // }
+    )
+    console.log({contracts})
+
+    // contracts.map(contract => )
+    const promises = contracts.map(contract => getTradeUserStakeBalance(contract.pool, address))
+
+    const result = await Promise.all(promises)
+
+    let myStakedBalance = 0
+    result.map(balance => myStakedBalance += balance)
+
+    return myStakedBalance
+
+    // getTradeUserStakeBalance()
+}
+
 // 내 지갑의 LpTokenList
 export const getMyLpTokenList = async (address) => {
     const myWallet = WalletUtil.getMyWallet();
@@ -346,6 +396,7 @@ export const getMyLpTokenList = async (address) => {
         let list = []
         let listDataBalanceChk = 0;
         const swapPairsData = await getSwapPairs();
+
         const promises = swapPairsData.map(async (swapPairKey, i) => {
 
             const swapSymbol = swapPairKey.split('_');
@@ -363,53 +414,94 @@ export const getMyLpTokenList = async (address) => {
             console.log("allData===",allData)
             console.log("allData==currentSupply=",currentSupply)
 
-            //console.log("lpTokenName===",lpTokenName)
-            await axios.get(properties.IOST_ADDR + "/getTokenBalance/" + address + "/" + lpTokenName + "/1").then(async ({data}) => {
-                //console.log("getMyLpTokenListBalance======999=======",data)
-                //  i___h___tst, d__i___tst, d__h___tst
-                const dpLpTokenName = ComUtil.getDPLpTokenName(lpTokenName);
-                const myBalance = data.balance;
+            const {data} = await axios.get(properties.IOST_ADDR + "/getTokenBalance/" + address + "/" + lpTokenName + "/1")
 
-                // 전체공급량에서 자기 지분 토큰량 계산
-                const symbol1Balance = new BigNumber(myBalance).div(currentSupply).multipliedBy(allData[symbol1]).toFixed(8)
-                const symbol2Balance = new BigNumber(myBalance).div(currentSupply).multipliedBy(allData[symbol2]).toFixed(8)
+            //console.log("getMyLpTokenListBalance======999=======",data)
+            //  i___h___tst, d__i___tst, d__h___tst
+            const dpLpTokenName = ComUtil.getDPLpTokenName(lpTokenName);
+            const myBalance = data.balance;
+            const myStakedBalance = await getMyStakedBalance(lpTokenName, address);
+            const myAllBalance = myBalance + myStakedBalance
 
-                //if(data.balance > 0) {
+            // 전체공급량에서 자기 지분 토큰량 계산
+            // const symbol1Balance = new BigNumber(myBalance).div(currentSupply).multipliedBy(allData[symbol1]).toFixed(8)
+            // const symbol2Balance = new BigNumber(myBalance).div(currentSupply).multipliedBy(allData[symbol2]).toFixed(8)
 
-                if(myBalance > 0){
-                    listDataBalanceChk = listDataBalanceChk + 1;
-                }
-                list.push({
-                    dpLpTokenName: dpLpTokenName,
-                    lpTokenName: lpTokenName,
-                    symbol1: symbol1,
-                    symbol2: symbol2,
-                    lpTokenBalance: myBalance,
-                    symbol1Balance:symbol1Balance,
-                    symbol2Balance:symbol2Balance,
-                    symbol1Total:allData[symbol1],
-                    symbol2Total:allData[symbol2],
-                    swapPairKey:swapPairKey,
-                    currentSupply: currentSupply,
-                    lpTokenBalanceRate: (myBalance / currentSupply) * 100
-                });
-                //}
-            }).catch(err => {
-                console.log(err);
-            })
+            // 전체공급량에서 자기 지분 토큰량 계산
+            const symbol1Balance = new BigNumber(myAllBalance).div(currentSupply).multipliedBy(allData[symbol1]).toFixed(8)
+            const symbol2Balance = new BigNumber(myAllBalance).div(currentSupply).multipliedBy(allData[symbol2]).toFixed(8)
+
+            //if(data.balance > 0) {
+
+            if(myBalance > 0){
+                listDataBalanceChk = listDataBalanceChk + 1;
+            }
+
+            list.push({
+                dpLpTokenName: dpLpTokenName,
+                lpTokenName: lpTokenName,
+                symbol1: symbol1,
+                symbol2: symbol2,
+                lpTokenBalance: myBalance,
+                symbol1Balance:symbol1Balance,
+                symbol2Balance:symbol2Balance,
+                symbol1Total:allData[symbol1],
+                symbol2Total:allData[symbol2],
+                swapPairKey:swapPairKey,
+                currentSupply: currentSupply,
+                lpTokenBalanceRate: (myAllBalance / currentSupply) * 100,
+                myStakedBalance: myStakedBalance
+            });
+
+            // //console.log("lpTokenName===",lpTokenName)
+            // await axios.get(properties.IOST_ADDR + "/getTokenBalance/" + address + "/" + lpTokenName + "/1").then(async ({data}) => {
+            //     //console.log("getMyLpTokenListBalance======999=======",data)
+            //     //  i___h___tst, d__i___tst, d__h___tst
+            //     const dpLpTokenName = ComUtil.getDPLpTokenName(lpTokenName);
+            //     const myBalance = data.balance;
+            //
+            //     // 전체공급량에서 자기 지분 토큰량 계산
+            //     const symbol1Balance = new BigNumber(myBalance).div(currentSupply).multipliedBy(allData[symbol1]).toFixed(8)
+            //     const symbol2Balance = new BigNumber(myBalance).div(currentSupply).multipliedBy(allData[symbol2]).toFixed(8)
+            //
+            //     //if(data.balance > 0) {
+            //
+            //     if(myBalance > 0){
+            //         listDataBalanceChk = listDataBalanceChk + 1;
+            //     }
+            //     list.push({
+            //         dpLpTokenName: dpLpTokenName,
+            //         lpTokenName: lpTokenName,
+            //         symbol1: symbol1,
+            //         symbol2: symbol2,
+            //         lpTokenBalance: myBalance,
+            //         symbol1Balance:symbol1Balance,
+            //         symbol2Balance:symbol2Balance,
+            //         symbol1Total:allData[symbol1],
+            //         symbol2Total:allData[symbol2],
+            //         swapPairKey:swapPairKey,
+            //         currentSupply: currentSupply,
+            //         lpTokenBalanceRate: (myBalance / currentSupply) * 100,
+            //
+            //     });
+            //     //}
+            // }).catch(err => {
+            //     console.log(err);
+            // })
         });
         await Promise.all(promises);
 
-        if(list.length > 0){
-            if(listDataBalanceChk > 0) {
-                list = ComUtil.sortByKey(list, 'lpTokenBalance')
-            }else{
-                list = ComUtil.sortByKey(list, 'dpLpTokenName')
-            }
-        }else{
-            list = null;
-        }
+        // if(list.length > 0){
+        //     if(listDataBalanceChk > 0) {
+        //         list = ComUtil.sortByKey(list, 'lpTokenBalance')
+        //     }else{
+        //         list = ComUtil.sortByKey(list, 'dpLpTokenName')
+        //     }
+        // }else{
+        //     list = null;
+        // }
 
+        ComUtil.sortByKey(list, 'dpLpTokenName')
         return list;
     }else{
         return null
@@ -649,6 +741,7 @@ export const getTokenCurrentSupply = async (tokenName) => {
 export default {
     getTokenBalance,
     getPoolTokenBalance,
+    getTradeUserStakeBalance,
     getPoolIsOpen,
     // getPoolIsOpenByName,
     getPoolStartTime,

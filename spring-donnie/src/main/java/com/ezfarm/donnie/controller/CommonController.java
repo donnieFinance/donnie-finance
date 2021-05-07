@@ -220,19 +220,22 @@ public class CommonController {
                 coinUsdPrice = "1.0";
             } else if(name.equals("ppt")) {
 
-                String iostPrice = this.getIostPrice();
-                if (StringUtils.isEmpty(iostPrice)) {
-                    iostPrice = IOST_DEFAULT_PRICE;
-                }
+                coinUsdPrice = "0.2"; //not using. bu fast return.
 
-                String pptIostRatio = this.getPPTRatio();
-
-                if(!StringUtils.isEmpty(pptIostRatio)){
-                    coinUsdPrice =  String.valueOf(Double.valueOf(pptIostRatio) * Double.valueOf(iostPrice));
-                }else {
-                    //PPT_DEFAULT_ PRICE:
-                    coinUsdPrice = String.valueOf( Double.valueOf(PPT_DEFAULT_RATIO) * Double.valueOf(iostPrice) );
-                }
+                //ppt closed.
+//                String iostPrice = this.getIostPrice();
+//                if (StringUtils.isEmpty(iostPrice)) {
+//                    iostPrice = IOST_DEFAULT_PRICE;
+//                }
+//
+//                String pptIostRatio = this.getPPTRatio();
+//
+//                if(!StringUtils.isEmpty(pptIostRatio)){
+//                    coinUsdPrice =  String.valueOf(Double.valueOf(pptIostRatio) * Double.valueOf(iostPrice));
+//                }else {
+//                    //PPT_DEFAULT_ PRICE:
+//                    coinUsdPrice = String.valueOf( Double.valueOf(PPT_DEFAULT_RATIO) * Double.valueOf(iostPrice) );
+//                }
 
             }else if(name.startsWith("iwbly")) { //_t1 가능.
                 coinUsdPrice = this.getBlyPrice();
@@ -268,7 +271,7 @@ public class CommonController {
                     //lp AmountData(don:100, husd:300), supply 600개이면
                     //donAD * donPrice + husdAD / 600 공식.
                     String lpPrice =  openApiService.getDonHusdPrice(pairKey, donPrice, name);
-                    log.info("lpPrice:" + lpPrice + ", name:" + name);
+                    //log.info("lpPrice:" + lpPrice + ", name:" + name);
 
                     return lpPrice;
                 }
@@ -282,7 +285,7 @@ public class CommonController {
                     }
 
                     String lpPrice = openApiService.getIostHusdPrice(pairKey, iostPrice, name);
-                    log.info("lpPrice:" + lpPrice + ", name:" + name);
+                    //log.info("lpPrice:" + lpPrice + ", name:" + name);
 
                     return lpPrice;
                 }
@@ -296,7 +299,7 @@ public class CommonController {
                     }
 
                     String lpPrice = openApiService.getBnbHusdPrice(pairKey, bnbPrice, name);
-                    log.info("lpPrice:" + lpPrice + ", name:" + name);
+                    //log.info("lpPrice:" + lpPrice + ", name:" + name);
 
                     return lpPrice;
                 }
@@ -312,7 +315,7 @@ public class CommonController {
                     }
 
                     String lpPrice = openApiService.getDonIostPrice(pairKey, donPrice, iostPrice, name);
-                    log.info("lpPrice:" + lpPrice + ", name:" + name);
+                    //log.info("lpPrice:" + lpPrice + ", name:" + name);
 
                     return lpPrice;
                 }

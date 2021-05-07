@@ -10,11 +10,15 @@ import { useLocation } from 'react-router-dom';
 import useSwapPairs from "~/hooks/useSwapPairs";
 import SwitchButton from "~/components/common/buttons/SwitchButton";
 import loadable from "@loadable/component";
+import TotalLiquidity from "~/components/exchange/TotalLiquidity";
+import useLpInfo from "~/hooks/useLpInfo";
 
 const Swap = loadable(() => import('~/components/exchange/Swap'))
 const Liquidity = loadable(() => import('~/components/exchange/Liquidity'))
 const AddLiquidity = loadable(() => import('~/components/exchange/AddLiquidity'))
 const Bridge = loadable(() => import('./Bridge'))
+
+
 
 const pathData = [
     {pathname: '/exchange/swap', name: 'Swap'},
@@ -28,6 +32,10 @@ export default withTranslation()((props) => {
     const { pathname } = useLocation();
 
     const history = useHistory()
+    //total liquidity, list 리코일에 담기
+    useLpInfo({delay: 10*1000})
+
+
     //Search all token usd price
     useUsdPrice()
 
@@ -36,6 +44,7 @@ export default withTranslation()((props) => {
 
     const {t} = props;
     const {exchange} = t('menu', {returnObjects: true})
+
 
     const [modalOpen, setModalOpen, selected, setSelected, setModalState, toggle] = useModal();
 
@@ -64,6 +73,9 @@ export default withTranslation()((props) => {
                 description={exchange.desc}
             />
 
+            <Flex justifyContent={'center'} mb={50}>
+                <TotalLiquidity />
+            </Flex>
             <Flex justifyContent={'center'} pb={80}>
                 <Flex justifyContent={'center'} flexDirection={'column'} flexGrow={1}>
                     <Div mb={30}>

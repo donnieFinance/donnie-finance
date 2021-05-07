@@ -233,10 +233,11 @@ const locale = {
     poolShare: '나의 지분',
     totalPool: '전체 유동성',
     lpTokenDesc: 'LP Token은 유동성을 공급할 때마다 총 유동성에 비례하여 발급됩니다. LP Token의 보유량으로 총 유동성 pool내에서의 나의 지분이 결정됩니다.',
-    myShareDesc: '나의 잔고 내에서 지분은 사용자들의 swap에 따라 토큰간 비율이 변동됩니다. 또한 사용자들의 swap에 따라 수수료가 누적되면서 증가합니다.',
+    myShareDesc: '사용자들의 swap에 따라 나의 지분 내에서 토큰간 비율이 변동됩니다. 또한 사용자들의 swap에 따라 수수료가 누적되면서 토큰수량도 증가합니다.',
     lpTokenWalletDesc: '내 지갑의 LP Token',
     depositLpToken: 'LP Token 예치',
     bep20bscDesc: 'BEP20(BSC) - 바이낸스 스마트 체인 네트워크',
+    estimatedValue: '평가 가치'
 }
 
 export default locale;

@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 import {Heading, SymbolGroup} from "~/components/exchange/Components";
 import {Modal, Skeleton, Tooltip, Space} from "antd";
 import {useRecoilState} from "recoil";
-import {connectWalletModalState, swapPairsState, usdPriceState} from "~/hooks/atomState";
+import {connectWalletModalState, liquidityInfo, nowState, swapPairsState, usdPriceState} from "~/hooks/atomState";
 import ComUtil from "~/util/ComUtil";
 import {useHistory} from "react-router-dom";
 import useWallet from "~/hooks/useWallet";
@@ -20,158 +20,268 @@ import {FaChevronDown, FaChevronUp} from 'react-icons/fa'
 import {BsChevronDown} from 'react-icons/bs'
 import {BiChevronDown, BiChevronUp} from 'react-icons/bi'
 import useModal from "~/hooks/useModal";
+import styled from 'styled-components'
+import {color} from "~/styledComponents/Properties";
+
+const Item = loadable( () => import("~/components/checking/Item"));
 const LiquidityWithdraw = loadable( () => import("~/components/common/contents/LiquidityWithdraw"));
 
-const LiquidityItem = ({dataIdx, data, onLinkClick, onRemoveLiquidityClick, onClose, t, tExchange}) => {
-    console.log({data})
+const LiquidityItem = ({dataIdx, data, onLinkClick, onDepositLpTokenClick, onRemoveLiquidityClick, onClose, t, tExchange}) => {
+
+    const {sizeValue} = useSize()
+
+
     const history = useHistory()
     const [isOpen, setOpen, selected, setSelected, setOpenState, toggle] = useModal();
+
     //1분마다 갱신되는 usdPrice
     const [usdPrice] = useRecoilState(usdPriceState)
-    return(
-        <Div
-            bg={'white'}
-            py={17}
-            px={26}
-            shadow={'lg'}
-            bc={'light'}
-            rounded={20}
-        >
-            <Div>
-                <Flex justifyContent={'space-between'}>
-                    <Flex>
-                        <SymbolGroup
-                            symbol1={data.symbol1}
-                            symbol2={data.symbol2}
-                            size={30}
-                        />
-                        <Div mx={8} mt={3} fontSize={18} cursor>
-                            <Link to={`/exchange/liquidity/add/${data.symbol1}/${data.symbol2}`}>
-                                <u>{data.dpLpTokenName}</u>
-                            </Link>
-                        </Div>
-                        <Div fg={'blue'} mt={6}>
-                            <Tooltip title={t('lpTokenDesc')} placement="top">
-                                <BsQuestionCircle />
-                            </Tooltip>
-                        </Div>
-                    </Flex>
-                    <Flex onClick={toggle} cursor={1}>
-                        <Div mr={2} fw={600}>
-                            more
-                        </Div>
-                        {
-                            isOpen ? <BiChevronUp /> : <BiChevronDown />
-                        }
-                    </Flex>
-                </Flex>
 
-                <Div my={10}>
-                    <Flex justifyContent={'space-between'} >
+    //symbol1 밸런스
+    const symbol1Liquidity = new BigNumber(data.symbol1Total)
+    //symbol2 밸런스
+    const symbol2Liquidity = new BigNumber(data.symbol2Total)
+
+    //symbol1 달러
+    const symbol1LiquidityUsd = symbol1Liquidity.multipliedBy(usdPrice[data.symbol1] || properties.USD_PRICE[data.symbol1])
+    //symbol2 달러
+    const symbol2LiquidityUsd = symbol2Liquidity.multipliedBy(usdPrice[data.symbol2] || properties.USD_PRICE[data.symbol2])
+
+    //평가 가치 (Estimated value)
+    const totalLiquidity = symbol1LiquidityUsd.plus(symbol2LiquidityUsd)
+
+
+    return(
+        <Div>
+            <Div
+                bg={'white'}
+                py={17}
+                px={sizeValue(26, null, 15)}
+                shadow={'lg'}
+                bc={'light'}
+                rounded={20}
+                relative
+            >
+
+                <Div>
+
+                    <Flex justifyContent={'space-between'}>
                         <Flex>
-                            <Div>
-                                {t('myLpToken')}
+                            <SymbolGroup
+                                symbol1={data.symbol1}
+                                symbol2={data.symbol2}
+                                size={30}
+                            />
+                            <Div mx={8} mt={3} fontSize={18} cursor>
+                                <Link to={`/exchange/liquidity/add/${data.symbol1}/${data.symbol2}`}>
+                                    <u>{data.dpLpTokenName}</u>
+                                </Link>
                             </Div>
-                            <Flex mt={-2} fg={'blue'} ml={8}>
-                                <Tooltip title={t('myShareDesc')} placement="top">
+                            <Div fg={'blue'} mt={6}>
+                                <Tooltip title={t('lpTokenDesc')} placement="top">
                                     <BsQuestionCircle />
                                 </Tooltip>
-                            </Flex>
-                        </Flex>
-                        <Div fg={'info'}>
-                            {data.lpTokenBalance}
-                        </Div>
-                    </Flex>
-                    <Flex justifyContent={'space-between'}>
-                        <Div>
-                            {ComUtil.getDisplayTokenName(data.symbol1)}
-                        </Div>
-                        <Div>
-                            { (data.symbol1Balance && data.symbol1Balance > 0) ? new BigNumber(data.symbol1Balance).toFixed(4):0}
-                        </Div>
-                    </Flex>
-                    <Flex justifyContent={'space-between'}>
-                        <Div>
-                            {ComUtil.getDisplayTokenName(data.symbol2)}
-                        </Div>
-                        <Div>
-                            { (data.symbol2Balance && data.symbol2Balance > 0) ? new BigNumber(data.symbol2Balance).toFixed(4):0}
-                        </Div>
-                    </Flex>
-                    <Flex justifyContent={'space-between'} >
-                        <Div>{t('poolShare')}</Div>
-                        <Div>
-                            {data.lpTokenBalanceRate.toFixed(2)}%
-                        </Div>
-                    </Flex>
-
-
-                    {
-                        isOpen && (
-
-                            <Div>
-                                <Hr my={10}></Hr>
-                                <Div>
-                                    <Flex justifyContent={'space-between'}>
-                                        <Div>
-                                            Your LP Token Value (estimated)
-                                        </Div>
-                                        <Div>
-                                            {new BigNumber(usdPrice[data.lpTokenName]).multipliedBy(data.lpTokenBalance).toNumber().toFixed(2)} USD
-                                        </Div>
-                                    </Flex>
-                                </Div>
-                                {/*<Div>*/}
-                                {/*    {t('totalPool')}*/}
-                                {/*    <Flex justifyContent={'space-between'}>*/}
-                                {/*        <Div>*/}
-                                {/*            {ComUtil.getDisplayTokenName(data.symbol1)}*/}
-                                {/*        </Div>*/}
-                                {/*        <Div>*/}
-                                {/*            { (data.symbol1Total && data.symbol1Total > 0) ? new BigNumber(data.symbol1Total).toFixed(4):0}*/}
-                                {/*        </Div>*/}
-                                {/*    </Flex>*/}
-                                {/*    <Flex justifyContent={'space-between'}>*/}
-                                {/*        <Div>*/}
-                                {/*            {ComUtil.getDisplayTokenName(data.symbol2)}*/}
-                                {/*        </Div>*/}
-                                {/*        <Div>*/}
-                                {/*            { (data.symbol2Total && data.symbol2Total > 0) ? new BigNumber(data.symbol2Total).toFixed(4):0}*/}
-                                {/*        </Div>*/}
-                                {/*    </Flex>*/}
-                                {/*</Div>*/}
                             </Div>
-                        )
-                    }
+                        </Flex>
+                        <Flex onClick={toggle} cursor={1}>
+                            <Div mr={2} fw={600}>
+                                more
+                            </Div>
+                            {
+                                isOpen ? <BiChevronUp /> : <BiChevronDown />
+                            }
+                        </Flex>
+                    </Flex>
+
+                    <Div my={10}>
+                        <Flex justifyContent={'space-between'} alignItems={'flex-start'}>
+                            <Flex flexWrap={'wrap'}>
+                                <Div>
+                                    {t('myLpToken')+' / ' + t('Depositing')}
+                                </Div>
+                                <Flex mt={-2} fg={'blue'} ml={5}>
+                                    <Tooltip title={t('myShareDesc')} placement="top">
+                                        <BsQuestionCircle />
+                                    </Tooltip>
+                                </Flex>
+                            </Flex>
+                            <Div fg={'info'} flexShrink={0}>
+                                {
+                                    `${data.lpTokenBalance} / ${data.myStakedBalance}`
+                                }
+                            </Div>
+                        </Flex>
+                        <Flex justifyContent={'space-between'}>
+                            <Div>
+                                {ComUtil.getDisplayTokenName(data.symbol1)}
+                            </Div>
+                            <Div>
+                                { (data.symbol1Balance && data.symbol1Balance > 0) ? new BigNumber(data.symbol1Balance).toFixed(4):0}
+                            </Div>
+                        </Flex>
+                        <Flex justifyContent={'space-between'}>
+                            <Div>
+                                {ComUtil.getDisplayTokenName(data.symbol2)}
+                            </Div>
+                            <Div>
+                                { (data.symbol2Balance && data.symbol2Balance > 0) ? new BigNumber(data.symbol2Balance).toFixed(4):0}
+                            </Div>
+                        </Flex>
+                        <Flex justifyContent={'space-between'} >
+                            <Div>{t('poolShare')}</Div>
+                            <Div>
+                                {data.lpTokenBalanceRate.toFixed(2)}%
+                            </Div>
+                        </Flex>
+
+
+                        {
+                            isOpen && (
+
+                                <Div>
+                                    <Hr my={10}></Hr>
+                                    <Div>
+                                        <Div mb={10} bold>Total Liquidity</Div>
+                                        <Div lineHeight={24}>
+                                            <Div>
+                                                <Flex justifyContent={'space-between'}>
+
+                                                    <Space>
+                                                        <SymbolIcon src={properties.tokenImages[data.symbol1]} alt={data.symbol1} width={20} zIndex={1} p={1}/>
+                                                        <Div>{data.symbol1.toUpperCase()}</Div>
+                                                    </Space>
+
+                                                    <Div>
+                                                        {`${ComUtil.addCommas(symbol1Liquidity.decimalPlaces(0, 1))}`}
+
+                                                        {/*{new BigNumber(usdPrice[data.lpTokenName]).multipliedBy(data.lpTokenBalance).toNumber().toFixed(2)} USD*/}
+                                                    </Div>
+                                                </Flex>
+                                            </Div>
+                                            <Div>
+                                                <Flex justifyContent={'space-between'}>
+                                                    <Space>
+                                                        <SymbolIcon src={properties.tokenImages[data.symbol2]} alt={data.symbol2} width={20} zIndex={1} p={1}/>
+                                                        <Div>{data.symbol2.toUpperCase()}</Div>
+                                                    </Space>
+
+                                                    <Div>
+                                                        {`${ComUtil.addCommas(symbol2Liquidity.decimalPlaces(0, 1))}`}
+
+                                                        {/*{new BigNumber(usdPrice[data.lpTokenName]).multipliedBy(data.lpTokenBalance).toNumber().toFixed(2)} USD*/}
+                                                    </Div>
+                                                </Flex>
+                                            </Div>
+                                            <Div>
+                                                <Flex justifyContent={'space-between'}>
+                                                    <Div>
+                                                        {t('estimatedValue')}
+                                                    </Div>
+                                                    <Div>
+                                                        {`$${ComUtil.addCommas(totalLiquidity.decimalPlaces(0, 1))}`}
+                                                        {/*{new BigNumber(usdPrice[data.lpTokenName]).multipliedBy(data.lpTokenBalance).toNumber().toFixed(2)} USD*/}
+                                                    </Div>
+                                                </Flex>
+                                            </Div>
+                                        </Div>
+                                    </Div>
+
+
+
+
+
+                                    {/*<Div>*/}
+                                    {/*    {t('totalPool')}*/}
+                                    {/*    <Flex justifyContent={'space-between'}>*/}
+                                    {/*        <Div>*/}
+                                    {/*            {ComUtil.getDisplayTokenName(data.symbol1)}*/}
+                                    {/*        </Div>*/}
+                                    {/*        <Div>*/}
+                                    {/*            { (data.symbol1Total && data.symbol1Total > 0) ? new BigNumber(data.symbol1Total).toFixed(4):0}*/}
+                                    {/*        </Div>*/}
+                                    {/*    </Flex>*/}
+                                    {/*    <Flex justifyContent={'space-between'}>*/}
+                                    {/*        <Div>*/}
+                                    {/*            {ComUtil.getDisplayTokenName(data.symbol2)}*/}
+                                    {/*        </Div>*/}
+                                    {/*        <Div>*/}
+                                    {/*            { (data.symbol2Total && data.symbol2Total > 0) ? new BigNumber(data.symbol2Total).toFixed(4):0}*/}
+                                    {/*        </Div>*/}
+                                    {/*    </Flex>*/}
+                                    {/*</Div>*/}
+                                </Div>
+                            )
+                        }
+
+                    </Div>
+
+
+                    <Flex justifyContent={'center'}>
+
+                        <Button
+                            // bc={'info'}
+                            px={10}
+                            bg={'donnie'}
+                            fg={'white'}
+                            rounded={5}
+                            onClick={onDepositLpTokenClick}
+                            //항상 [Lp Token 에치] 버튼이 보이도록 주석 처리함
+                            // disabled={data.lpTokenBalance > 0 ? false:true}
+                            mr={10}
+                        >
+                            {t('depositLpToken')}
+                        </Button>
+
+                        <Button
+                            // bc={'info'}
+                            px={10}
+                            bg={'primary'}
+                            fg={'white'}
+                            rounded={5}
+                            onClick={onRemoveLiquidityClick}
+                            disabled={data.lpTokenBalance > 0 ? false:true}>{tExchange.removeLiquidity}
+                        </Button>
+                    </Flex>
 
                 </Div>
-
-
-                <Flex justifyContent={'center'}>
-
-                    <Button
-                        // bc={'info'}
-                        px={10}
-                        bg={'donnie'}
-                        fg={'white'}
-                        rounded={5}
-                        onClick={()=>history.push('/checking')}
-                        disabled={data.lpTokenBalance > 0 ? false:true} mr={10}>
-                        {t('depositLpToken')}
-                    </Button>
-
-                    <Button
-                        // bc={'info'}
-                        px={10}
-                        bg={'primary'}
-                        fg={'white'}
-                        rounded={5}
-                        onClick={onRemoveLiquidityClick}
-                        disabled={data.lpTokenBalance > 0 ? false:true}>{tExchange.removeLiquidity}
-                    </Button>
-                </Flex>
-
             </Div>
+        </Div>
+
+
+    )
+}
+
+const DepositModalContent = ({tokenName, dpTokenName, lpTokenBalance}) => {
+    const {t} = useTranslation()
+    const [, setNow] = useRecoilState(nowState)
+
+    // 1초에 한번씩 global 로 사용될 now 갱신
+    useInterval(() => {
+        setNow(Date.parse(new Date))
+    }, 1000)
+
+    return (
+        <Div bg={'secondary'} p={16}>
+            <Div fontSize={20} bold fg={'white'}>{`${t('myLpToken')} ${lpTokenBalance}`}</Div>
+            <Div fg={'white'} lighter mb={16}>
+                {t('Provide', {x: `LP Token (${tokenName}) `})}
+            </Div>
+            <GridColumns repeat={1} rowGap={20}>
+            {
+                Object.keys(properties.contractList).map(key => {
+                    const contract = properties.contractList[key]
+                    if (contract.tokenName === tokenName) {
+                        return <Item
+                            uniqueKey={key}
+                            contract={contract}
+                            size={'small'}
+                        />
+                    }else{
+                        return null
+                    }
+                })
+            }
+            </GridColumns>
         </Div>
     )
 }
@@ -190,7 +300,7 @@ const Liquidity = (props) => {
     const [, setConnectWalletModalOpen] = useRecoilState(connectWalletModalState)
     const {address} = useWallet()
 
-    const [swapPairs] = useRecoilState(swapPairsState)
+    // const [swapPairs] = useRecoilState(swapPairsState)
 
     const [myLpTokenList, setMyLpTokenList] = useState()
     const [isMyLpTokenListLoading, setIsMyLpTokenListLoading] = useState(true)
@@ -199,10 +309,18 @@ const Liquidity = (props) => {
     const [withDrawInfo,setWithDrawInfo] = useState(null);
     const [swapPairKey,setSwapPairKey] = useState(null);
 
+    const [modalOpen, setModalOpen, selected, setSelected, setModalState] = useModal();
+
 
     useEffect( () => {
         getMyLpTokenList()
     }, [address])
+
+    //LP Token click
+    const onDepositLpTokenClick = (tokenName, dpTokenName, lpTokenBalance) => {
+        setSelected({tokenName, dpTokenName, lpTokenBalance})
+        setModalState(true)
+    }
 
     const onAddLiquidityClick = () => {
         if (!address) {
@@ -262,7 +380,7 @@ const Liquidity = (props) => {
     }
 
     return (
-        <Div width={sizeValue(436, null, '90%')} minHeight={721}>
+        <Div width={sizeValue(436, null, '95%')} minHeight={721}>
             <Div bg={'white'} minHeight={400} rounded={10} shadow={'lg'}>
 
                 {/* Card */}
@@ -284,10 +402,10 @@ const Liquidity = (props) => {
                     <Hr/>
 
                     {/* Content */}
-                    <Div p={24}>
+                    <Div p={sizeValue(24, null, 15)}>
                         <Div mb={10}>
                             <Flex justifyContent={'space-between'}>
-                                <Div>{t('myLiquidity')}</Div>
+                                <Div bold>{t('myLiquidity')}</Div>
                                 <Flex>
                                     <Div></Div>
                                 </Flex>
@@ -307,6 +425,7 @@ const Liquidity = (props) => {
                                                                dataIdx={index}
                                                                data={myLpTokenItem}
                                                     // onLinkClick={onLinkClick.bind(this, myLpTokenItem.symbol1, myLpTokenItem.symbol2)}
+                                                               onDepositLpTokenClick={onDepositLpTokenClick.bind(this, myLpTokenItem.lpTokenName, myLpTokenItem.dpLpTokenName, myLpTokenItem.lpTokenBalance)}
                                                                onRemoveLiquidityClick={onWithDraw.bind(this,myLpTokenItem)}
                                                                onClose={onWithDrawClose}
                                                                t={t}
@@ -323,6 +442,26 @@ const Liquidity = (props) => {
                 </Div>
 
             </Div>
+
+            {/* 디파짓 */}
+            <Modal
+                title={t('depositLpToken')}
+                visible={modalOpen}
+                onCancel={() => setModalState(false)}
+                bodyStyle={{padding: 0}}
+                footer={null}
+                width={'auto'}
+                centered={true}
+                focusTriggerAfterClose={false}
+                getContainer={false}
+                maskClosable={false}
+
+            >
+                <DepositModalContent
+                    tokenName={selected && selected.tokenName}
+                    dpTokenName={selected && selected.dpTokenName}
+                    lpTokenBalance={selected && selected.lpTokenBalance} />
+            </Modal>
 
             {/* 인출 withdraw */}
             <Modal

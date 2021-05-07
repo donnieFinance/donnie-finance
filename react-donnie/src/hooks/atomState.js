@@ -274,8 +274,16 @@ export const swapPairsState = atom({
     const globalState = useRecoilValue(globalStateInfo);
 */
 
-
-
+//exchange 의 최상단 total 에서 사용 중
+export const liquidityInfo = atom({
+    key: 'liquidityInfo',
+    default: {
+        totalCurrentSupply: 0,
+        list: [],
+        loading: true,
+        timesOfCall: 0
+    }
+})
 
 
 // import TokenState from '...'

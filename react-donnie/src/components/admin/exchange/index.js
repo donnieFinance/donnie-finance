@@ -8,6 +8,7 @@ import {Div, Span, Flex, Img, Right} from "~/styledComponents/shared";
 import {Space, Table} from "antd";
 import AdminApi from "~/lib/adminApi";
 import ComUtil from "~/util/ComUtil";
+import axios from "axios";
 
 const Exchange = () => {
 
@@ -18,6 +19,10 @@ const Exchange = () => {
             await search()
         }
         fetch();
+
+
+        // axios.get("https://www.iostabc.com/api/contract/ContractL3GFG4Wo5XmpUpoJ8LctTA3VFbwTi9x9AEWDKNzg1VR/actions?page=1&size=50").then(result => console.log({result})).catch(err => console.log(err))
+
     }, [])
 
     const search = async () => {

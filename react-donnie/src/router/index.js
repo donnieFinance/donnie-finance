@@ -13,6 +13,8 @@ import SecureApi from '~/lib/secureApi'
 import Loading from "~/components/common/loading";
 import useInterval from "~/hooks/useInterval";
 import IOST from 'iost'
+import TestRemote from "~/components/common/testRemote";
+import {Div} from "~/styledComponents/shared";
 
 const AdminTemplate = loadable(() => import('~/components/admin/template'))
 
@@ -121,84 +123,85 @@ export default () => {
     }, [width])
 
     return(
-        <Switch>
+        <>
+            <TestRemote />
+            <Switch>
+                <Route exact path={'/'}>
+                    <Theme.Gray />
+                    <Home />
+                </Route>
 
-            <Route exact path={'/'}>
-                <Theme.Gray />
-                <Home />
-            </Route>
+                <Route exact path={'/admin/login'} >
+                    <AdminLogin />
+                </Route>
 
-            <Route exact path={'/admin/login'} >
-                <AdminLogin />
-            </Route>
+                <PrivateRoute path="/admin" type={'admin'}>
+                    <AdminTemplate />
+                </PrivateRoute>
 
-            <PrivateRoute path="/admin" type={'admin'}>
-                <AdminTemplate />
-            </PrivateRoute>
+                <Route path={'/'}>
+                    <Switch>
 
-            <Route path={'/'}>
-                <Switch>
+                        <Template>
+                            <Theme.Gray />
 
-                    <Template>
-                        <Theme.Gray />
+                            <Route exact path={'/about'} >
+                                <Theme.White />
+                                <About/>
+                            </Route>
+                            <Route exact path={'/checking'} >
+                                <Checking />
+                            </Route>
 
-                        <Route exact path={'/about'} >
-                            <Theme.White />
-                            <About/>
-                        </Route>
-                        <Route exact path={'/checking'} >
-                            <Checking />
-                        </Route>
+                            <Route exact path={'/trade/:uniqueKey'} >
+                                <Trade />
+                            </Route>
+                            <Route exact path={'/loan'} >
+                                <Loan />
+                            </Route>
+                            <Route exact path={'/exchange'} >
+                                <Redirect to={'/exchange/swap'} />
+                            </Route>
+                            <Route path={'/exchange'} >
+                                <Exchange />
+                            </Route>
+                            <Route exact path={'/credit'} >
+                                <CreditAnalysis />
+                            </Route>
+                            <Route exact path={'/payment'} >
+                                <Payment />
+                            </Route>
+                            <Route exact path={'/portfolio'} >
+                                <Portfolio />
+                            </Route>
 
-                        <Route exact path={'/trade/:uniqueKey'} >
-                            <Trade />
-                        </Route>
-                        <Route exact path={'/loan'} >
-                            <Loan />
-                        </Route>
-                        <Route exact path={'/exchange'} >
-                            <Redirect to={'/exchange/swap'} />
-                        </Route>
-                        <Route path={'/exchange'} >
-                            <Exchange />
-                        </Route>
-                        <Route exact path={'/credit'} >
-                            <CreditAnalysis />
-                        </Route>
-                        <Route exact path={'/payment'} >
-                            <Payment />
-                        </Route>
-                        <Route exact path={'/portfolio'} >
-                            <Portfolio />
-                        </Route>
+                            <ConnectWalletModal />
+                            <MenuModal />
 
-                        <ConnectWalletModal />
-                        <MenuModal />
+                            <MyDonModal />
 
-                        <MyDonModal />
+                            <DepositERCModal />
+                            <WithdrawERCModal />
 
-                        <DepositERCModal />
-                        <WithdrawERCModal />
+                            <DepositIWERCModal/>
+                            <WithdrawIWERCModal/>
 
-                        <DepositIWERCModal/>
-                        <WithdrawIWERCModal/>
+                            <DepositBNBModal/>
+                            <WithdrawBNBModal/>
 
-                        <DepositBNBModal/>
-                        <WithdrawBNBModal/>
+                            <NoticeModal/>
 
-                        <NoticeModal/>
+                            <BridgeDepositModal/>
+                            <BridgeWithdrawModal/>
 
-                        <BridgeDepositModal/>
-                        <BridgeWithdrawModal/>
+                            <Loading />
 
-                        <Loading />
+                        </Template>
+                    </Switch>
 
-                    </Template>
-                </Switch>
+                </Route>
 
-            </Route>
-
-        </Switch>
-
+            </Switch>
+        </>
     )
 }

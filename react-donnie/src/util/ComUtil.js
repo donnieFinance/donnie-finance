@@ -96,23 +96,23 @@ export default class ComUtil {
         }
     }
 
-    static getCheckingAndSavingCoinInfo (coin, status, t) {
+    static getCheckingAndSavingCoinInfo (coin, tokenName, status, t) {
 
         // console.log({ComUtilCoin: coin, status})
 
         const coinInfo = {...coin}
         coinInfo.status = status
-        coinInfo.name = coin.tokenName.toUpperCase()
+        coinInfo.name = tokenName.toUpperCase()
         coinInfo.img = coin.img
 
         // Preparing
         if ([-1].includes(status)) {
-            coinInfo.explain = t('Provide',{x: ComUtil.coinName(coinInfo.name.toUpperCase())})
+            coinInfo.explain = t('Provide',{x: ComUtil.coinName(coinInfo.name)})
             coinInfo.buttonText = `${t('depositToMine')}`
         }
         // Coming soon
         else if([0].indexOf(status) > -1) {
-            coinInfo.explain = t('Provide',{x: ComUtil.coinName(coinInfo.name.toUpperCase())})
+            coinInfo.explain = t('Provide',{x: ComUtil.coinName(coinInfo.name)})
             coinInfo.buttonText = `${t('depositToMine')}`
         }
         // Running, Ended
@@ -497,16 +497,29 @@ export default class ComUtil {
     }
 
     //[Checking & Saving 페이지 캐시된 날짜체크(60분 이내 재접속인지)
-    static isCached = () => {
-        const t1 = moment(localStorage.getItem('updateTime'))
-        // const t1 = moment('2021-04-01 00:00:00')
-        const t2 = moment()
+    static isCached = (minutes = 60) => {
+        try{
 
-        //최종 업데이트 된(checking 페이지 접속한) 시간차(분)
-        const diffMinutes = moment.duration(t2.diff(t1)).asMinutes()
+            const updateTime = localStorage.getItem('updateTime')
+            console.log({updateTime})
+            if (!updateTime
+                // || updateTime !== "" || updateTime === null || updateTime === undefined
+            )
+                return false
 
-        if (diffMinutes <= 60) {
-            return true
+            const t1 = moment(updateTime)
+
+            // const t1 = moment('2021-04-01 00:00:00')
+            const t2 = moment()
+
+            //최종 업데이트 된(checking 페이지 접속한) 시간차(분)
+            const diffMinutes = moment.duration(t2.diff(t1)).asMinutes()
+
+            if (diffMinutes <= minutes) {
+                return true
+            }
+        }catch (err){
+            return false
         }
         return false
     }

@@ -267,9 +267,11 @@ export const XCenter = styled(Div)`
 export const SymbolIcon = styled(Img)`
     background-color: ${color.white};
     border: 1px solid ${color.secondary};
-    box-shadow: 2px 2px 3px rgba(0,0,0,0.2);
+    // ${props => props.shadow && `
+    //     box-shadow: 2px 2px 3px rgba(0,0,0,0.2);
+    // `}
     border-radius: 50%;
-    padding: 3px;
+    padding: ${props => props.p ? getValue(props.p) : '3px'};
     object-fit: fill;
     &:hover {
         transform: scale(1.4);

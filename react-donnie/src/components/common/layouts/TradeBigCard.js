@@ -76,7 +76,7 @@ const TradeBigCard = ({
 
                 <Div fontSize={20} mt={8} bold>{ComUtil.coinName(name)}</Div>
             </Flex>
-            <Flex p={15} bg={'white'} minHeight={140} flexDirection={'column'} justifyContent={'center'} relative>
+            <Flex p={15} bg={'white'} minHeight={166} flexDirection={'column'} justifyContent={'center'} relative>
                 {
                     loading ? <Skeleton active /> : (
                         <>
@@ -94,10 +94,7 @@ const TradeBigCard = ({
                             }
 
                             <Div mb={15} textAlign={'center'}>
-                                {
-                                    balance && <Content fontSize={16}>{balance}</Content>
-                                }
-
+                                <Content fontSize={16}>{balance}</Content>
                             </Div>
                             <Content>
                                 {

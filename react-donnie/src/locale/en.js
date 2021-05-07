@@ -227,14 +227,15 @@ const locale = {
 
     addLiquidityDesc: 'Add Liquidity to receive LP Tokens',
     myLiquidity: 'My Liquidity',
-    myLpToken: 'Your LP Token',
-    poolShare: 'Your pool share',
+    myLpToken: 'My LP Token',
+    poolShare: 'My pool share',
     totalPool: 'Total Liquidity',
     lpTokenDesc: 'LP Token will be issued in proportion to total liquidity pool. LP Token Balance decides Your pool share in the total liquidity pool.',
-    myShareDesc: 'Token ratio inside LP Token will be changed according to users swap. And Your Share will increase accumulating swap transaction fee.',
+    myShareDesc: 'Ratio between 2 tokens will be changed in My Share according to users swap. And token count will increase accumulating swap transaction fees.',
     lpTokenWalletDesc: 'LP Token in My Wallet',
     depositLpToken: 'Deposit LP Token',
     bep20bscDesc: 'BEP20(BSC) - BINANCE SMART CHAIN NETWORK',
+    estimatedValue: 'Estimated value'
 }
 
 export default locale;

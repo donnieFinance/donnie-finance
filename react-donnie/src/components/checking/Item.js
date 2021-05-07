@@ -28,7 +28,7 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
         forcedEndTime: forcedEndTime ? forcedEndTime : null
     })
 
-    const {name, mining, explain, total, usd, rate, buttonText, loading} = ComUtil.getCheckingAndSavingCoinInfo(coin, status, t)
+    const {name, mining, explain, total, usd, rate, buttonText, loading} = ComUtil.getCheckingAndSavingCoinInfo(coin, tokenName, status, t)
     const [myStaked, setMyStaked] = useState(false)
 
     useEffect(() => {
@@ -39,8 +39,11 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
     useEffect(() => {
         //진행중일 경우만 계속 조회하도록 함
         if (status === 1) {
-            refresh()                          //코인정보 갱신
-            setRefreshInterval(3000)    //3초마다 코인정보 interval
+            refresh()                             //코인정보 갱신
+            setRefreshInterval(1000*10)    //10 초마다 코인정보 interval
+
+            // if (uniqueKey === 'donhusdlp')
+                console.log(`============== item 에서 refresh 하고 useCoin 10초 인터벌 적용 [${uniqueKey}] ===============`)
         }
         //종료
         else if ([0,2,3].includes(status)) {
@@ -54,7 +57,7 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
     }
 
     const getAllBalance = async () => {
-
+        console.time()
         try{
 
             if (!contract.tokenName)
@@ -150,11 +153,12 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
                     }
                 }
             }
-
+        console.timeEnd()
         }catch (error){
             console.log(error)
         }
     }
+
 
     if (size === 'big') {
         return (

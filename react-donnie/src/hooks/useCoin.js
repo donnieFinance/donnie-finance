@@ -21,14 +21,14 @@ const useCoin = (uniqueKey
                  //{pool, tokenName, startTime, img}
 ) => {
 
-    const {pool, tokenName, img} = contractList[uniqueKey]
+    const {pool, tokenName, img = null} = contractList[uniqueKey]
     const [usdPrice] = useRecoilState(usdPriceState)
 
     const [state, setState] = useState(
         {
-            pool,
-            tokenName,
-            img,
+            pool: pool,
+            tokenName: tokenName,
+            img: img,
             // name: tokenName,
             // img: img,
             startTime: null,
@@ -50,18 +50,36 @@ const useCoin = (uniqueKey
 
     useEffect(() => {
         //캐시된 시간이 1시간 이전이면.. 기본값을 캐시데이터로 우선시함
+        console.log("isCached:"+ComUtil.isCached().toString())
         if (ComUtil.isCached()){
-            const cachedData = localStorage.getItem('coin')
-            if (cachedData) {
+            const storageData = localStorage.getItem('coin')
+            if (storageData) {
 
                 //에러가 났을경우 아무행동을 하지 않게끔 함, 대신 다음 인터벌에서 알아서 localStorage 값이 업데이트 됨(정상적으로)
                 try{
-                    const cachedCoin = JSON.parse(cachedData)[uniqueKey]
+                    const cachedCoin = JSON.parse(storageData)[uniqueKey]
                     if (cachedCoin) {
-                        setState({
-                            ...cachedCoin,
-                            loading: false
+
+                        let canUpdate = true;
+
+                        //밸리데이션 체크
+                        Object.keys(state).map(key => {
+                            //[중요] 값이 undefined 인 경우는 hasOwnProperty 에 포함되지 않음. 그래서 위에 img 같은경우 properties 에 없는 경우도 있기 때문에 값이 없을 경우 null 로 지정해 놓았음.
+                            if (!cachedCoin.hasOwnProperty(key)){
+                                if (canUpdate) {
+                                    canUpdate = false
+                                }
+                            }
                         })
+
+                        if (canUpdate) {
+
+                            console.log({canUpdate, uniqueKey})
+                            setState({
+                                ...cachedCoin,
+                                loading: false
+                            })
+                        }
                     }
                 }catch (err) {
                 }
@@ -75,13 +93,15 @@ const useCoin = (uniqueKey
         if (usdPrice) {
             //최초 갱신
             search()
-            // console.log(`==============useCoin [${uniqueKey}] 최초 호출===============`)
+
+            // if (uniqueKey === 'donhusdlp')
+                console.log(`==============useCoin [${uniqueKey}] 최초 호출===============`)
 
             //현재 인터벌 종료
             setCheckUsdInterval(null)
 
-            //앞으로 3초마다 갱신
-            setRefreshInterval(3000)
+            //2020.05.04 JADEN : 부모쪽에서 갱신하도록 아래코드는 미사용으로 처리
+            // setRefreshInterval(3000)
         }
     }, checkUsdInterval)
 
@@ -89,7 +109,10 @@ const useCoin = (uniqueKey
     useInterval(async() => {
         if (usdPrice)
             search()
-        // console.log(`==============useCoin [${uniqueKey}] 3초마다 호출===============`)
+
+        // if (uniqueKey === 'donhusdlp')
+            console.log(`==============useCoin [${uniqueKey}] 호출===============`)
+
     }, refreshInterval);
 
 

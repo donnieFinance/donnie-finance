@@ -182,8 +182,40 @@ const HarvestWithDraw = ({
                     alert(errorMessage);
                 }
 
+            } else if(!donyBalance) {
+                let contractID = contract.pool;
+                const gasLimit = 300000; // 기존 120000 -> 토큰포켓에 가스 비용 300000 사용됨
+                const {result, isSuccess} = await IostApi.onWithDrawSendBC(gasLimit, contractID, ComUtil.numToString(stakeBalance));
+                console.log({isSuccess: isSuccess, result: result});
+                if (isSuccess) {
+                    window.$message.success('Success');
+                    onClose()
+                } else {
+                    window.$message.error('fail');
+                    let errorMessage = `${tMessage.failedToSend}`;
+                    if (typeof result === 'string') {
+                        if (result.indexOf('{') > -1) {
+                            let error = JSON.parse(result.substring(result.indexOf('{'), result.indexOf('}') + 1))
+                            if (error.code === 2) {
+                                let vFailedToSend = `${tMessage.lackOfIgas} ${gasLimit} \n${tMessage.chargeIgasTime}`;
+                                if (error.message) {
+                                    vFailedToSend = vFailedToSend + "\n" + error.message.toString();
+                                }
+                                errorMessage = vFailedToSend
+                            } else {
+                                errorMessage = result
+                            }
+                        }
+                    } else if (typeof result === 'object') {
+                        if (result.status_code === 'BALANCE_NOT_ENOUGH') {
+                            errorMessage = `${tMessage.lackOfIram}`;
+                        } else {
+                            errorMessage = `${tMessage.jetstreamFail}`;
+                        }
+                    }
+                    alert(errorMessage)
+                }
             } else {
-
                 let gasLimit = 300000;  // gasLimit를 늘려줌Z
                 const {result, isSuccess} = await IostApi.onHarvestWithDrawSendBC(gasLimit, pool);
                 console.log({isSuccess: isSuccess, result: result});

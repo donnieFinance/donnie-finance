@@ -22,7 +22,7 @@ const Box = styled(Div)`
     
     box-shadow: 2px 2px 8px rgba(0,0,0, 0.4);
     
-    animation: timeInfoAni 5s ease-in-out infinite;
+    // animation: timeInfoAni 5s ease-in-out infinite;
     
     margin-bottom: 90px;
 `

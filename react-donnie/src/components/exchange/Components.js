@@ -93,8 +93,8 @@ const SymbolGroup = ({symbol1, symbol2, size = 30}) =>
     <Tooltip placement="topLeft" title={<Span bold>{symbol1.toUpperCase()}/{symbol2.toUpperCase()}</Span>}>
         {/*<img src={ComUtil.getLpTokenIcon(data.symbol1,data.symbol2)} width={50}/>*/}
         <Flex cursor={1}>
-            <SymbolIcon src={properties.tokenImages[symbol1]} alt={symbol1} width={size} zIndex={1}/>
-            <SymbolIcon src={properties.tokenImages[symbol2]} alt={symbol2} width={size} ml={-7}/>
+            <SymbolIcon shadow={'sm'} src={properties.tokenImages[symbol1]} alt={symbol1} width={size} zIndex={1}/>
+            <SymbolIcon shadow={'sm'} src={properties.tokenImages[symbol2]} alt={symbol2} width={size} ml={-7}/>
         </Flex>
     </Tooltip>
 

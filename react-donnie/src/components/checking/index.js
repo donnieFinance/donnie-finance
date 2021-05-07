@@ -1,21 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import properties from "~/properties";
-import {Div, Flex, GridColumns, Hr, XCenter} from "~/styledComponents/shared";
+import {Div, Flex, GridColumns, Button} from "~/styledComponents/shared";
 import {useTranslation, withTranslation} from "react-i18next";
 import PageHeading from "~/components/common/layouts/PageHeading";
 import useSize from "~/hooks/useSize";
 import loadable from "@loadable/component";
-import EarnCoinCard from "~/components/common/layouts/EarnCoinCard";
-import useRunningStatus from "~/hooks/useRunningStatus";
-import ComUtil from "~/util/ComUtil";
 import {useRecoilState} from "recoil";
 import {nowState, noticeModalState} from "~/hooks/atomState";
 import useInterval from "~/hooks/useInterval";
 import TotalHarvestedDon from "~/components/checking/TotalHarvestedDon";
 import useUsdPrice from "~/hooks/useUsdPrice";
+import {useHistory} from "react-router-dom";
+import {BsArrowRight} from 'react-icons/bs'
+import {IoIosLink} from 'react-icons/io'
 const Item = loadable(() => import('./Item'))
 
 const AttemptCard = () => {
+
     const {t} = useTranslation()
     const {sizeValue} = useSize()
     return(
@@ -30,6 +31,7 @@ const AttemptCard = () => {
 
 export default withTranslation()((props) => {
 
+    const history = useHistory()
     const [, setNow] = useRecoilState(nowState)
     const [noticeOpen, setNoticeOpen] = useRecoilState(noticeModalState)
     const [lpTokens, setLpTokens] = useState([])
@@ -70,7 +72,13 @@ export default withTranslation()((props) => {
         }
 
         //캐시된 시간 저장
-        localStorage.setItem('updateTime', new Date())
+        setTimeout(() => localStorage.setItem('updateTime', new Date()), 500)
+
+
+
+
+        //캐시된 시간 저장
+        return(() => localStorage.setItem('updateTime', new Date()))
 
     }, [])
 
@@ -128,13 +136,30 @@ export default withTranslation()((props) => {
 
             >
 
-                <Flex fg={'white'} fw={500} mb={20}>
-                    <Div width={22} height={22} bc={'white'} rounded={'50%'} bg={'rgba(255,255,255,0.2)'}></Div>
-                    <Div width={22} height={22} bc={'white'} rounded={'50%'} bg={'rgba(255,255,255,0.2)'} ml={-6} mr={8}></Div>
-                    <Div fontSize={sizeValue(25, null, 20)} >
-                        Liquidity Pool(LP) Token
-                    </Div>
+                <Flex mb={20} flexDirection={'column'}>
+                    <Flex fg={'white'} fw={500} mb={5}>
+                        <Div width={22} height={22} bc={'white'} rounded={'50%'} bg={'rgba(255,255,255,0.2)'}></Div>
+                        <Div width={22} height={22} bc={'white'} rounded={'50%'} bg={'rgba(255,255,255,0.2)'} ml={-6} mr={8}></Div>
+                        <Div fontSize={sizeValue(25, null, 20)} >
+                            Liquidity Provider(LP) Token
+                        </Div>
+                    </Flex>
+                    <Button bg={'white'} fg={'primary'} px={10} py={4} bold
+                            onClick={() => {
+                                history.push('/exchange/liquidity')
+                                window.scrollTo({top:0, behavior:'smooth'})
+                            }}>
+                        <Flex>
+                            <Div mr={5}>
+                                Get LP Token
+                            </Div>
+                            <BsArrowRight />
+                        </Flex>
+
+                    </Button>
                 </Flex>
+
+
                 <GridColumns repeat={sizeValue(4, null, 1)}
                              rowGap={sizeValue(10, null,  40)}
                     // maxWidth={sizeValue(928,  null, '100%' )}

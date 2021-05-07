@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Div} from '~/styledComponents/shared'
 import loadable from '@loadable/component'
 import imgSaving from '~/assets/savings.svg'
@@ -20,6 +20,7 @@ import imgPaymentWhite from '~/assets/card_w.svg'
 import imgPortfolio from '~/assets/fund_management.svg'
 import imgPortfolioWhite from '~/assets/fund_management_w.svg'
 import useSize from "~/hooks/useSize";
+import ComUtil from "~/util/ComUtil";
 
 const Web = loadable(() => import('./Web'))
 const Mobile = loadable(() => import('./Mobile'))
@@ -84,6 +85,16 @@ const store = [
 export default () => {
 
     const {size} = useSize()
+
+    useEffect(() => {
+        //TODO : 초반 10분 이상 지났을때는 쿠키 클리어, 나중에는 60분 으로 (체킹페이지) 같이 맞춰주면 될듯 함
+        if(!ComUtil.isCached(10)) {
+            localStorage.removeItem("coinStatus")
+            localStorage.removeItem("coinInfo")
+            localStorage.removeItem("coin")
+            localStorage.removeItem("updateTime")
+        }
+    }, [])
 
     return(
         <Div bg={'background'} style={{height: '100%'}} >
