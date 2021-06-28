@@ -3,7 +3,7 @@ const DON_TOKEN = 'don';
 const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
 const STAKE_TOKEN = 'don';
 
-const START_TIME = 1620086400;      // 20210504:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:ContractCvzzr8aGiVhMKYADQxQakL1S9kisumkDgQMDKQx29Skq
+const START_TIME = 1624924800;      // 20210629:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:ContractCvzzr8aGiVhMKYADQxQakL1S9kisumkDgQMDKQx29Skq
 const DURATION = 24 * 3600 * 56;    // 56일, in Seconds
 // const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;
@@ -42,14 +42,16 @@ class DonDonPool {
     ////////////////////////StakeToken Wrapper/////////////////////
 
     updateStartTime(startTime) {
-        storage.put(START_TIME_KEY, ""+startTime);
-        let duration = storage.get(DURATION_KEY);
+        if (tx.publisher === blockchain.contractOwner()) {
+            storage.put(START_TIME_KEY, "" + startTime);
+            let duration = storage.get(DURATION_KEY);
 
-        // addRewardAmount로 duration 변경 전
-        if(!duration) {
-            storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(DURATION).toString());
-        } else {
-            storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(new Int64(duration)).toString());
+            // addRewardAmount로 duration 변경 전
+            if (!duration) {
+                storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(DURATION).toString());
+            } else {
+                storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(new Int64(duration)).toString());
+            }
         }
     }
 

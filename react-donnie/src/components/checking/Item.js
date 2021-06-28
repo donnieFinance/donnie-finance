@@ -40,7 +40,7 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
         //진행중일 경우만 계속 조회하도록 함
         if (status === 1) {
             refresh()                             //코인정보 갱신
-            setRefreshInterval(1000*10)    //10 초마다 코인정보 interval
+            setRefreshInterval(1000*60)    //60 초마다 코인정보 interval
 
             // if (uniqueKey === 'donhusdlp')
                 console.log(`============== item 에서 refresh 하고 useCoin 10초 인터벌 적용 [${uniqueKey}] ===============`)

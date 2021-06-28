@@ -20,6 +20,7 @@ const BnbWithdrawSwap = loadable(() => import('~/components/admin/bnbWithdrawSwa
 const Home = loadable(() => import('~/components/admin/home'));
 const Exchange = loadable(() => import('~/components/admin/exchange'));
 const Properties = loadable(() => import('~/components/admin/properties'));
+const ExContractHistory = loadable(() => import('~/components/admin/exContractHistory'));
 
 const iwStore = {
     wbtc: {
@@ -103,6 +104,10 @@ export default () => {
             </PrivateRoute>
             <PrivateRoute exact path="/admin/bnbWithdrawSwap" type={'admin'}>
                 <BnbWithdrawSwap />
+            </PrivateRoute>
+
+            <PrivateRoute exact path="/admin/exContractHistory" type={'admin'}>
+                <ExContractHistory />
             </PrivateRoute>
 
         </Switch>

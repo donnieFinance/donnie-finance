@@ -201,6 +201,11 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                                 onClick={() => rowData.transferOkClick()}> status2로변경.
                         </Button>
                     </Span>
+                    <Span ml={10}>
+                        <Button size={'small'} type={'primary'}
+                                onClick={() => rowData.manualApproveCancelClick()}> 재Approve
+                        </Button>
+                    </Span>
                 </div>
                 :
                 <div>
@@ -216,9 +221,8 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
 
     function ethAccountRenderer ({value}) {
         let ethScanUrl = 'https://etherscan.io/address/';
-        const ropstenEthScanUrl = 'https://ropsten.etherscan.io/address/'
         if(properties.isTestMode){
-            ethScanUrl = ropstenEthScanUrl;
+            ethScanUrl = 'https://ropsten.etherscan.io/address/';
         }
         return value && <><a href={`${ethScanUrl}${value}`} target={'_blank'} fg={'primary'} ml={10} ><u>EthScan</u></a> <span>{value}</span></>
     }
@@ -377,10 +381,6 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
         })
 
         if(data) {
-            data.map(item => item.transferOkClick = function () {
-                userApproveOk(iwTokenName, item);
-            })
-
             data.map(item => {
                 item.iwTokenName = iwTokenName
                 item.approveAllowanceClick = function () {
@@ -392,8 +392,19 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
                 item.manualApprove = function () {
                     manualErcApprove(iwTokenName, item);
                 }
+                item.manualApproveCancelClick = function () {
+                    const vNonce = window.prompt("Nonce를 입력해주세요")
+                    if (!vNonce) {
+                        return
+                    }
+                    if(window.confirm("재Approve 하시겠습니까? 가스를 49000*GWEI충분히 넣고해주세요.")) {
+                        approveErcCancelManually(iwTokenName, item, vNonce);
+                    }
+                }
+                item.transferOkClick = function () {
+                    userApproveOk(iwTokenName, item);
+                }
             })
-
         }
 
         setData(data);
@@ -441,6 +452,13 @@ const IwblyDepositSwap = ({iwTokenName, ercTokenName}) => {
         alert("Approve Result:"+approveResult);
     }
 
+    //20210524 추가.
+    async function approveErcCancelManually(iwTokenName, item, nonce) {
+        console.slog("수동 approveErcCancelManually 요청");
+        const {data:approveResult} = await AdminApi.approveErcCancelManually(iwTokenName, item.iwSwapDepositNo, nonce);
+        console.slog({approveResult});
+        alert("ApproveErcCancelManually Result:"+approveResult);
+    }
 
     async function searchWithEth() {
         setLoading(true);

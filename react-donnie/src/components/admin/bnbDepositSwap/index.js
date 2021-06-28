@@ -32,7 +32,8 @@ const SearchBox = styled.div`
 
 const BnbDepositSwap = () => {
 
-    const iwTokenName = "iwBNB";
+    // const iwTokenName = "iwBNB";
+    const iwTokenName = "iwbnb";
     const bepTokenName = "BNB";
 
     const [gridApi, setGridApi] = useState(null);
@@ -118,7 +119,7 @@ const BnbDepositSwap = () => {
                 }
             },
             {
-                headerName: "manager전송", field: "managerTransfered", width: 170,
+                headerName: "manager전송", field: "managerTransfered", width: 300,
                 cellStyle:ComUtil.getCellStyle({cellAlign: 'center'}), cellRenderer: 'managerTransferRenderer'
             },
             {
@@ -130,7 +131,7 @@ const BnbDepositSwap = () => {
                 }
             },
             {
-                headerName: "irc전송여부", field: "ircTokenPaid", width: 110, cellStyle:ComUtil.getCellStyle({cellAlign: 'center'}),
+                headerName: "irc전송여부", field: "ircTokenPaid", cellRenderer: 'sudongSendRenderer'
             },
             {
                 headerName: "swap 완료시간", field: "ircTokenPaidTime", width: 140,
@@ -155,7 +156,7 @@ const BnbDepositSwap = () => {
             bepAccountRenderer: bepAccountRenderer,
             managerTransferRenderer: managerTransferRenderer,
             balanceCheckRenderer: balanceCheckRenderer,
-            // sudongSendRenderer:sudongSendRenderer
+            sudongSendRenderer:sudongSendRenderer,
         }
     }
 
@@ -201,7 +202,12 @@ const BnbDepositSwap = () => {
                     {status}
                     <Span ml={10}>
                         <Button size={'small'} type={'primary'}
-                                onClick={() => rowData.transferOkClick()}> 완료처리
+                                onClick={() => rowData.manualSend()}> 수동전송
+                        </Button>
+                    </Span>
+                    <Span ml={10}>
+                        <Button size={'small'} type={'primary'}
+                                onClick={() => rowData.transferOkClick()}> 완료처리(status=2)
                         </Button>
                     </Span>
                 </div>
@@ -212,53 +218,53 @@ const BnbDepositSwap = () => {
 
     function bepAccountRenderer ({value}) {
         let bscScanUrl = 'https://bscscan.com/address/';
-        const testnetBscScanUrl = 'https://testnet.bscscan.com/address/'
         if(properties.isTestMode){
-            bscScanUrl = testnetBscScanUrl;
+            bscScanUrl = 'https://testnet.bscscan.com/address/';
         }
         return value && <><a href={`${bscScanUrl}${value}`} target={'_blank'} fg={'primary'} ml={10} ><u>BscScan</u></a> <span>{value}</span></>
     }
 
-    // function sudongSendRenderer(props) {
-    //     const rowData = props.data;
-    //     const onHandleClick = async() => {
-    //         if(window.confirm(rowData.ircAccount+'의 '+ rowData.ercTokenAmount +'토큰을 수동전송 하시겠습니까?')) {
-    //             const params = {
-    //                 iwSwapDepositNo: rowData.iwSwapDepositNo,
-    //                 iwTokenName: iwTokenName,
-    //                 ircAccount: rowData.ircAccount,
-    //                 ercTokenAmount: rowData.ercTokenAmount
-    //             }
-    //             //approve된 Iw ERC토큰 수동 전송 기능
-    //             let {data: result} = await AdminApi.issueIwIrcToUser(params);
-    //             alert(result);
-    //             if (window.confirm('다시 재 검색하시겠습니까?')) {
-    //                 search();
-    //             }
-    //         }
-    //     }
-    //     let ircTokenPaidStat = 'false';
-    //     if(rowData.ircTokenPaid){
-    //         ircTokenPaidStat = 'true'
-    //     }
-    //     let v_memo = null;
-    //     if(rowData.memo){
-    //         v_memo = "("+rowData.memo+")";
-    //     }
-    //
-    //     return(
-    //         <div>
-    //             {ircTokenPaidStat}
-    //             {
-    //                 !rowData.ircTokenPaid &&
-    //                 <Span ml={10}>
-    //                     <button onClick={onHandleClick}>수동전송</button>
-    //                 </Span>
-    //             }
-    //             {v_memo}
-    //         </div>
-    //     )
-    // }
+    function sudongSendRenderer(props) {
+        const rowData = props.data;
+        const onHandleClick = async() => {
+            if(window.confirm(rowData.ircAccount+'의 '+ rowData.bnbTokenAmount +'토큰을 수동전송 하시겠습니까?')) {
+                const params = {
+                    iwSwapDepositNo: rowData.swapBnbNo,
+                    iwTokenName: iwTokenName,
+                    ircAccount: rowData.ircAccount,
+                    ercTokenAmount: rowData.bnbTokenAmount
+                }
+                //iwbnb 수동 전송 기능
+                let {data: result} = await AdminApi.issueIwIrcToUser(params);
+                alert(result);
+
+                if (window.confirm('다시 재 검색하시겠습니까?')) {
+                    search();
+                }
+            }
+        }
+        let ircTokenPaidStat = 'false';
+        if(rowData.ircTokenPaid){
+            ircTokenPaidStat = 'true'
+        }
+        // let v_memo = null;
+        // if(rowData.memo){
+        //     v_memo = "("+rowData.memo+")";
+        // }
+
+        return(
+            <div>
+                {ircTokenPaidStat}
+                {
+                    !rowData.ircTokenPaid &&
+                    <Span ml={10}>
+                        <button onClick={onHandleClick}>수동전송</button>
+                    </Span>
+                }
+                {/*{v_memo}*/}
+            </div>
+        )
+    }
 
     function balanceCheckRenderer(props) {
         const rowData = props.data;
@@ -333,6 +339,9 @@ const BnbDepositSwap = () => {
 
         if(data) {
             data.map(item => {
+                item.manualSend = function () {
+                    manualSendApprove(item);
+                }
                 item.transferOkClick = function () {
                     managerTransferOk(item);
                 }
@@ -355,11 +364,25 @@ const BnbDepositSwap = () => {
         setLoading(false);
     }
 
+    // bnb토큰입금 수동전송
+    async function manualSendApprove(item) {
+        console.slog("수동 전송 approve 요청");
+        if(window.confirm(item.ircAccount+'의 '+ item.bnbTokenAmount +'토큰을 bnbManager로 수동전송 하시겠습니까?')) {
+            // 매니저  수동 전송
+            const {data:approveResult} = await AdminApi.manualBnbDeposit(item.swapBnbNo);
+            console.slog({approveResult});
+            alert("Approve Result:"+approveResult);
+        }
+    }
+
+    // bnb토큰입금 완료처리
     async function managerTransferOk(item) {
-        const {data:result} = await AdminApi.updateBnbSwapDepositFinished(item.swapBnbNo);
-        if(result === 200) {
-            alert("변경이 완료되었습니다.");
-            search();
+        if(window.confirm("상태값이 완료처리가 되어 배치처리가 됩니다!(수동전송이 아님! 주의! bnbscan에서 금액 확인후에 눌러주세요!)")) {
+            const {data: result} = await AdminApi.updateBnbSwapDepositFinished(item.swapBnbNo);
+            if (result === 200) {
+                alert("변경이 완료되었습니다.");
+                search();
+            }
         }
     }
 
@@ -373,20 +396,6 @@ const BnbDepositSwap = () => {
             + "\navailableWithdraw : " + result.availableWithdraw;
         alert(resultText);
     }
-
-    // async function searchWithEth() {
-    //     setLoading(true);
-    //     const {data} = await AdminApi.iwErcDepositSwap(iwTokenName, true, false);
-    //     setData(data);
-    //     setLoading(false);
-    // }
-    //
-    // async function searchWithErc() {
-    //     setLoading(true);
-    //     const {data} = await AdminApi.iwErcDepositSwap(iwTokenName,true, true);
-    //     setData(data);
-    //     setLoading(false);
-    // }
 
     function copy ({value}) {
         ComUtil.copyTextToClipboard(value, '', '');

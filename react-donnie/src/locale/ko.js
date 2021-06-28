@@ -209,6 +209,7 @@ const locale = {
     attemptTitle: '사칭주의!',
     attempt: 'DON 컨트랙트 주소를 확인해 주세요',
     contactUs: '이메일 info@donnie.finance 로 문의 부탁드립니다.',
+    delayWithdraw: '본 출금건은 iw토큰이 정상적으로 반납 되었다면, 실제 토큰 전송에는 1시간 정도 소요될 예정입니다.(가스 불충분등의 사유)',
 
     swapDesc:'간편하게 토큰간 거래를 수행하세요',
     selectToken: '토큰을 선택해 주세요',

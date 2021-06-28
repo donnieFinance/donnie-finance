@@ -152,6 +152,9 @@ export default () => {
                             <Route exact path={'/checking'} >
                                 <Checking />
                             </Route>
+                            <Route exact path={'/checking/finished'} >
+                                <Checking />
+                            </Route>
 
                             <Route exact path={'/trade/:uniqueKey'} >
                                 <Trade />

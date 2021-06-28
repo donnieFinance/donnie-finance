@@ -30,6 +30,7 @@ const getDonManagerIGas = () => axiosSecure(properties.restAPIHost + '/getDonMan
 const getDonManagerIRam = () => axiosSecure(properties.restAPIHost + '/getDonManagerIRam', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const updateUserApproveOk = (iwTokenName, iwSwapDepositNo) => axiosSecure(properties.restAPIHost + '/updateUserApproveOk', {method: "post", params: {iwTokenName:iwTokenName, iwSwapDepositNo:iwSwapDepositNo},  withCredentials: true, credentials: 'same-origin'})
 const manualErcApprove = (iwTokenName, iwSwapDepositNo) => axiosSecure(properties.restAPIHost + '/manualErcApprove', {method: "post", params: {iwTokenName:iwTokenName, iwSwapDepositNo:iwSwapDepositNo},  withCredentials: true, credentials: 'same-origin'})
+const approveErcCancelManually = (iwTokenName, iwSwapDepositNo, nonce) => axiosSecure(properties.restAPIHost + '/approveErcCancelManually', {method: "post", params: {iwTokenName:iwTokenName, iwSwapDepositNo:iwSwapDepositNo, nonce:nonce},  withCredentials: true, credentials: 'same-origin'})
 const iwIrcWithdrawSwap = (iwTokenName) => axiosSecure(properties.restAPIHost + '/iwIrcWithdrawSwap', {method: "get", params: {iwTokenName:iwTokenName},  withCredentials: true, credentials: 'same-origin'})
 const getIwErcTokenApproved = (iwTokenName, ownerIrcAccount) => axiosSecure(properties.restAPIHost + '/iwErcTokenAllowance', {method: "get", params: {iwTokenName:iwTokenName, ownerIrcAccount:ownerIrcAccount},  withCredentials: true, credentials: 'same-origin'})
 // iw의 출금 WithdrawSequence 조회
@@ -50,6 +51,8 @@ const getBnbManagerAccount = () => axiosSecure(properties.restAPIHost + '/getBnb
 const getBnbManagerBalance = () => axiosSecure(properties.restAPIHost + '/getBnbManagerBalance', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const getBnbGasPrice = () => axiosSecure(properties.restAPIHost + '/getBnbGasPrice', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const bnbDepositSwap = () => axiosSecure(properties.restAPIHost + '/bnbDepositSwap', {method: "get", withCredentials: true, credentials: 'same-origin'})
+const manualBnbDeposit = (depositNo) => axiosSecure(properties.restAPIHost + '/manualBnbDeposit', {method: "post", params: {depositNo:depositNo},  withCredentials: true, credentials: 'same-origin'})
+
 // const bnbWithdrawSwap = () => axiosSecure(properties.restAPIHost + '/bnbWithdrawSwap', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const updateBnbSwapDepositFinished = (swapBnbNo) => axiosSecure(properties.restAPIHost + '/updateBnbSwapDepositFinished', {method: "post", params: {swapBnbNo:swapBnbNo},  withCredentials: true, credentials: 'same-origin'})
 const getBep20BNBBalance = (bep20Account) => axios(properties.restAPIHost + '/getBep20BNBBalance', { method: "post", params: {bep20Account},withCredentials: true, credentials: 'same-origin' })
@@ -86,6 +89,12 @@ const getIwSwapTotalAmount = async (iwTokenName, ircAccount) => {
 
 const manualApprove0x34 = (iwTokenName, ircAccount) => axiosSecure(properties.restAPIHost + '/manualApprove0x34', {method: "post", params: {iwTokenName:iwTokenName, ircAccount:ircAccount},  withCredentials: true, credentials: 'same-origin'})
 
+
+//set exchange contract history
+const setExContractHistory = (pageNo) => axios(properties.restAPIHost + '/setExContractHistory', { method: "post", params: {pageNo:pageNo}, withCredentials: true, credentials: 'same-origin' })
+//exchange contract history list
+const getExContractHistory = ({year}) => axios(properties.restAPIHost + '/exContractHistory', { method: "get", params:{year:year}, withCredentials: true, credentials: 'same-origin' })
+
 export default {
     ercDonDepositSwap,
     ercDonWidthdrawSwap,
@@ -108,6 +117,7 @@ export default {
     iwIrcWithdrawSwap,
     getIwErcTokenApproved,
     manualErcApprove,
+    approveErcCancelManually,
 
     sendUserIwErcToExtAccount,
     sendUserIwErcToExtAccountManual,
@@ -116,12 +126,13 @@ export default {
     issueIwIrcToUser,
     issueIwIrcToUserFinish,
     getBnbManagerAccount, getBnbManagerBalance, getBnbGasPrice,
-    bnbDepositSwap,
+    bnbDepositSwap,manualBnbDeposit,
     // bnbWithdrawSwap,
     updateBnbSwapDepositFinished,
     getBep20BNBBalance,
     sendUserBnbToExtAccount,
     getIwSwapTotalAmount,
     getIwMaxWithdrawSequence,
-    manualApprove0x34
+    manualApprove0x34,
+    setExContractHistory, getExContractHistory
 }

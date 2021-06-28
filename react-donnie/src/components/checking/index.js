@@ -10,10 +10,18 @@ import {nowState, noticeModalState} from "~/hooks/atomState";
 import useInterval from "~/hooks/useInterval";
 import TotalHarvestedDon from "~/components/checking/TotalHarvestedDon";
 import useUsdPrice from "~/hooks/useUsdPrice";
-import {useHistory} from "react-router-dom";
+import {useHistory, useRouteMatch} from "react-router-dom";
 import {BsArrowRight} from 'react-icons/bs'
 import {IoIosLink} from 'react-icons/io'
+import SwitchButton from "~/components/common/buttons/SwitchButton";
+
 const Item = loadable(() => import('./Item'))
+
+const pathData = [
+    {pathname: '/checking', name: 'Live'},
+    {pathname: '/checking/finished', name: 'Finished'},
+]
+
 
 const AttemptCard = () => {
 
@@ -36,6 +44,16 @@ export default withTranslation()((props) => {
     const [noticeOpen, setNoticeOpen] = useRecoilState(noticeModalState)
     const [lpTokens, setLpTokens] = useState([])
     const [tokenPools, setTokenPools] = useState([])
+
+    const isLive = useRouteMatch({
+        path: '/checking',
+        exact: true
+    })
+
+    const isFinished = useRouteMatch({
+        path: '/checking/finished',
+        exact: true
+    })
 
     //1분에 한번씩 코인별 usdPrice 갱신
     useUsdPrice()
@@ -88,6 +106,8 @@ export default withTranslation()((props) => {
     }, 1000)
 
 
+
+
     //!!주의!! 모두 Object 형식임 (Array 아님!)
     const {contractList, coinList, oldAddress} = properties
 
@@ -128,93 +148,138 @@ export default withTranslation()((props) => {
                 <TotalHarvestedDon />
             </Flex>
 
+            <Flex mt={50} justifyContent={'center'}>
+                <SwitchButton data={pathData} />
+            </Flex>
 
-            <Flex justifyContent={'center'}
-                  flexDirection={'column'}
-                  mt={sizeValue(50, 40, 50)}
-                  pb={sizeValue(200, 90)}
+            {
+                isLive && (
+                    <Flex justifyContent={'center'}
+                          flexDirection={'column'}
+                          mt={sizeValue(50, 40, 50)}
+                          pb={sizeValue(200, 90)}
 
-            >
+                    >
 
-                <Flex mb={20} flexDirection={'column'}>
-                    <Flex fg={'white'} fw={500} mb={5}>
-                        <Div width={22} height={22} bc={'white'} rounded={'50%'} bg={'rgba(255,255,255,0.2)'}></Div>
-                        <Div width={22} height={22} bc={'white'} rounded={'50%'} bg={'rgba(255,255,255,0.2)'} ml={-6} mr={8}></Div>
-                        <Div fontSize={sizeValue(25, null, 20)} >
-                            Liquidity Provider(LP) Token
-                        </Div>
-                    </Flex>
-                    <Button bg={'white'} fg={'primary'} px={10} py={4} bold
-                            onClick={() => {
-                                history.push('/exchange/liquidity')
-                                window.scrollTo({top:0, behavior:'smooth'})
-                            }}>
-                        <Flex>
-                            <Div mr={5}>
-                                Get LP Token
-                            </Div>
-                            <BsArrowRight />
+                        <Flex mb={20} flexDirection={'column'}>
+                            <Flex fg={'white'} fw={500} mb={5}>
+                                <Div width={22} height={22} bc={'white'} rounded={'50%'} bg={'rgba(255,255,255,0.2)'}></Div>
+                                <Div width={22} height={22} bc={'white'} rounded={'50%'} bg={'rgba(255,255,255,0.2)'} ml={-6} mr={8}></Div>
+                                <Div fontSize={sizeValue(25, null, 20)} >
+                                    Liquidity Provider(LP) Token
+                                </Div>
+                            </Flex>
+                            <Button bg={'white'} fg={'primary'} px={10} py={4} bold
+                                    onClick={() => {
+                                        history.push('/exchange/liquidity')
+                                        window.scrollTo({top:0, behavior:'smooth'})
+                                    }}>
+                                <Flex>
+                                    <Div mr={5}>
+                                        Get LP Token
+                                    </Div>
+                                    <BsArrowRight />
+                                </Flex>
+
+                            </Button>
                         </Flex>
 
-                    </Button>
-                </Flex>
 
+                        <GridColumns repeat={sizeValue(4, null, 1)}
+                                     rowGap={sizeValue(10, null,  40)}
+                            // maxWidth={sizeValue(928,  null, '100%' )}
+                                     width={sizeValue('unset', null,'90%')}
+                        >
+                            {
 
-                <GridColumns repeat={sizeValue(4, null, 1)}
-                             rowGap={sizeValue(10, null,  40)}
-                    // maxWidth={sizeValue(928,  null, '100%' )}
-                             width={sizeValue('unset', null,'90%')}
-                >
-                    {
-
-                        Object.keys(contractList).map( (key,i) => {
-                            const contract = contractList[key]
-                            if (contract.tokenType === 'lp') {
-                                return (
-                                    <Item
-                                        key={`depositBigCard${i}`}
-                                        contract={contract}
-                                        uniqueKey={key}
-                                        size={size === 'sm' ? 'small' : 'big'}
-                                    />
-                                )
+                                Object.keys(contractList).map( (key,i) => {
+                                    const contract = contractList[key]
+                                    if (contract.finished) return null
+                                    if (contract.tokenType === 'lp') {
+                                        return (
+                                            <Item
+                                                key={`depositBigCard${i}`}
+                                                contract={contract}
+                                                uniqueKey={key}
+                                                size={size === 'sm' ? 'small' : 'big'}
+                                            />
+                                        )
+                                    }
+                                    return null
+                                })
                             }
-                            return null
-                        })
-                    }
-                </GridColumns>
+                        </GridColumns>
 
 
-                <Flex fg={'white'} fw={500} fontSize={25} mt={40} mb={20}>
-                    <Div width={22} height={22} bc={'white'} rounded={'50%'} bg={'rgba(255,255,255,0.2)'} mr={8}></Div>
-                    <Div fontSize={sizeValue(25, null, 20)} >
-                        Token Pool
-                    </Div>
-                </Flex>
-                <GridColumns repeat={sizeValue(4, null, 1)}
-                             rowGap={sizeValue(10, null,  40)}
-                    // maxWidth={sizeValue(928,  null, '100%' )}
-                             width={sizeValue('unset', null,'90%')}
-                >
-                    {
+                        <Flex fg={'white'} fw={500} fontSize={25} mt={40} mb={20}>
+                            <Div width={22} height={22} bc={'white'} rounded={'50%'} bg={'rgba(255,255,255,0.2)'} mr={8}></Div>
+                            <Div fontSize={sizeValue(25, null, 20)} >
+                                Token Pool
+                            </Div>
+                        </Flex>
+                        <GridColumns repeat={sizeValue(4, null, 1)}
+                                     rowGap={sizeValue(10, null,  40)}
+                            // maxWidth={sizeValue(928,  null, '100%' )}
+                                     width={sizeValue('unset', null,'90%')}
+                        >
+                            {
 
-                        Object.keys(contractList).map( (key,i) => {
-                            const contract = contractList[key]
-                            if (contract.tokenType !== 'lp') {
-                                return (
-                                    <Item
-                                        key={`depositBigCard${i}`}
-                                        contract={contract}
-                                        uniqueKey={key}
-                                        size={size === 'sm' ? 'small' : 'big'}
-                                    />
-                                )
+                                Object.keys(contractList).map( (key,i) => {
+                                    const contract = contractList[key]
+                                    if (contract.finished) return null
+                                    if (contract.tokenType !== 'lp') {
+                                        return (
+                                            <Item
+                                                key={`depositBigCard${i}`}
+                                                contract={contract}
+                                                uniqueKey={key}
+                                                size={size === 'sm' ? 'small' : 'big'}
+                                            />
+                                        )
+                                    }
+                                    return null
+                                })
                             }
-                            return null
-                        })
-                    }
-                </GridColumns>
-            </Flex>
+                        </GridColumns>
+                    </Flex>
+                )
+            }
+
+            {
+                isFinished && (
+                    <Flex justifyContent={'center'}
+                          flexDirection={'column'}
+                          mt={sizeValue(50, 40, 50)}
+                          pb={sizeValue(200, 90)}
+
+                    >
+                        <GridColumns repeat={sizeValue(4, null, 1)}
+                                     rowGap={sizeValue(10, null,  40)}
+                            // maxWidth={sizeValue(928,  null, '100%' )}
+                                     width={sizeValue('unset', null,'90%')}
+                        >
+                            {
+
+                                Object.keys(contractList).map( (key,i) => {
+                                    const contract = contractList[key]
+                                    if (!contract.finished) return null
+                                    return (
+                                        <Item
+                                            key={`depositBigCard${i}`}
+                                            contract={contract}
+                                            uniqueKey={key}
+                                            size={size === 'sm' ? 'small' : 'big'}
+                                        />
+                                    )
+                                    return null
+                                })
+                            }
+                        </GridColumns>
+                    </Flex>
+                )
+            }
+
+
 
         </Div>
     );

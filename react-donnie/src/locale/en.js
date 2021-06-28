@@ -207,6 +207,7 @@ const locale = {
     attemptTitle: 'BEWARE OF SCAM ATTEMPTS!',
     attempt: 'THE CONTRACT ADDRESS IS',
     contactUs: 'Please contact us via info@donnie.finance',
+    delayWithdraw: 'If your iwToken is returned successfully, Token send transaction will be processed in 1 hour.(Gas maybe not enough)',
 
     swapDesc:'Trade tokens in an instant',
     selectToken: 'Select a token',

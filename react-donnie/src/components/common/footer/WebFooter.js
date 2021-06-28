@@ -8,15 +8,27 @@ const WebFooter = ({t, iconList}) => {
         <Flex flexWrap={'no-wrap'} bg={'darkPrimary'} fg={'white'} p={20}>
             <Div flexGrow={1}>
                 <Div>ⓒ DONNIE FINANCE. ALL RIGHTS RESERVED.</Div>
-                <Div>powered by IOST & EZFARM</Div>
+                <Div>powered by IOST</Div>
             </Div>
             <Flex ml={'auto'} flexShrink={0}>
                 <Div mr={20}>
                     <a
+                        href={`${properties.TermsOfUseLink}`}
+                        target="_black"
+                    >
+                        <Button fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4}>Terms of Use</Button>
+                    </a>
+                    <a
+                        href={`${properties.PrivacyPolicyLink}`}
+                        target="_black"
+                    >
+                        <Button fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4} ml={10}>Privacy Policy</Button>
+                    </a>
+                    <a
                         href={`${properties.DonDistributionFileLink}`}
                         target="_black"
                     >
-                        <Button fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4}>Don Distribution</Button>
+                        <Button fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4} ml={10}>Don Distribution</Button>
                     </a>
                     <a
                         href={`https://www.iostabc.com/token/${properties.address.token}`}

@@ -9,6 +9,18 @@ const MobileFooter = ({t, iconList}) => {
             <Div bg={'darkPrimary'} fg={'white'} p={20}>
                 <Div>
                     <a
+                        href={`${properties.TermsOfUseLink}`}
+                        target="_black"
+                    >
+                        <Button block fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4} mb={20}>Terms of Use</Button>
+                    </a>
+                    <a
+                        href={`${properties.PrivacyPolicyLink}`}
+                        target="_black"
+                    >
+                        <Button block fg={'light'} bc={'secondary'} bg={'darkPrimary'} px={15} py={10} rounded={4} mb={20}>Privacy Policy</Button>
+                    </a>
+                    <a
                         href={`${properties.DonDistributionFileLink}`}
                         target="_black"
                     >
@@ -38,7 +50,7 @@ const MobileFooter = ({t, iconList}) => {
                 </Flex>
                 <Div textAlign={'center'} mt={10}>
                     <Div>ⓒ DONNIE FINANCE. ALL RIGHTS RESERVED.</Div>
-                    <Div>powered by IOST & EZFARM</Div>
+                    <Div>powered by IOST</Div>
                 </Div>
             </Div>
         </>

@@ -43,6 +43,7 @@ const store = [
             {to: '/admin/exchange', name:'Exchange'},
             {to: '/admin/properties', name:'Properties'},
             {to: '/admin/ercDonDepositSwap', name:'DON토큰입금'},
+            {to: '/admin/exContractHistory', name:'Ex히스토리'},
             // {to: '/admin/ercDonWithdrawSwap', name:'DON토큰출금'}, //사용하지 않음
             // {to: '/admin/iwlinkDepositSwap', name:'iwlink토큰입금'},
             // {to: '/admin/iwlinkWithdrawSwap', name:'iwlink토큰출금'},

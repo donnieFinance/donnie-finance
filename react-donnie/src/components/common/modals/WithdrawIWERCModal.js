@@ -206,13 +206,13 @@ const WithdrawIWERCContent = () => {
                     setWithdrawIWERCState({uniqueKey:'',tokenName:'',isOpen:false})
                 }else {
                     setLoadingStatus('failed')
-                    alert(t('contactUs'));
+                    alert(t('delayWithdraw'));
                     setWithdrawIWERCState({uniqueKey:'',tokenName:'',isOpen:false})
                 }
             }catch (err){
                 console.slog(err)
                 setLoadingStatus('failed')
-                alert(t('contactUs'));
+                alert(t('delayWithdraw'));
             }
 
         }

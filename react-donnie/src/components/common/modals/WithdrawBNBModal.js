@@ -188,12 +188,12 @@ const WithdrawBNBContent = () => {
                     setWithdrawBNBState({uniqueKey:'',tokenName:'',isOpen:false})
                 }else {
                     setLoadingStatus('failed')
-                    alert(t('contactUs'));
+                    alert(t('delayWithdraw'));
                     setWithdrawBNBState({uniqueKey:'',tokenName:'',isOpen:false})
                 }
             }catch (err){
                 console.slog(err)
-                alert(t('contactUs'));
+                alert(t('delayWithdraw'));
                 setLoadingStatus('failed')
             }
         }

@@ -243,14 +243,14 @@ export default withTranslation()((props) => {
                             <span>
                                 <img src={logo_iost2} alt="iost logo" className="logo_iost" />
                             </span>
-                            <span
-                                // style="padding-left: 80px;"
-                                style={{
-                                    paddingLeft: 30
-                                }}
-                            >
-                                <img src={logo_ezfarm} alt={"ezfarm logo"} className="logo_ezfarm" />
-                            </span>
+                            {/*<span*/}
+                            {/*    // style="padding-left: 80px;"*/}
+                            {/*    style={{*/}
+                            {/*        paddingLeft: 30*/}
+                            {/*    }}*/}
+                            {/*>*/}
+                            {/*    <img src={logo_ezfarm} alt={"ezfarm logo"} className="logo_ezfarm" />*/}
+                            {/*</span>*/}
                             <h6>Audited and Secured by</h6>
                             <div className="m_hide"
                                 // style="display: flex; justify-content: center; padding-top: 10px;"
@@ -378,24 +378,24 @@ export default withTranslation()((props) => {
                     </div>
                 </div>
                 {/* d_contact  */}
-                <div className="d_meaning_of_d about_cont">
-                    <div className="inner">
-                        <h2>The meaning of Donnie</h2>
-                        <div>
-                            <img src={illust_meaning} alt="the meaning of donnie" />
-                        </div>
-                        <ul>
-                            <li>“DON” means “money” in Korean</li>
-                            <li>“Donnie” which is a form of English nickname of “DON” is used to engage more users
-                                and be acknowledged familiar than other project
-                            </li>
-                            <li>We focused on the fundamental principle of financial market and seek to implement
-                                real meaning of financial services in the De-Fi market. It is the reason why we use
-                                “DON” as the project name
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                {/*<div className="d_meaning_of_d about_cont">*/}
+                {/*    <div className="inner">*/}
+                {/*        <h2>The meaning of Donnie</h2>*/}
+                {/*        <div>*/}
+                {/*            <img src={illust_meaning} alt="the meaning of donnie" />*/}
+                {/*        </div>*/}
+                {/*        <ul>*/}
+                {/*            <li>“DON” means “money” in Korean</li>*/}
+                {/*            <li>“Donnie” which is a form of English nickname of “DON” is used to engage more users*/}
+                {/*                and be acknowledged familiar than other project*/}
+                {/*            </li>*/}
+                {/*            <li>We focused on the fundamental principle of financial market and seek to implement*/}
+                {/*                real meaning of financial services in the De-Fi market. It is the reason why we use*/}
+                {/*                “DON” as the project name*/}
+                {/*            </li>*/}
+                {/*        </ul>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
                 {/* d_meaning_of_d */}
 
             </div>

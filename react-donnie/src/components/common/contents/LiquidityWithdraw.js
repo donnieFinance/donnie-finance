@@ -75,8 +75,8 @@ const LiquidityWithdraw = ({swapPairKey, data, onClose}) => {
 
         if(numberVal <= v_lpTokenBalance) {
 
-            const v_lpToken1Balance = data.symbol1Balance;
-            const v_lpToken2Balance = data.symbol2Balance;
+            const v_lpToken1Balance = data.myLPSymbol1Balance;
+            const v_lpToken2Balance = data.myLPSymbol2Balance;
 
             const a = (numberVal / v_lpTokenBalance) * v_lpToken1Balance
             const b = (numberVal / v_lpTokenBalance) * v_lpToken2Balance
@@ -153,8 +153,8 @@ const LiquidityWithdraw = ({swapPairKey, data, onClose}) => {
 
             <Div fontSize={20} bold textAlign={'center'} mb={10}>{`Balance : ${data.lpTokenBalance}`}</Div>
             <Div textAlign={'center'} mb={10}>
-                {`${data.symbol1.toUpperCase()} : ${data.symbol1Balance}`} <br/>
-                {`${data.symbol2.toUpperCase()} : ${data.symbol2Balance}`} <br/>
+                {`${data.symbol1.toUpperCase()} : ${data.myLPSymbol1Balance}`} <br/>
+                {`${data.symbol2.toUpperCase()} : ${data.myLPSymbol2Balance}`} <br/>
             </Div>
             <Div height={56} textAlign={'center'}>
                 <InputNumber
@@ -176,12 +176,7 @@ const LiquidityWithdraw = ({swapPairKey, data, onClose}) => {
                     <Button type="primary" shape="round" onClick={withDrawRatio.bind(this,1)} disabled={loading}>100%</Button>
                 </Space>
             </Flex>
-            <Flex height={56} justifyContent={'center'}>
-                <Space>
-                    <Button onClick={onClose}>{t('cancel')}</Button>
-                    <Button type="primary" loading={loading} onClick={onWithDrawSendClick}>{tExchange.removeLiquidity}</Button>
-                </Space>
-            </Flex>
+
 
             <Hr my={20}/>
 
@@ -199,6 +194,12 @@ const LiquidityWithdraw = ({swapPairKey, data, onClose}) => {
                     <img src={properties.tokenImages[data.symbol2]} width={20} alt=""/>
                     <Div ml={10}>{`${data.symbol2.toUpperCase()} : ${token2Balance}`}</Div>
                 </Flex>
+            </Flex>
+            <Flex height={56} justifyContent={'center'}>
+                <Space>
+                    <Button onClick={onClose}>{t('cancel')}</Button>
+                    <Button type="primary" loading={loading} onClick={onWithDrawSendClick}>{tExchange.removeLiquidity}</Button>
+                </Space>
             </Flex>
         </Div>
     );

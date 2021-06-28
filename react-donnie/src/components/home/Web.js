@@ -142,6 +142,6 @@ export default ({store}) =>
 
         <Div textAlign={'center'} fontSize={16} fw={700} py={20}>
             ⓒ DONNIE FINANCE. ALL RIGHTS RESERVED.<br/>
-            <Span>powered by IOST & EZFARM</Span>
+            <Span>powered by IOST</Span>
         </Div>
     </>

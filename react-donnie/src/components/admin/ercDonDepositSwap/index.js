@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import {Div, Flex, Span} from '~/styledComponents/shared'
+import {Div, FilterGroup, Flex, Hr, Span} from '~/styledComponents/shared'
 import styled from 'styled-components'
 import {color} from '~/styledComponents/Properties'
 import {getValue} from "~/styledComponents/Util";
@@ -15,11 +15,13 @@ import useModal from '~/hooks/useModal'
 import {AgGridReact} from 'ag-grid-react';
 
 import AdminApi from '~/lib/adminApi'
+import FilterContainer from "~/components/common/gridFilter/FilterContainer";
+import InputFilter from "~/components/common/gridFilter/InputFilter";
+import CheckboxFilter from "~/components/common/gridFilter/CheckboxFilter";
 
 const SearchBox = styled.div`
     background-color: ${color.white};
     padding: ${getValue(10)};    
-    margin: ${getValue(10)}; 
     
     & > * {
         margin-right: ${getValue(10)};
@@ -54,6 +56,8 @@ const ErcDonDepositSwap = (props) => {
     const [managerIrcDon, setManagerIrcDon] = useState(0);
     const [swapManagerAccount, setSwapManagerAccount] = useState("");
 
+    const [gridApi, setGridApi] = useState()
+
     //ag-grid 옵션
     const defaultColDef = {
         filter: true,
@@ -85,7 +89,8 @@ const ErcDonDepositSwap = (props) => {
             },
             {
                 headerName: "manager전송", field: "managerTransfered", width: 170,
-                cellStyle:ComUtil.getCellStyle({cellAlign: 'center'}), cellRenderer: "managerTransferRenderer"
+                cellStyle:ComUtil.getCellStyle({cellAlign: 'center'}),
+                //cellRenderer: "managerTransferRenderer"
             },
             {
                 headerName: "manager 전송시간", field: "managerTransferedTime", width: 160,
@@ -121,8 +126,15 @@ const ErcDonDepositSwap = (props) => {
             managerTransferRenderer: managerTransferRenderer,
             balanceCheckRenderer: balanceCheckRenderer,
             ethBalanceRenderer: ethBalanceRenderer
-        }
+        },
+        onGridReady: onGridReady
     }
+
+    //[이벤트] 그리드 로드 후 callback 이벤트 API init
+    function onGridReady (params) {
+        setGridApi(params.api);
+    };
+
 
     function ethAccountRenderer ({value}) {
         let ethScanUrl = 'https://etherscan.io/address/';
@@ -152,11 +164,11 @@ const ErcDonDepositSwap = (props) => {
                     {status}
                     <Span ml={10}>
                         <Button size={'small'} type={'primary'}
-                            onClick={() => rowData.transferOkClick()}> 완료처리
+                                onClick={() => rowData.transferOkClick()}> 완료처리
                         </Button>
                     </Span>
                 </div>
-            :
+                :
                 <div>{status}</div>
         )
     }
@@ -256,7 +268,7 @@ const ErcDonDepositSwap = (props) => {
         let totalDeposit = 0;
         data && data.map(item => {
             totalDeposit = totalDeposit + parseFloat(item.ercTokenAmount);
-          // console.log(item);
+            // console.log(item);
         })
         setTotal(totalDeposit);
         setLoading(false);
@@ -289,59 +301,99 @@ const ErcDonDepositSwap = (props) => {
     }
 
     return (
-        <>
-        <SearchBox>
-            <Div>
+        <div>
+            <SearchBox>
                 <Div>
-                    <Div>Manager 계좌 정보</Div>
-                    <Div ml={10}>SwapManagerAccount : {swapManagerAccount}</Div>
                     <Div>
-                        <Flex ml={10}>
-                            <Div mr={10}>
-                                SwapManager ETH : <Span fg="blue">{ComUtil.toCurrency(swapManagerEth && swapManagerEth.toFixed(2))}</Span> <br/>
-                                SwapManager DON : <Span fg="blue">{ComUtil.toCurrency(swapManagerDon && swapManagerDon.toFixed(0))} </Span> <br/>
-                            </Div>
-                            <Div ml={20}>
-                                donswap igas : <Span fg="blue">{ComUtil.toCurrency(managerIGas && managerIGas.toFixed(2))}</Span> <br/>
-                                donswap Don : <Span fg="blue">{ComUtil.toCurrency(managerIrcDon && managerIrcDon.toFixed(2))} </Span> <br/>
-                            </Div>
-                            <Div ml={20}>
-                                ethGasGwei : <Span fg="blue">{ComUtil.toCurrency(ethGasGwei && ethGasGwei.toFixed(2))}</Span> <br/>
-                                donswap iram : <Span fg="blue">{ComUtil.toCurrency(managerIRam && managerIRam.toFixed(2))}</Span> <br/>
-                            </Div>
-                        </Flex>
+                        <Div>Manager 계좌 정보</Div>
+                        <Div ml={10}>SwapManagerAccount : {swapManagerAccount}</Div>
+                        <Div>
+                            <Flex ml={10}>
+                                <Div mr={10}>
+                                    SwapManager ETH : <Span fg="blue">{ComUtil.toCurrency(swapManagerEth && swapManagerEth.toFixed(2))}</Span> <br/>
+                                    SwapManager DON : <Span fg="blue">{ComUtil.toCurrency(swapManagerDon && swapManagerDon.toFixed(0))} </Span> <br/>
+                                </Div>
+                                <Div ml={20}>
+                                    donswap igas : <Span fg="blue">{ComUtil.toCurrency(managerIGas && managerIGas.toFixed(2))}</Span> <br/>
+                                    donswap Don : <Span fg="blue">{ComUtil.toCurrency(managerIrcDon && managerIrcDon.toFixed(2))} </Span> <br/>
+                                </Div>
+                                <Div ml={20}>
+                                    ethGasGwei : <Span fg="blue">{ComUtil.toCurrency(ethGasGwei && ethGasGwei.toFixed(2))}</Span> <br/>
+                                    donswap iram : <Span fg="blue">{ComUtil.toCurrency(managerIRam && managerIRam.toFixed(2))}</Span> <br/>
+                                </Div>
+                            </Flex>
+                        </Div>
                     </Div>
+                    <Div my={10}>총 입금합계 : {total} DON</Div>
+                    <Flex>
+                        <Div mr={5}>
+                            <Button loading={loading} onClick={searchWithEth}>Eth 잔고출력</Button>
+                        </Div>
+                        <Div>
+                            <Button loading={loading} onClick={searchWithDon}>Eth, Don 잔고출력</Button>
+                        </Div>
+                    </Flex>
                 </Div>
-                <Div my={10}>총 입금합계 : {total} DON</Div>
-                <Flex>
-                    <Div mr={5}>
-                        <Button loading={loading} onClick={searchWithEth}>Eth 잔고출력</Button>
-                    </Div>
-                    <Div>
-                        <Button loading={loading} onClick={searchWithDon}>Eth, Don 잔고출력</Button>
-                    </Div>
-                </Flex>
-            </Div>
 
 
-        </SearchBox>
-        <Div m={10}>
-            {/*<Flex bg={'white'} my={10} p={10}>*/}
+            </SearchBox>
+            {/* filter START */}
+            <FilterContainer gridApi={gridApi} excelFileName={'쿠폰마스터 목록'}>
+                <FilterGroup>
+                    <InputFilter
+                        gridApi={gridApi}
+                        columns={[
+                            {field: 'ircAccount', name: 'irc계정'},
+                            {field: 'swapAccount', name: 'swap계정'},
+                            {field: 'ercTokenAmount', name: '입금ercDon'},
+                            {field: 'recordCreateTime', name: 'swap 시작시간'},
+                            {field: 'managerTransferedTime', name: 'manager 전송시간'},
+                            {field: 'ircTokenPaidTime', name: 'swap 완료시간'},
+                        ]}
+                        isRealTime={true}
+                    />
+                </FilterGroup>
+                <Hr/>
+                <FilterGroup>
+                    <CheckboxFilter
+                        gridApi={gridApi}
+                        field={'managerTransfered'}
+                        name={'manager전송'}
+                        data={[
+                            {value: 0, name: '0. 전송중'},
+                            {value: 1, name: '1. 전송중'},
+                            {value: 2, name: '2. 전송성공'},
+                        ]}
+                    />
+                    <CheckboxFilter
+                        gridApi={gridApi}
+                        field={'ircTokenPaid'}
+                        name={'ircDon전송'}
+                        data={[
+                            {value: true, name: '전송완료'},
+                            {value: false, name: '미완료'},
+                        ]}
+                    />
+                </FilterGroup>
+            </FilterContainer>
+            {/* filter END */}
+            <Div my={10}>
+                {/*<Flex bg={'white'} my={10} p={10}>*/}
                 {/*<Div>test</Div>*/}
                 {/*<Div>test</Div>*/}
                 {/*<Div>test</Div>*/}
-            {/*</Flex>*/}
-            <Div className="ag-theme-balham" height={600} my={10}>
-                <AgGridReact
-                    defaultColDef={defaultColDef}
-                    gridOptions={gridOptions}
-                    rowData={data}
-                    onCellDoubleClicked={copy}
-                >
-                </AgGridReact>
+                {/*</Flex>*/}
+                <Div className="ag-theme-balham" height={600}>
+                    <AgGridReact
+                        defaultColDef={defaultColDef}
+                        gridOptions={gridOptions}
+                        rowData={data}
+                        onCellDoubleClicked={copy}
+                    >
+                    </AgGridReact>
+                </Div>
             </Div>
-        </Div>
-        </>
+        </div>
     )
 }
 export default ErcDonDepositSwap;

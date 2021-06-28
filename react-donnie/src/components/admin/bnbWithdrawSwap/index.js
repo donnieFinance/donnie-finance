@@ -185,11 +185,11 @@ const BnbWithdrawSwap = () => {
     function sudongSendRenderer(props) {
         const rowData = props.data;
         const onHandleClick = async() => {
-            if(window.confirm('BNB토큰을 수동전송 하시겠습니까?')) {
+            if(window.confirm('BNB토큰을 수동전송 하시겠습니까?(실패가 확실할때만 해야합니다)')) {
                 const params = {
                     withdrawSeq: rowData.withdrawSeq,
                     receiverAddr: rowData.ercAccount,
-                    tokenAmount: rowData.ercWithdrawAmount
+                    tokenAmount: rowData.amount
                 }
                 //approve된 Iw ERC토큰 수동 전송 기능
                 let {data: result} = await AdminApi.sendUserBnbToExtAccount(params);
@@ -211,7 +211,7 @@ const BnbWithdrawSwap = () => {
                 {
                     bnbStatus < 2 &&
                     <Span ml={10}>
-                        <button onClick={onHandleClick}>수동전송</button>
+                        <button onClick={onHandleClick}>수동전송(위험)</button>
                     </Span>
                 }
             </div>

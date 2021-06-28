@@ -606,13 +606,13 @@ const AddLiquidity = ({history}) => {
 
             const swapPair = ComUtil.findSwapPair(swapPairs, xTokenName, yTokenName)
 
-            setLoadingState('confirmation')
+            //setLoadingState('confirmation')
             const {result, isSuccess} = await iostApi.exchangeAddLiquidity(xTokenName,yTokenName,xTokenBalance,yTokenBalance);
             if (isSuccess) {
-                setLoadingState('success')
+                //setLoadingState('success')
+                window.$message.success('Success');
             }else{
-                setLoadingState('failed')
-
+                window.$message.error('failed');
                 let errorMessage = "";
                 if (typeof result === 'string') {
                     if (result.indexOf('{') > -1) {
@@ -639,10 +639,10 @@ const AddLiquidity = ({history}) => {
                 if(errorMessage) {
                     alert(errorMessage);
                 }
-                return
             }
         }catch (err) {
-            setLoadingState('failed')
+            //setLoadingState('failed')
+            window.$message.error('failed');
         }
     }
 

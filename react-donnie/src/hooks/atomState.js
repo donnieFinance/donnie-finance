@@ -298,3 +298,9 @@ export const liquidityInfo = atom({
 //         balance: tokenBalance
 //     }
 // })
+
+export const allFilterClearState = atom({
+    key: 'allFilterClearState',
+    default: 0
+})
+

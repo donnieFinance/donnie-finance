@@ -148,9 +148,8 @@ const IwWithdrawSwap = ({iwTokenName, ercTokenName}) => {
 
     function ethAccountRenderer ({value}) {
         let ethScanUrl = 'https://etherscan.io/address/';
-        const ropstenEthScanUrl = 'https://ropsten.etherscan.io/address/'
         if(properties.isTestMode){
-            ethScanUrl = ropstenEthScanUrl;
+            ethScanUrl = 'https://ropsten.etherscan.io/address/';
         }
         return value && <><a href={`${ethScanUrl}${value}`} target={'_blank'} fg={'primary'} ml={10} ><u>EthScan</u></a> <span>{value}</span></>
     }

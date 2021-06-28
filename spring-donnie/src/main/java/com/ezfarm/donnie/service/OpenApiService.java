@@ -4,6 +4,8 @@ import com.ezfarm.donnie.config.ComUtil;
 import com.ezfarm.donnie.config.DateUtil;
 import com.ezfarm.donnie.controller.CommonController;
 import com.ezfarm.donnie.dataclass.UsdExchangeRawData;
+import com.ezfarm.donnie.dbdata.ExContractHistory;
+import com.ezfarm.donnie.dbdata.SwapErcAccount;
 import com.ezfarm.donnie.dbdata.UsdExchangeRate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,8 +28,10 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -35,6 +39,9 @@ public class OpenApiService {
 
     @Autowired
     MongoTemplate mongoTemplate;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     @Autowired
     IostService iostService;
@@ -502,5 +509,186 @@ public class OpenApiService {
         log.info("///////////////////upsert UsdExchangeRate DONE////////////////////////");
     }
 
+
+    public boolean firstSetExContractHistory() {
+
+        for (int i = 1; i <= 25; i++) {
+
+            setExContractHistory(String.valueOf(i));
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                log.error(e.toString());
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean dailySetExContractHistory() {
+        for (int i = 1; i <= 6; i++) { //하루 3천개
+
+            setExContractHistory(String.valueOf(i));
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                log.error(e.toString());
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean setExContractHistory(String pageNo)
+    {
+        String contractKey = "ContractL3GFG4Wo5XmpUpoJ8LctTA3VFbwTi9x9AEWDKNzg1VR";
+        String vPageNo = pageNo;
+        String resourceUrl = "https://www.iostabc.com/api/contract/"+contractKey+"/actions?page="+vPageNo+"&size=500";
+
+        //header
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", "application/json");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        try {
+
+            HttpEntity<String> httpEntity = new HttpEntity<String>("parameters", headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(resourceUrl, HttpMethod.GET, httpEntity, String.class);
+
+            if (response.getStatusCode().value() == 200) {
+                JsonNode root = mapper.readTree(response.getBody());
+
+                JsonNode jsonActions = root.get("actions");
+                if(jsonActions.size() > 0){
+                    jsonActions.forEach(jsonNodeActions -> {
+                        try {
+
+                            ExContractHistory exContractHistory = new ExContractHistory();
+
+                            String _id = jsonNodeActions.path("_id").asText();
+                            String action_name = jsonNodeActions.path("action_name").asText();
+                            String data = jsonNodeActions.path("data").asText();
+                            String dataR = "";
+                            String data1 = "";
+                            String data2 = "";
+                            String data3 = "";
+                            String data4 = "";
+                            String data5 = "";
+                            String data6 = "";
+                            if(!StringUtils.isEmpty(data)){
+                                dataR = data.replaceAll("!\"#[$]%&\\(\\)\\{\\}@`[*]:[+];-.<>,\\^~|'\\[\\]","");
+                                String dataRR = dataR.replaceAll("\"","").replaceAll("\\[","").replaceAll("\\]","");
+
+                                String[] arrData = dataRR.split(",");
+
+                                if(arrData.length > 0 && arrData.length == 1){
+                                    data1 = arrData[0];
+                                }
+                                else if(arrData.length > 0 && arrData.length == 2){
+                                    data1 = arrData[0];
+                                    data2 = arrData[1];
+                                }
+                                else if(arrData.length > 0 && arrData.length == 3){
+                                    data1 = arrData[0];
+                                    data2 = arrData[1];
+                                    data3 = arrData[2];
+                                }
+                                else if(arrData.length > 0 && arrData.length == 4){
+                                    data1 = arrData[0];
+                                    data2 = arrData[1];
+                                    data3 = arrData[2];
+                                    data4 = arrData[3];
+                                }
+                                else if(arrData.length > 0 && arrData.length == 5){
+                                    data1 = arrData[0];
+                                    data2 = arrData[1];
+                                    data3 = arrData[2];
+                                    data4 = arrData[3];
+                                    data5 = arrData[4];
+                                }else if(arrData.length > 0 && arrData.length == 6){
+                                    data1 = arrData[0];
+                                    data2 = arrData[1];
+                                    data3 = arrData[2];
+                                    data4 = arrData[3];
+                                    data5 = arrData[4];
+                                    data6 = arrData[5];
+                                }
+                            }
+                            String block = jsonNodeActions.path("block").asText();
+                            String txHash = jsonNodeActions.path("tx_hash").asText();
+                            String from = jsonNodeActions.path("from").asText();
+
+                            String created_at = jsonNodeActions.path("created_at").asText();
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+
+                            //9시간 추가해야 정확.: gary
+                            LocalDateTime createdAtDateTime = LocalDateTime.parse(created_at, formatter).plusHours(9);
+
+                            long createdAtDateTimeLong = DateUtil.localDateTime2YyyymmddhhmmssLong(createdAtDateTime);
+
+                            int index = jsonNodeActions.path("index").asInt();
+
+                            String returnData = jsonNodeActions.path("return").asText();
+                            String returnDataR = "";
+                            if(!StringUtils.isEmpty(returnData)) {
+                                returnDataR = returnData.replaceAll("!\"#[$]%&\\(\\)\\{\\}@`[*]:[+];-.<>,\\^~|'\\[\\]", "");
+                                returnDataR = returnDataR.replaceAll("\"","").replaceAll("\\[","").replaceAll("\\]","").replaceAll("\\\\","");
+                            }
+
+                            String statusCode = jsonNodeActions.path("status_code").asText();
+
+                            exContractHistory.setTxId(_id);
+                            exContractHistory.setActionName(action_name);
+                            exContractHistory.setData(dataR);
+                            exContractHistory.setDataField1(data1);
+                            exContractHistory.setDataField2(data2);
+                            exContractHistory.setDataField3(data3);
+                            exContractHistory.setDataField4(data4);
+                            exContractHistory.setDataField5(data5);
+                            exContractHistory.setDataField6(data6);
+                            exContractHistory.setBlock(block);
+                            exContractHistory.setTxHash(txHash);
+                            exContractHistory.setContract(contractKey);
+                            exContractHistory.setCreatedAt(createdAtDateTime);
+                            exContractHistory.setCreatedAtLong(createdAtDateTimeLong);
+                            exContractHistory.setIndex(index);
+                            exContractHistory.setReturnData(returnDataR);
+                            exContractHistory.setFrom(from);
+                            exContractHistory.setStatusCode(statusCode);
+
+                            mongoTemplate.save(exContractHistory,"exContractHistory");
+
+                        } catch (IllegalArgumentException | NullPointerException e) {
+                        }
+
+                    });
+                }
+            }
+
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
+    }
+
+    public List<ExContractHistory> getExContractHistory(String year) {
+        Criteria criteria = new Criteria();
+        if(!StringUtils.isEmpty(year)){
+            // 해당년도 시작일~마지막일 구하기
+            LocalDateTime startDate = LocalDateTime.of(Integer.valueOf(year), 1, 1, 0,0,0);
+            LocalDateTime endDate = LocalDateTime.of(Integer.valueOf(year), 12, 31, 23,59,59);
+            criteria.and("createdAt").gte(startDate).lte(endDate);
+        }
+        Query query = new Query(criteria);
+        Sort sort = Sort.by(Sort.Direction.DESC, "_id"); //Sort->Sort.by로 바뀜. springboot2.4.0
+        query.with(sort);
+
+        return mongoTemplate.find(query, ExContractHistory.class, "exContractHistory");
+    }
 
 }

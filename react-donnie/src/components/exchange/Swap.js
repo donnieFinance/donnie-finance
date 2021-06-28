@@ -646,9 +646,9 @@ const Swap = (props) => {
                 return
             }
 
-            setLoadingState('confirmation')
+            //setLoadingState('confirmation')
 
-            console.log({symbol1, symbol2, amount, amountOutMin})
+            //console.log({symbol1, symbol2, amount, amountOutMin})
 
             let isSuccess;
             let routeResult;
@@ -663,8 +663,8 @@ const Swap = (props) => {
             }
 
             if (isSuccess) {
-                setLoadingState('success')
-
+                //setLoadingState('success')
+                window.$message.success('Success');
                 // 바로 잔액 업데이트 처리
                 const amount = getRouteSwapAmount(tokenFrom.tokenName, tokenTo.tokenName, tokenFrom.balance)
                 setTokenTo({
@@ -673,7 +673,8 @@ const Swap = (props) => {
                 });
 
             }else{
-                setLoadingState('failed')
+                //setLoadingState('failed')
+                window.$message.error('failed');
                 let errorMessage = "";
                 if (typeof routeResult === 'string') {
                     if (routeResult.indexOf('{') > -1) {
@@ -697,12 +698,15 @@ const Swap = (props) => {
                         errorMessage = `${tMessage.jetstreamFail}`;
                     }
                 }
-                alert(errorMessage);
-                return
+
+                if(errorMessage){
+                    alert(errorMessage);
+                }
             }
-            console.log({isSuccess})
+            //console.log({isSuccess})
         }catch (err) {
-            setLoadingState('failed')
+            //setLoadingState('failed')
+            window.$message.error('failed');
         }
     }
 

@@ -296,12 +296,18 @@ class ExchangeSwap {
             let token1Value = token1Price.multi(token1Amount);
 
             //mint(tx.publisher, lpAmount)
-            let totalLpValue = (token1Value.plus(husdAmount)).toFixed(4); //LP토큰은 소숫점 4자리
+            //0508 HOTFIX: let totalLpValue = (token1Value.plus(husdAmount)).toFixed(4); //LP토큰은 소숫점 4자리
 
             //LP토큰 개수 최소값 보장.
-            if (minLpToken.gt(totalLpValue)) {
-                totalLpValue = minLpToken.toFixed(4);
+            //0508 항상 비례식. if (minLpToken.gt(totalLpValue)) {
+            let totalLpValue = minLpToken.toFixed(4);
+            //}
+
+            //addPairMintLP토큰(매니저용)일때만 이부분 호출.
+            if (inputSymbol1Ratio.eq(0)) {
+                totalLpValue = (token1Value.plus(husdAmount)).toFixed(4); //LP토큰은 소숫점 4자리
             }
+
             blockchain.callWithAuth(lpTokenAddress, "mint", [blockchain.contractName(), totalLpValue]);
             blockchain.callWithAuth(lpTokenAddress, "transfer", [lpTokenName, blockchain.contractName(), tx.publisher, totalLpValue, "LpToken mint"]);
 
@@ -330,12 +336,18 @@ class ExchangeSwap {
             let token2Price = husd2Amount.div(token2Amount);
             let token2Value = token2Price.multi(symbol2Amount); //symbol2Amount=user Input
 
-            let totalLpValue = (token1Value.plus(token2Value)).toFixed(4); //LP토큰은 소숫점 4자리
+            //0510 HOTFIX: let totalLpValue = (token1Value.plus(token2Value)).toFixed(4); //LP토큰은 소숫점 4자리
 
             //LP토큰 개수 최소값 보장.
-            if (minLpToken.gt(totalLpValue)) {
-                totalLpValue = minLpToken.toFixed(4);
+            //0510 항상 비례식.if (minLpToken.gt(totalLpValue)) {
+                let totalLpValue = minLpToken.toFixed(4);
+            //}
+
+            //addPairMintLP토큰(매니저용)일때만 이부분 호출.
+            if (inputSymbol1Ratio.eq(0)) {
+                totalLpValue = (token1Value.plus(token2Value)).toFixed(4); //LP토큰은 소숫점 4자리
             }
+
             blockchain.callWithAuth(lpTokenAddress, "mint", [blockchain.contractName(), totalLpValue]);
             blockchain.callWithAuth(lpTokenAddress, "transfer", [lpTokenName, blockchain.contractName(), tx.publisher, totalLpValue, "LpToken mint"]);
 
@@ -407,9 +419,17 @@ class ExchangeSwap {
         blockchain.callWithAuth("token.iost", "destroy", [lpTokenName, tx.publisher, amountStr]); //token.iost or lpTokenAddress
 
 
-        //Sends user the appropriate amount in the pool.
+        //Sends user the appropriate amount in the pool.(abuser logic)
+        // if (_isHackerOrSevereAbuser(tx.publisher)) { //cut in half
+        //
+        //     symbol1Amount = ((symbol1AmountData.multi(ratio)).div(2)).toFixed(8);
+        //     symbol2Amount = ((symbol2AmountData.multi(ratio)).div(2)).toFixed(8);
+        //
+        // }
+
         this._transferToken(symbol1, blockchain.contractName(), tx.publisher, symbol1Amount, 'User withdraw liquidity pool. ');
         this._transferToken(symbol2, blockchain.contractName(), tx.publisher, symbol2Amount, 'User withdraw liquidity pool. ');
+
 
         //deducts user's pool contribution from the total pools.
         amountData[symbol1] = (symbol1AmountData.minus(new Float64(symbol1Amount))).toFixed(8);
@@ -420,6 +440,7 @@ class ExchangeSwap {
 
         //update the pool with new pool.
         storage.mapPut(mainPair, 'amountData', JSON.stringify(amountData));
+
     }
 
     //checks pairs.

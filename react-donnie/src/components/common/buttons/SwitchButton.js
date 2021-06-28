@@ -39,7 +39,7 @@ const SwitchButton = ({data}) => {
         <Flex bg={'light'} rounded={20} relative>
             {
                 data.map((item, index) =>
-                    <StyledButton key={`switchButton${index}`} active={history.location.pathname.includes(item.pathname)} onClick={() => history.push(item.pathname)}>{item.name}</StyledButton>
+                    <StyledButton key={`switchButton${index}`} active={history.location.pathname === item.pathname} onClick={() => history.push(item.pathname)}>{item.name}</StyledButton>
                 )
             }
         </Flex>

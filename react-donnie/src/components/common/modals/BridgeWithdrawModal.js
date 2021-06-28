@@ -206,7 +206,7 @@ const BridgeWithdrawContent = () => {
                             onModalClose();
                         } else {
                             setLoadingStatus('failed')
-                            alert(t('contactUs'));
+                            alert(t('delayWithdraw'));
                             onModalClose();
                         }
                     } else {
@@ -222,14 +222,14 @@ const BridgeWithdrawContent = () => {
                             onModalClose();
                         } else {
                             setLoadingStatus('failed')
-                            alert(t('contactUs'));
+                            alert(t('delayWithdraw'));
                             onModalClose();
                         }
                     }
                 }
             }catch (err){
                 console.slog(err)
-                alert(t('contactUs'));
+                alert(t('delayWithdraw'));
                 setLoadingStatus('failed')
             }
         }

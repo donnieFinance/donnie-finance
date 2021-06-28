@@ -5,8 +5,8 @@ const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
 const STAKE_TOKEN = 'iwbnb';
 const STAKE_TOKEN_ADDRESS = 'Contract6ZPp62E2J4bChdQkvCEZTozLHC2GcefdxpWnj647DjGJ';
 
-const START_TIME = 1619481600;      // 20210427:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract4NpXpwmkYD3ZC6wknspcdPunCTH5hxeBUSrvaRYdfMV4
-const DURATION = 24 * 3600 * 63;    // 63일, in Seconds
+const START_TIME = 1624924800;      // 20210629:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract4NpXpwmkYD3ZC6wknspcdPunCTH5hxeBUSrvaRYdfMV4
+const DURATION = 24 * 3600 * 56;    // 56일, in Seconds
 // const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;
 const TO_FIXED = 4;   //소수점 4자리까지 저장.
@@ -44,14 +44,16 @@ class IwDonBnbPool {
     ////////////////////////StakeToken Wrapper/////////////////////
 
     updateStartTime(startTime) {
-        storage.put(START_TIME_KEY, ""+startTime);
-        let duration = storage.get(DURATION_KEY);
+        if (tx.publisher === blockchain.contractOwner()) {
+            storage.put(START_TIME_KEY, "" + startTime);
+            let duration = storage.get(DURATION_KEY);
 
-        // addRewardAmount로 duration 변경 전
-        if(!duration) {
-            storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(DURATION).toString());
-        } else {
-            storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(new Int64(duration)).toString());
+            // addRewardAmount로 duration 변경 전
+            if (!duration) {
+                storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(DURATION).toString());
+            } else {
+                storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(new Int64(duration)).toString());
+            }
         }
     }
 

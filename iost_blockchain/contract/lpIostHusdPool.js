@@ -42,14 +42,16 @@ class LpIostHusdPool {
     ////////////////////////StakeToken Wrapper/////////////////////
 
     updateStartTime(startTime) {
-        storage.put(START_TIME_KEY, ""+startTime);
-        let duration = storage.get(DURATION_KEY);
+        if (tx.publisher === blockchain.contractOwner()) {
+            storage.put(START_TIME_KEY, "" + startTime);
+            let duration = storage.get(DURATION_KEY);
 
-        // addRewardAmount로 duration 변경 전
-        if(!duration) {
-            storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(DURATION).toString());
-        } else {
-            storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(new Int64(duration)).toString());
+            // addRewardAmount로 duration 변경 전
+            if (!duration) {
+                storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(DURATION).toString());
+            } else {
+                storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(new Int64(duration)).toString());
+            }
         }
     }
 

@@ -77,13 +77,13 @@ public class CommonController {
 
 
     //defaultValue:서버구동시 사용. front에선 properties.js/////////////////////////////
-    public static String DON_DEFAULT_PRICE = "2.0";
-    public static String IOST_DEFAULT_PRICE = "0.06";
+    public static String DON_DEFAULT_PRICE = "0.434";
+    public static String IOST_DEFAULT_PRICE = "0.019";
     public static String PPT_DEFAULT_RATIO = "6.2";
 
-    public static String BLY_DEFAULT_PRICE = "0.2";
-    public static String BTC_DEFAULT_PRICE = "53000";
-    public static String BNB_DEFAULT_PRICE = "530";
+    public static String BLY_DEFAULT_PRICE = "0.03";
+    public static String BTC_DEFAULT_PRICE = "34350";
+    public static String BNB_DEFAULT_PRICE = "284";
 
 
     ////코인 가격들 local 캐시 한번 더 함.//////////////////////////////////////////////////////////////////

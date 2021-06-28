@@ -4,7 +4,7 @@ import {Div, Span, Img, Flex, Right, Hr, Sticky, Fixed, Mask, BackgroundContaine
 import {A, Link, NavLink} from './Links'
 import {TriangleUp, TriangleDown} from './Shapes'
 import {Svg} from "./Svgs";
-
+import {FilterGroup} from "./AdminLayouts";
 
 export {
     Button,
@@ -13,5 +13,5 @@ export {
     A, Link, NavLink,
     TriangleUp, TriangleDown,
     Svg,
-
+    FilterGroup
 }
