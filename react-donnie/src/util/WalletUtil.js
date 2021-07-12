@@ -37,6 +37,7 @@ export default class WalletUtil {
                 }
             }
         } else if (type === 'Jetstream') {
+            console.log("Jetstream",Jetstream)
             w.address = (Jetstream && Jetstream.account) ? Jetstream.account : null;
             w.wallet = Jetstream ? Jetstream : null;
             if (w.wallet && !w.wallet.iost) {

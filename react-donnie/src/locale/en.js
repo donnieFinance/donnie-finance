@@ -18,6 +18,10 @@ const locale = {
             name: 'Loan',
             desc: 'Borrow and Lend any cryptocurrency with an Algorithmic & Autonomous Interest Rate'
         },
+        ido: {
+            name: 'IOSTarter',
+            desc: 'Join a IOSTarter,  built for cross-chain token offerings, which enables new projects to raise liquidity in a decentralized fair protocol.'
+        },
         exchange: {
             name: 'Exchange',
             desc: 'Trade Cryptocurrency-to-Cryptocurrency with Automated Liquidity Provision'
@@ -61,6 +65,8 @@ const locale = {
     Approve: 'Approve',
     HarvestWithdraw: 'Harvest & Withdraw',
     HarvestDONY: 'Harvest DON',
+    fromCoinone: 'from Coinone',
+    toCoinone: 'to Coinone',
     withdraw: 'Withdraw',
     Deposit2: 'Deposit',
     ViewonEtherscan: 'View on IostABC',
@@ -91,6 +97,33 @@ const locale = {
     DONYTokenAddress: 'DON Smart Contract Address',
     WalletMath: 'Math Wallet',
     WalletHuobi: 'Huobi Wallet',
+
+    ticketDesc:'More Ticket You Have, More Chance To Be Whitelisted.',
+    lstDesc:'Must READ : Staked tokens and LP is locked for 7 days from the last staked time.',
+    swapIdoTicket:'Get IDO Ticket',
+    idoTicketSwap1:'Stake {{x}} & Get Ticket',
+    idoTicketSwap2:'Return Ticket & Get {{x}} Back',
+    idoMessage: {
+        tokenNotEnough:'Token not enough for swapping into IDO Ticket',
+        inputTokenOver: 'Token Count is larger than staked token amount.',
+        lastStakeTimeNotPasssed:'Unstaking is possible after 1 WEEK from Last Stake Time.',
+        needTicket: 'ticket must be between {{x}} ~ {{y}}',
+        whitelistApplied:'Whitelist applied with {{x}} ticket.',
+        waitingDraw: 'Waiting for whitelist draw.',
+        whitelistDone:'Whitelist Winner, Completed Whitelist. ({{x}} ticket)',
+        whitelistFail:' Unfortunately, not selected as winner.',
+        applyKyc:'please apply KYC',
+        kycProgress:'your KYC is in review.',
+        kycDone:'your KYC is done.',
+        kycRejected:'KYC rejected, try again. Reason: {{x}}',
+        idoRequestDone:'Purchase request done ({{x}})',
+        idoDone:'IDO done ({{x}})',
+        joinIdo:'Purchase IDO Token with {{x}}',
+        claimIdo:'please claim IDO token ({{x}})',
+        jetstreamIdoFail:'IDO supply may have been exhausted or your igas is not enough'
+    },
+    idoDetail:'IDO Detail',
+
     message: {
         UserRejected: 'The request was rejected by the user',
         InvalidParam: 'The parameters were invalid',
@@ -108,7 +141,7 @@ const locale = {
     depositErc:{
         confirmMsgTitle:'ERC address can be changed, please check before deposit!',
         confirmMsgTitle2:' Minimum deposit: 10 DON, takes 30 minutes',
-        confirmMsgTitle3:'Is the ERC DON Token deposit correct?',
+        confirmMsgTitle3:'Are you sending ERC DON from Coinone?',
         addressTitle:'DON(ERC) address for deposit',
         addressCopy:'Address Copy',
         addressCopyMsg:'Address has been copied',
@@ -202,6 +235,10 @@ const locale = {
         supply: 'Supply',
         addLiquidity:'Add Liquidity',
         removeLiquidity:'Remove Liquidity',
+    },
+    ido:{
+        failedToSend:'IOST transmission failed. please try again.',
+        whiteListApplyRequestMsg:'The whiteList apply application has been requested.',
     },
     warning: 'Warning',
     attemptTitle: 'BEWARE OF SCAM ATTEMPTS!',

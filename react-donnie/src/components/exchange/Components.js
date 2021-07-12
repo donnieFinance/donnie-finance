@@ -46,6 +46,7 @@ const TokenBox = ({title, totalBalance, balance, img, tokenName = 'Select a curr
                 <Div flexGrow={1}>
                     <Input
                         type={'number'}
+                        inputMode="numeric" pattern="[0-9]*"
                         step="0.1"
                         block
                         bold
@@ -88,6 +89,7 @@ const TokenBox = ({title, totalBalance, balance, img, tokenName = 'Select a curr
         </Div>
     )
 }
+
 
 const SymbolGroup = ({symbol1, symbol2, size = 30}) =>
     <Tooltip placement="topLeft" title={<Span bold>{symbol1.toUpperCase()}/{symbol2.toUpperCase()}</Span>}>

@@ -99,19 +99,18 @@ const MyDon = ({t}) => {
                 >
                     <Div lineHeight={14}>
                         <Div fontSize={14} textAlign={'center'}>DON Swap</Div>
-                        <Div fontSize={13} textAlign={'center'}>ERC to IRC</Div>
+                        <Div fontSize={13} textAlign={'center'}>{t('fromCoinone')}</Div>
                     </Div>
                 </RoundedButton>
+
                 {/*<RoundedButton justifyContent={'center'} cursor={1} rounded={10}*/}
                 {/*               bg={address ? 'info' : 'secondary'}*/}
                 {/*               fg={'white'}*/}
                 {/*               p={15}*/}
-                {/*               width={70}*/}
-                {/*               height={70}*/}
                 {/*               onClick={onWithdrawERCClick}>*/}
                 {/*    <Div lineHeight={14}>*/}
-                {/*        <Div fontSize={13}>Withdraw</Div>*/}
-                {/*        <Div fontSize={13} lighter textAlign={'center'}>ERC</Div>*/}
+                {/*        <Div fontSize={14}>DON Swap</Div>*/}
+                {/*        <Div fontSize={13} textAlign={'center'}>{t('toCoinone')}</Div>*/}
                 {/*    </Div>*/}
                 {/*</RoundedButton>*/}
             </HoverContainer>

@@ -101,22 +101,20 @@ const BridgeWithdrawContent = () => {
         setRealWithdrawAmount(realWithdrawAmount)
     }, [withdrawAmount])
 
-    const onWithDrawNumberChange_bak = (value) => {
-        setWithdrawAmount(ComUtil.replaceDecimalNumber(value, 8));
-    }
-
     const onWithDrawNumberChange = ({target}) => {
         const {value} = target
-        const res = ComUtil.replaceDecimalNumber(value, 8)
-        setWithdrawAmount(res);
-
-        setRealWithdrawAmount(parseFloat(new BigNumber(res).minus(coinFee).toNumber().toFixed(8)))
+        const val = new BigNumber(value).decimalPlaces(8).toNumber();
+        setWithdrawAmount(val);
+        setRealWithdrawAmount(parseFloat(new BigNumber(val).minus(coinFee).toNumber().toFixed(8)))
     }
 
     const onWithDrawNumberBlur = ({target}) => {
         const {value} = target
-        if (value > balance) {
-            setWithdrawAmount(balance);
+        const val = new BigNumber(value).decimalPlaces(8).toNumber();
+        const valBalance = new BigNumber(balance).decimalPlaces(8).toNumber();
+        if (val > valBalance) {
+            setWithdrawAmount(valBalance);
+            setRealWithdrawAmount(parseFloat(new BigNumber(valBalance).minus(coinFee).toNumber().toFixed(8)))
         }
     }
 

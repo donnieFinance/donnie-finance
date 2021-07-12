@@ -1,14 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import iostApi from "~/lib/iostApi";
-import priceApi from "~/lib/priceApi";
-import BigNumber from "bignumber.js";
-
-import properties from "~/properties";
 import {Div, Span, Flex, Img, Right} from "~/styledComponents/shared";
-import {Space, Table} from "antd";
-import AdminApi from "~/lib/adminApi";
+import { List, Card } from 'antd';
 import ComUtil from "~/util/ComUtil";
-import axios from "axios";
 
 const Exchange = () => {
 
@@ -19,10 +13,6 @@ const Exchange = () => {
             await search()
         }
         fetch();
-
-
-        // axios.get("https://www.iostabc.com/api/contract/ContractL3GFG4Wo5XmpUpoJ8LctTA3VFbwTi9x9AEWDKNzg1VR/actions?page=1&size=50").then(result => console.log({result})).catch(err => console.log(err))
-
     }, [])
 
     const search = async () => {
@@ -33,11 +23,11 @@ const Exchange = () => {
 
             // 해당 pair의 lpTokenName 가져오기
             const lpTokenName = await iostApi.getLpTokenName(item);
-            console.log({lpTokenName});
+            //console.log({lpTokenName});
 
             // lpToken의 현재 발행량 가져오기
             const currentSupply = await iostApi.getTokenCurrentSupply(lpTokenName);
-            console.log({currentSupply});
+            //console.log({currentSupply});
 
             return iostApi.getAmountData(item).then(async(res)=>{
                 return {"idx":idx+1,"swapPairKey":item,"amountData":JSON.stringify(res), "lpTokenName":lpTokenName, "currentSupply":currentSupply};
@@ -53,32 +43,33 @@ const Exchange = () => {
                 Exchange 현황
             </Div>
             <Div>
-                <Flex mb={10}>
-                    {/*<Flex bc={'secondary'} rounded={5} p={10}>*/}
-                    {/*    <Div fontSize={18} mr={10}>USD</Div>*/}
-                    {/*    <Div fontSize={30} bold></Div>*/}
-                    {/*</Flex>*/}
-                </Flex>
-                <Div>
-                    {
-                        data.map((swapItem, index) =>
-                            <Div key={`swapItem${index}`} bg={'white'} fg={'black'} fontSize={18} mb={2}>
-                                <Flex>
-                                    <Div fontSize={12} p={10} bc={'secondary'}>{swapItem.idx}</Div>
-                                    <Div fontSize={12} p={10} bc={'secondary'} ml={0.9}>swapPairKey : <Span fg={"brown"} bold>{swapItem.swapPairKey}</Span></Div>
-                                    <Div fontSize={12} p={10} bc={'secondary'} ml={0.9}>
-                                        AmountData : <Span fg={"blue"} bold>{swapItem.amountData}</Span> <br/>
-                                        lpTokenName: <Span fg={"blue"} bold>{swapItem.lpTokenName}</Span> <br/>
+                <List
+                    dataSource={data}
+                    renderItem={(swapItem, index) => (
+                        <List.Item.Meta
+                            description={
+                                <Div mb={10}>
+                                    <Card
+                                        title={
+                                            <Div fontSize={12}>swapPairKey : <Span fg={"brown"} bold>{swapItem.swapPairKey}</Span></Div>
+                                        }
+                                    >
+                                        <Div fontSize={12}>
+                                            AmountData : <Span fg={"blue"} bold>{swapItem.amountData}</Span>
+                                        </Div>
+                                        <Div fontSize={12}>
+                                        lpTokenName: <Span fg={"blue"} bold>{swapItem.lpTokenName}</Span>
+                                        </Div>
+                                        <Div fontSize={12}>
                                         currentSupply: <Span fg={"blue"} bold>{swapItem.currentSupply}</Span>
-                                    </Div>
-                                    <Flex flexGrow={1} fontSize={12} p={10} bc={'secondary'} ml={0.9}>
-                                        &nbsp;
-                                    </Flex>
-                                </Flex>
-                            </Div>
-                        )
-                    }
-                </Div>
+                                        </Div>
+                                    </Card>
+                                </Div>
+                            }
+                        >
+                        </List.Item.Meta>
+                    )}
+                />
             </Div>
         </Div>
     );

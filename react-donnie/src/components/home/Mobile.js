@@ -6,7 +6,7 @@ import styled from "styled-components";
 import {getValue} from "~/styledComponents/Util";
 import {color} from "~/styledComponents/Properties";
 
-const CardMobile = ({pathname, fg, img, alt, title, desc}) =>
+const CardMobile = ({pathname, fg, img, alt, title, desc, isNew}) =>
     <Link to={pathname} display={'block'}>
         <Flex p={20}
               // alignItems={'flex-start'}
@@ -21,9 +21,12 @@ const CardMobile = ({pathname, fg, img, alt, title, desc}) =>
             {/*    <Img src={img} alt={alt}/>*/}
             {/*</Flex>*/}
             <Div>
-                <Div fg={fg} fw={700}>
-                    {title}
-                </Div>
+                <Flex fg={fg} fw={700}>
+                    <Div>
+                        {title}
+                    </Div>
+                    <Div notiNew={isNew} left={10} top={-10}></Div>
+                </Flex>
                 <Div fg={'secondary'} style={{whiteSpace:'pre-wrap', breakWord: 'word-break'}}>
                     {desc}
                 </Div>
@@ -64,6 +67,7 @@ export default ({store}) =>
                                 title={item.title}
                                 desc={item.desc}
                                 fg={item.fg}
+                                isNew={item.isNew}
                             />
                         )
                     }

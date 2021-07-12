@@ -11,11 +11,6 @@ import ComUtil from "~/util/ComUtil";
 // contract 정보 (iost 및 don)
 const contractList = properties.contractList;
 
-const calcAPR = (symbol, total, dony, usd) => {
-    //console.slog('calcAPR:' + symbol + ',' + total+ ',' + dony+ ',' + usd)
-    return (((symbol / (total < 1 ? 1 : total) * dony) * 360 * 24 * 60 * 60) / usd) * 100;
-}
-
 //현재 사용하지 않음
 const useCoin = (uniqueKey
                  //{pool, tokenName, startTime, img}
@@ -149,7 +144,7 @@ const useCoin = (uniqueKey
         // const dony = usdPrice['don']
         // const isOpen = true//(res[3] === 'true')
 
-        const rate = await getRewardRate({total, usd, dony})
+        const rate = await getRewardRate({total, usd, dony, tokenName})
 
 
         let totalBalance;
@@ -270,11 +265,11 @@ const useCoin = (uniqueKey
         return donUsdPrice;
     }
 
-    const getRewardRate = async ({total, usd, dony}) => {
+    const getRewardRate = async ({total, usd, dony, tokenName}) => {
         try{
             const rewardRate = await iostApi.getPoolRewardRate(pool);
             if (rewardRate) {
-                return calcAPR(rewardRate, total, dony, usd)
+                return ComUtil.calcAPR(rewardRate, total, dony, usd, tokenName)
             }
         }
         catch (error) {

@@ -33,16 +33,16 @@ const MobileHeader = ({t}) => {
                     falseValue={<BsLockFill/>}
                 />
             </Button>
-            <Button bg={'white'} px={10} height={30} mr={10}
+            <Button bg={'white'} px={10} height={30}
                     onClick={() => setMenuOpen(true)}>
                 <AiOutlineMenu color={color.info} />
 
             </Button>
-            <Div>
-                <LanguageSelectContent>
-                    <Button fontSize={12} bc={'background'} fg={'background'} px={10} height={30} >{t('lang')}</Button>
-                </LanguageSelectContent>
-            </Div>
+            {/*<Div ml={10}>*/}
+            {/*    <LanguageSelectContent>*/}
+            {/*        <Button fontSize={12} bc={'background'} fg={'background'} px={10} height={30} >{t('lang')}</Button>*/}
+            {/*    </LanguageSelectContent>*/}
+            {/*</Div>*/}
         </Flex>
     );
 };

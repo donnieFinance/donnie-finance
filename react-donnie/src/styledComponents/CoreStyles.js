@@ -9,6 +9,7 @@ export const border = css`
     border-right: ${props => props.br && `${getValue(props.br)} solid ${color[props.bc]}`};
     border-bottom: ${props => props.bb && `${getValue(props.bb)} solid ${color[props.bc]}`};
     border-left: ${props => props.bl && `${getValue(props.bl)} solid ${color[props.bc]}`};
+    ${props => props.bw && `border-width: ${getValue(props.bw)};`};
 `;
 
 export const margin = css`

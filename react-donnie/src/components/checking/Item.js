@@ -9,6 +9,7 @@ import iostApi from "~/lib/iostApi";
 import useWallet from "~/hooks/useWallet";
 import WalletUtil from "~/util/WalletUtil";
 import axios from "axios";
+import properties from "~/properties";
 
 const DepositBigCard = loadable(() => import('../common/layouts/DepositBigCard'))
 const DepositSmallCard = loadable(() => import('~/components/common/layouts/DepositSmallCard'))
@@ -107,7 +108,7 @@ const Item = ({ uniqueKey, contract, t, history, size = 'big' }) => {
                     if(hasIWallet()) {
                         if(isLogin()) {
                             const iost = myWallet.wallet.newIOST(window.IOST);
-                            const iostHost = iost.currentRPC._provider._host;
+                            const iostHost = properties.IOST_ADDR;//iost.currentRPC._provider._host;
 
                             const data = await axios.get(iostHost + "/getNodeInfo")
 

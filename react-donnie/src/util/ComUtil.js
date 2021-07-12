@@ -1,6 +1,7 @@
 import moment from 'moment-timezone'
-import {isMobileOnly} from "react-device-detect";
-import properties from "~/properties";
+import momentDurationFormatSetup from 'moment-duration-format'
+import {isMobileOnly} from "react-device-detect"
+import properties from "~/properties"
 
 import iconLpDonHusd from '~/assets/icon_lp_don_husd.png'
 import iconLpDonIost from '~/assets/icon_lp_don_iost.png'
@@ -311,6 +312,14 @@ export default class ComUtil {
         return this.decimalAdjust('floor', number, midPointRoundingNumber * (-1));
     }
 
+    //token count -> 소숫점 한자리로 반올림..
+    //@Param: str
+    //@Return: str
+    static roundTokenCount(str){
+        let num = Number(str);
+        return num.toFixed(2);
+    }
+
     static decimalAdjust(type, value, exp){
         // If the exp is undefined or zero...
         if (typeof exp === 'undefined' || +exp === 0) {
@@ -343,6 +352,15 @@ export default class ComUtil {
         else {
             return ''
         }
+    }
+
+    //iwwitch -> witch
+    static idoTokenName(value) {
+        if (value.startsWith('iw')) {
+            return value.substring(2);
+        }
+
+        return value;
     }
 
     /*******************************************************
@@ -396,8 +414,13 @@ export default class ComUtil {
         })
     }
 
-    static calcAPR = (symbol, total, dony, usd) => {
-        return (((symbol / (total < 1 ? 1 : total) * dony) * 360 * 24 * 60 * 60) / usd) * 100;
+    static calcAPR = (symbol, total, dony, usd, tokenName = '') => {
+        let unitVal = 1;
+        // console.log("tokenName",tokenName)
+        if(tokenName === 'iwbtc'){
+            unitVal = 0.1;
+        }
+        return (((symbol / (total < 1 ? unitVal : total) * dony) * 360 * 24 * 60 * 60) / usd) * 100;
     }
 
     static countdown (time) {
@@ -406,6 +429,10 @@ export default class ComUtil {
 
     static coinName (coinNm) {
         if(coinNm){
+
+            if (coinNm.startsWith('IdoTicket')){ //ido에서 추가
+                return coinNm;
+            }
 
             if (coinNm.length >= 8) {
                 return ComUtil.getDPLpTokenName(coinNm.toLowerCase())
@@ -416,6 +443,11 @@ export default class ComUtil {
                 return rCoinNm.toString().replace(/IW/g,'iw')     //replace all
                 // return rCoinNm.replaceAll('IW','iw');
             }
+
+            if (coinNm.startsWith('don')){ //ido에서 추가
+                return coinNm.toUpperCase();
+            }
+
             return coinNm;
         }
     }
@@ -454,6 +486,7 @@ export default class ComUtil {
         }
     }
 
+    // 사용안함..
     static getLpTokenIcon = (symbol1,symbol2) => {
         if(symbol1 === 'don' && symbol2==='husd'){
             return iconLpDonHusd
@@ -472,7 +505,7 @@ export default class ComUtil {
 
     static getDPLpTokenName = (lpTokenName) => {
         const dpLpTokenName = lpTokenName.toString()
-            .replace(/don/g,'Don').replace(/husd/g,'Husd').replace(/iost/g,'Iost').replace(/bnb/g,'Bnb')
+            .replace(/don/g,'Don').replace(/husd/g,'Husd').replace(/iost/g,'Iost').replace(/bnb/g,'Bnb').replace(/witch/g,'Witch')
             .replace(/lp$/g,'LP')  //production
             .replace(/tt$/g,'TT'); //stage
         return dpLpTokenName;
@@ -492,6 +525,9 @@ export default class ComUtil {
         }
         if(dpLpTokenName.includes('bnbhusd')){
             return ['bnb','husd']
+        }
+        if(dpLpTokenName.includes('witchhusd')){
+            return ['witch','husd']
         }
         return null;
     }
@@ -522,5 +558,254 @@ export default class ComUtil {
             return false
         }
         return false
+    }
+
+    //////IdoCard용 time 조회
+
+    //buyIdo start했는지 체크용도:for ProgressBar
+    static isStarted = (startYyyymmdd) => {
+        const dateStart = new Date(Date.UTC(startYyyymmdd.toString().substr(0,4), startYyyymmdd.toString().substr(4,2)-1, startYyyymmdd.toString().substr(6,2)));
+        const momentStart = moment(dateStart).valueOf(); //valueOf = 밀리세컨드
+
+        const now = moment().valueOf(); //valueOf = 밀리세컨드
+        if (now > momentStart) {
+            return true;
+        }
+        return false;
+    }
+
+
+    //param: applyWhiteList 시작시간, buyIdo 끝시간
+    //return 0:open전, 1:running, 2:finished
+    static getIdoStatus = (startYyyymmdd, endYyyymmdd) => {
+
+        //utc date로 생성: 월(month)는 0~11이라서 -1 필요.
+        const dateStart = new Date(Date.UTC(startYyyymmdd.toString().substr(0,4), startYyyymmdd.toString().substr(4,2)-1, startYyyymmdd.toString().substr(6,2)));
+        const dateEnd = new Date(Date.UTC(endYyyymmdd.toString().substr(0,4), endYyyymmdd.toString().substr(4,2)-1, endYyyymmdd.toString().substr(6,2)));
+
+        //moment용 start,end
+        const momentStart = moment(dateStart).valueOf(); //valueOf = 밀리세컨드
+        const momentEnd = moment(dateEnd).valueOf(); //valueOf = 밀리세컨드
+
+        const now = moment().valueOf(); //valueOf = 밀리세컨드
+
+        // console.log('========getIdoStatus')
+        // console.log(momentStart)
+        // console.log(now)
+        // console.log(momentEnd)
+
+        if (now > momentEnd) return 2; //finished
+        if (momentStart > now) return 0; //open 전
+        return 1; //running
+    }
+
+    // idoState 값, timeDuration 값, countdown 값
+    // 0일경우 오픈시간까지 countdown 00:00:00:00로 text값 표시
+    // 1일경우 종료시간까지 countdown 00:00:00:00로 text값 표시
+    // 2일경우 종료시간만료로 Finished 표시
+    static getIdoDurationDate = (startYyyymmdd, endYyyymmdd) => {
+        const now = moment().valueOf(); //valueOf = 밀리세컨드
+        let idoState=1; //running
+        const dateStart = new Date(Date.UTC(startYyyymmdd.toString().substr(0,4), startYyyymmdd.toString().substr(4,2)-1, startYyyymmdd.toString().substr(6,2)));
+        const dateEnd = new Date(Date.UTC(endYyyymmdd.toString().substr(0,4), endYyyymmdd.toString().substr(4,2)-1, endYyyymmdd.toString().substr(6,2)));
+
+        //moment용 start,end
+        const momentStart = moment(dateStart).valueOf(); //valueOf = 밀리세컨드
+        const momentEnd = moment(dateEnd).valueOf(); //valueOf = 밀리세컨드
+
+        let timeDuration = momentEnd - now
+        let leftTime = this.leftTime(timeDuration);
+        let countDownTxt = this.countdown(leftTime);
+        if (momentStart > now){
+            idoState=0; //open 전
+            timeDuration = momentStart - now
+            leftTime = this.leftTime(timeDuration);
+            countDownTxt = this.countdown(leftTime);
+        }
+        if (now > momentEnd){
+            idoState=2; //finished
+            countDownTxt = 'Finished';
+        }
+
+        return {state:idoState,value:timeDuration,text:countDownTxt};
+    }
+
+    // rangeState:범위여부, timeDuration 값, countDownText 값
+    // 0일경우 오픈시간까지 countdown 00:00:00:00로 text값 표시
+    // 1일경우 종료시간까지 countdown 00:00:00:00로 text값 표시
+    // 2일경우 종료시간만료로 Finished 표시
+    static getDurationBetweenDate = (startYyyymmdd, endYyyymmdd) => {
+        const now = moment().valueOf(); //valueOf = 밀리세컨드
+        let rangeState = 1; //range
+        const dateStart = new Date(Date.UTC(startYyyymmdd.toString().substr(0,4), startYyyymmdd.toString().substr(4,2)-1, startYyyymmdd.toString().substr(6,2)));
+        const dateEnd = new Date(Date.UTC(endYyyymmdd.toString().substr(0,4), endYyyymmdd.toString().substr(4,2)-1, endYyyymmdd.toString().substr(6,2)));
+
+        //moment용 start,end
+        const momentStart = moment(dateStart).valueOf(); //valueOf = 밀리세컨드
+        const momentEnd = moment(dateEnd).valueOf(); //valueOf = 밀리세컨드
+
+        let timeDuration = momentEnd - now
+        let leftTime = this.leftTime(timeDuration);
+        let countDownText = this.countdown(leftTime);
+        if (momentStart > now){
+            rangeState=0; // range (범위기간전)
+            timeDuration = momentStart - now
+            leftTime = this.leftTime(timeDuration);
+            countDownText = this.countdown(leftTime);
+        }
+        if (now > momentEnd){
+            rangeState=2; // range 후 (범위기간끝)
+            countDownText = 'Finished';
+        }
+        return {rangeState:rangeState,value:timeDuration,text:countDownText};
+    }
+
+    // 한개의 종료날짜로 상태값 표시
+    // endState:종료여부, timeDuration 값, countDownText 값
+    // false일경우 종료시간까지 countdown 00:00:00:00로 text값 표시
+    // true일경우 종료시간만료로 Finished 표시
+    static getDurationEndDate = (endYyyymmdd) => {
+        let endState = false; //isEnd
+        const nowDate = moment().valueOf(); //valueOf = 밀리세컨드
+        const utcDate = new Date(Date.UTC(endYyyymmdd.toString().substr(0,4), endYyyymmdd.toString().substr(4,2)-1, endYyyymmdd.toString().substr(6,2)));
+
+        const endTime = moment(utcDate).valueOf(); //valueOf = 밀리세컨드
+        let timeDuration = endTime - nowDate
+        const leftTime = this.leftTime(timeDuration);
+        let countDownText = this.countdown(leftTime);
+        if (nowDate > endTime){
+            endState=true; // EndDate 끝
+            countDownText='Finished'
+        }
+        return {endState:endState,value:timeDuration,text:countDownText};
+    }
+
+    //open in X day(s), open in X hour(s), open in X min(s)로 표시.
+    static getIdoCommingSoonText = (startYyyymmdd) => {
+
+        let dayRemained = this.dayRemained(startYyyymmdd);
+        if (dayRemained > 1) return 'open in ' + dayRemained + ' day' + ((dayRemained>1)?'s':'');
+        //하루이하는 시간출력. (위쪽 >1 부분)
+
+        let hourRemained = this.hourRemained(startYyyymmdd);
+        if (hourRemained > 1) return 'open in ' + hourRemained + ' hour' + ((hourRemained>1)?'s':'');
+        //1시간이하는 분출력. (위쪽 >1 부분)
+
+        let minRemained = this.minRemained(startYyyymmdd);
+        if (minRemained > 0) return 'open in ' + minRemained + ' min' + ((minRemained>1)?'s':'');
+    }
+
+    static setupDone = false; //moment.duration은 셋업이 한번 필됴함.
+
+
+    //param: 20210601 (int)
+    //return: 2021.06.01 00h
+    static utc0DateFormat = (yyyymmdd) => {
+        const utcDate = new Date(Date.UTC(yyyymmdd.toString().substr(0,4), yyyymmdd.toString().substr(4,2)-1, yyyymmdd.toString().substr(6,2)));
+        const momentDate = moment(utcDate);
+
+        return (momentDate.format('yyyy.MM.DD') + ' 00h')
+    }
+
+    //param: 20610601
+    //return: 남은날짜, or 0 (오늘일경우)
+    static dayRemained = (yyyymmdd) => {
+        if (!this.setupDone) { //duration을 formatting 하기위한 plugin초기화.
+            momentDurationFormatSetup(moment);
+            this.setupDone = true;
+        }
+
+        const utcDate = new Date(Date.UTC(yyyymmdd.toString().substr(0,4), yyyymmdd.toString().substr(4,2)-1, yyyymmdd.toString().substr(6,2)));
+        const momentDate = moment(utcDate);
+
+        const now = moment();
+        const dayDiff = moment.duration(momentDate.diff(now)).format('D')  //날짜 차이.
+
+        return dayDiff; //정상리턴.
+        //return dayDiff-1; //마직막날 0.9일이 1로 리턴되서 이때 시간으로 전환하기 위해서 -1을 함.
+    }
+
+    //param: 20610601 : dayRemained가 0일때 호출 예정
+    //return: 남은시간, or 0 (오늘일경우)
+    static hourRemained = (yyyymmdd) => {
+        if (!this.setupDone) { //duration을 formatting 하기위한 plugin초기화.
+            momentDurationFormatSetup(moment);
+            this.setupDone = true;
+        }
+
+        const utcDate = new Date(Date.UTC(yyyymmdd.toString().substr(0,4), yyyymmdd.toString().substr(4,2)-1, yyyymmdd.toString().substr(6,2)));
+        const momentDate = moment(utcDate);
+
+        const now = moment();
+        const hourDiff = moment.duration(momentDate.diff(now)).format('H')  //시간 차이.
+
+        return hourDiff;
+    }
+    //param: 20610601 : dayRemained가 0, hourRemained도 0일때 호출예정
+    //return: 남은시간, or 0 (오늘일경우)
+    static minRemained = (yyyymmdd) => {
+        if (!this.setupDone) { //duration을 formatting 하기위한 plugin초기화.
+            momentDurationFormatSetup(moment);
+            this.setupDone = true;
+        }
+
+        const utcDate = new Date(Date.UTC(yyyymmdd.toString().substr(0,4), yyyymmdd.toString().substr(4,2)-1, yyyymmdd.toString().substr(6,2)));
+        const momentDate = moment(utcDate);
+
+        const now = moment();
+        const minDiff = moment.duration(momentDate.diff(now)).format('m')  //분 차이.
+
+        return minDiff;
+    }
+    //param: 20610601 : dayRemained가 0, hourRemained0, minRemained0일때 호출예정
+    //return: 남은시간, or 0 (오늘일경우)
+    static secRemained = (yyyymmdd) => {
+        if (!this.setupDone) { //duration을 formatting 하기위한 plugin초기화.
+            momentDurationFormatSetup(moment);
+            this.setupDone = true;
+        }
+
+        const utcDate = new Date(Date.UTC(yyyymmdd.toString().substr(0,4), yyyymmdd.toString().substr(4,2)-1, yyyymmdd.toString().substr(6,2)));
+        const momentDate = moment(utcDate);
+
+        const now = moment();
+        const secDiff = moment.duration(momentDate.diff(now)).format('s')  //초 차이.
+
+        return secDiff;
+    }
+
+    /*
+    Countries not supported:
+        Afghanistan(AFG), Albania(ALB), Belarus(BLR), Bosnia and Herzegovina(BIH),
+        Burundi(BDI), Burma(MMR), Canada(CAN), China(CHN),
+        Korea (Democratic People's Republic of) (PRK),
+        Democratic Republic of Congo(COG,COD), Cuba(CUB), Ethiopia(ETH),
+        Guinea-Bissau(GNB), Guinea(GNQ,GIN,GNB,PNG), Iran(IRN), Iraq(IRQ), Japan(JPN), Liberia(LBR),
+        Lebanon(LBN), Libya(LBY), Macedonia(MKD), Malaysia(MYS),
+        New Zealand(NZL), Serbia(SRB), Sri Lanka(LKA), Sudan(SDN), Somalia(SOM), Syria(SYR),
+        Thailand(THA), Trinidad and Tobago(TTO), Tunisia(TUN), Uganda(UGA), Ukraine(UKR),
+        United States of America(USA), Venezuela(VEN), Yemen(YEM), Zimbabwe(ZWE).
+
+    For users from other countries, please check and make sure your participation in the token sale on Startup complies with local laws and regulations.
+    */
+    static isKycNotCountryChk (countryCode) {
+        if(countryCode){
+            if(
+                countryCode === 'AFG' || countryCode === 'ALB' || countryCode === 'BLR' || countryCode === 'BIH' ||
+                countryCode === 'BDI' || countryCode === 'MMR' || countryCode === 'CAN' || countryCode === 'CHN' ||
+                countryCode === 'COG' || countryCode === 'COD' || countryCode === 'CUB' || countryCode === 'ETH' ||
+                countryCode === 'GNB' || countryCode === 'PRK' ||
+                countryCode === 'GNQ' || countryCode === 'GIN' || countryCode === 'GNB' || countryCode === 'PNG' ||
+                countryCode === 'IRN' || countryCode === 'IRQ' || countryCode === 'JPN' || countryCode === 'LBR'||
+                countryCode === 'LBN' || countryCode === 'LBY' || countryCode === 'MKD' || countryCode === 'MYS' ||
+                countryCode === 'NZL' || countryCode === 'SRB' || countryCode === 'LKA' || countryCode === 'SDN' ||
+                countryCode === 'SOM' || countryCode === 'SYR' || countryCode === 'THA' || countryCode === 'TTO' ||
+                countryCode === 'TUN' || countryCode === 'UGA' || countryCode === 'UKR' || countryCode === 'USA' ||
+                countryCode === 'VEN' || countryCode === 'YEM' || countryCode === 'ZWE'
+            ){
+                return true;
+            }
+            return false;
+        }
     }
 }

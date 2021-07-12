@@ -12,7 +12,7 @@ const BasicButton = styled.button`
 
     display: ${props => props.display || 'inline-block'};   
     color: ${props => color[props.fg] || 'inherit'};
-    background-color: ${props => props.bg ? `${color[props.bg]}` : `inherit`};  
+    background-color: ${props => props.bg ? `${color[props.bg] || props.bg}` : `inherit`};  
     border: ${props => props.bc ? `1px solid ${color[props.bc]}` : '0'};
     font-size: ${props => props.fontSize ? `${getValue(props.fontSize)}` : `inherit`};
     text-decoration: ${props => props.textDecoration || 'none'};
@@ -35,6 +35,10 @@ const BasicButton = styled.button`
     
     ${pseudo.hover};
     ${pseudo.active};
+    
+    transition: 0.2s;
+    
+    ${props => props.custom && props.custom};
 `;
 
 

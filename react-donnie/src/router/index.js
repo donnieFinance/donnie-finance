@@ -27,7 +27,11 @@ const About = loadable(() => import('~/components/about'))
 const Checking = loadable(() => import('~/components/checking'))
 const Trade = loadable(() => import('~/components/trade'))
 
-const Loan = loadable(() => import('~/components/loan'))
+// const Loan = loadable(() => import('~/components/loan'))
+
+const Ido = loadable(() => import('~/components/ido'))
+const IdoDetail = loadable(() => import('~/components/ido/IdoDetail'))
+
 const Exchange = loadable(() => import('~/components/exchange'))
 const CreditAnalysis = loadable(() => import('~/components/creditAnalysis'))
 const Payment = loadable(() => import('~/components/payment'))
@@ -67,7 +71,6 @@ export default () => {
     useScrollPosition()
 
     useEffect(() => {
-
         initializeInfo();
 
         async function fetch() {
@@ -159,9 +162,15 @@ export default () => {
                             <Route exact path={'/trade/:uniqueKey'} >
                                 <Trade />
                             </Route>
-                            <Route exact path={'/loan'} >
-                                <Loan />
+
+
+                            <Route exact path={'/iostarter'} >
+                                <Ido />
                             </Route>
+                            <Route exact path={'/iostarter/:uniqueKey'} >
+                                <IdoDetail />
+                            </Route>
+
                             <Route exact path={'/exchange'} >
                                 <Redirect to={'/exchange/swap'} />
                             </Route>

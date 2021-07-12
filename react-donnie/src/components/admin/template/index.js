@@ -42,13 +42,24 @@ const store = [
             {to: '/admin/home', name:'대시보드'},
             {to: '/admin/exchange', name:'Exchange'},
             {to: '/admin/properties', name:'Properties'},
-            {to: '/admin/ercDonDepositSwap', name:'DON토큰입금'},
             {to: '/admin/exContractHistory', name:'Ex히스토리'},
+            {to: '/admin/ido', name:'IDO관리'},
+            // {to: '/admin/ercDonDepositSwap', name:'DON토큰입금'},
             // {to: '/admin/ercDonWithdrawSwap', name:'DON토큰출금'}, //사용하지 않음
             // {to: '/admin/iwlinkDepositSwap', name:'iwlink토큰입금'},
             // {to: '/admin/iwlinkWithdrawSwap', name:'iwlink토큰출금'},
             // {to: '/admin/notice', name:'menu 3'},
-            // {to: '/admin/faq', name:'menu 4'},
+            // {to: '/admin/iwlinkDepositSwap', name:'iwlink토큰입금'},
+            // {to: '/admin/iwlinkWithdrawSwap', name:'iwlink토큰출금'},
+        ]
+    },
+    {
+        key: 'submenu_Don',
+        icon: <BiCoinStack/>,
+        name: 'DON 토큰 관리',
+        children: [
+            {to: '/admin/ercDonDepositSwap', name:'DON토큰입금'},
+            {to: '/admin/ercDonWithdrawSwap', name:'DON토큰출금'}
         ]
     },
     {
@@ -124,7 +135,7 @@ const AdminTemplate = (props) => {
 
     const [to, setTo] = useState(pathname)      //initial value
     //const [openKeys, setOpenKeys] = useState([store[0].key, store[1].key, store[2].key])
-    const [openKeys, setOpenKeys] = useState([store[0].key, store[1].key, store[2].key, store[3].key])
+    const [openKeys, setOpenKeys] = useState([store[0].key, store[1].key, store[2].key, store[3].key, store[4].key])
 
     useEffect(() => {
         //pathname에 해당하는 메뉴 펼치기
@@ -201,13 +212,13 @@ const AdminTemplate = (props) => {
                             setOpenKeys(keys)
                         }}
 
-                        style={{ height: '100%', borderRight: 0, fontSize:'medium' }}
+                        style={{ height: '100%', borderRight: 0, fontSize:'small' }}
                     >
                         {
                             store.map(({key, icon, name, children}, index) => (
                                 <SubMenu key={key} icon={icon} title={' ' + name}>
                                     {
-                                        children.map(({to, name}) => <Menu.Item key={to} style={{fontSize:'medium'}}><Link to={to}>{name}</Link></Menu.Item>)
+                                        children.map(({to, name}) => <Menu.Item key={to} style={{fontSize:'small'}}><Link to={to}>{name}</Link></Menu.Item>)
                                     }
                                 </SubMenu>
                             ))

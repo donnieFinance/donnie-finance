@@ -5,6 +5,7 @@ import BigNumber from "bignumber.js";
 
 import properties from "~/properties";
 import {Div, Flex, Img, Right} from "~/styledComponents/shared";
+import { List, Card } from 'antd';
 import ComUtil from "~/util/ComUtil";
 import useCoinInfo from "~/hooks/useCoinInfo";
 import useInterval from "~/hooks/useInterval";
@@ -46,28 +47,34 @@ const Home = (props) => {
                         </Flex>
                     </Flex>
                 </Flex>
-
-
-                <Flex>
-                    {
-                        coins.map((coin, index) =>
-                            <Flex key={`coin${index}`} justifyContent={'center'} minWidth={120} minHeight={120} flexDirection={'column'} bg={'primary'} fg={'white'} rounded={4} mr={10} px={5}>
-                                <Div fontSize={12}>{coin.uniqueKey}</Div>
+                <List
+                    grid={{
+                        gutter: 16,
+                        xs: 1,
+                        sm: 2,
+                        md: 4,
+                        lg: 4,
+                        xl: 6,
+                        xxl: 3,
+                    }}
+                    dataSource={coins}
+                    renderItem={(coin, index) => (
+                        <List.Item>
+                            <Card title={coin.uniqueKey}>
                                 <Div fontSize={18} lighter>
                                     {
                                         `${ComUtil.addCommas(coin.total)}`
                                     }
                                 </Div>
-                                <Div fontSize={25} lighter>
+                                <Div fontSize={20} lighter>
                                     {
                                         `$${ComUtil.addCommas(coin.usd.toFixed(2))}`
                                     }
                                 </Div>
-                            </Flex>
-
-                        )
-                    }
-                </Flex>
+                            </Card>
+                        </List.Item>
+                    )}
+                />
             </Div>
         </Div>
     );

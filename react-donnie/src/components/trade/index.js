@@ -148,7 +148,7 @@ const Trade = withTranslation()(({t, history}) => {
                 if (isLogin()) {
 
                     const iost = myWallet.wallet.newIOST(window.IOST);
-                    const iostHost = iost.currentRPC._provider._host;
+                    const iostHost = properties.IOST_ADDR;//iost.currentRPC._provider._host;
 
                     const res = await Promise.all([
                         getBatchContractStorage(),
@@ -292,8 +292,8 @@ const Trade = withTranslation()(({t, history}) => {
                     if(hasIWallet()) {
                         if(isLogin()) {
                             const iost = myWallet.wallet.newIOST(window.IOST);
-                            const iostHost = iost.currentRPC._provider._host;
-
+                            //const iostHost = iost.currentRPC._provider._host;
+                            const iostHost = properties.IOST_ADDR;
                             const data = await axios.get(iostHost + "/getNodeInfo")
 
                             let serverTime = parseFloat((data.data.server_time / (10 ** 9)).toFixed(0));

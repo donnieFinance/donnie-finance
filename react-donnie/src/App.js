@@ -20,7 +20,7 @@ import BigNumber from "bignumber.js";
 
 require('~/plugins/donnieCustom');
 
-const isKoKR = (localStorage.getItem("ko-KR")||"en_US") === 'ko-KR' ? true:false;
+const isKoKR = false;//(localStorage.getItem("ko-KR")||"en_US") === 'ko-KR' ? true:false;
 
 function App() {
     useEffect(() => {

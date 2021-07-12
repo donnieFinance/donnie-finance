@@ -224,6 +224,23 @@ export const onSendIrcDonToManagerBC  = async (address, withdrawAmount, memo) =>
     return res;
 }
 
+// don ircToErc 출금
+export const onErcDonWithdrawBC = async(gasLimit, contractID, amountStr, ercAccount) => {
+    const myWallet = WalletUtil.getMyWallet();
+    const iost = myWallet.wallet.newIOST(window.IOST)
+    let txWithdraw = iost.callABI(contractID, "swapWithdraw", [amountStr.toString(), ercAccount]);
+
+    txWithdraw.addApprove('iost', amountStr.toString())
+    txWithdraw.addApprove(donTokenName, amountStr.toString()) //jetstream 때문에 넣음
+
+    txWithdraw.gasLimit = gasLimit;
+    txWithdraw.amount_limit.push({ token: "*", value: "unlimited" });
+    const res = await signAndSend(txWithdraw)
+    console.log(res)  // res.result res.isSuccess 로 데이터 결과값 사용가능
+    return res;
+}
+
+
 export const onWithDrawSendBC = async(gasLimit, contractID, amountVal) => {
     const myWallet = WalletUtil.getMyWallet();
     const iost = myWallet.wallet.newIOST(window.IOST)
@@ -708,13 +725,14 @@ export default {
     getPoolTotalSupply,
     getPoolRewardRate,
     getTradeBalanceAll,
-    onSendIrcDonToManagerBC,
+    onSendIrcDonToManagerBC, //TODO chagne to onIwSwapWithdrawBC 유사함수.
+    onErcDonWithdrawBC,
     onWithDrawSendBC,
     onDepositSendBC,
     onHarvestSendBC,
     onHarvestWithDrawSendBC,
     onIwSwapWithdrawBC,
-
+    signAndSend,
     //exchange Function
     exchangeSwapTokens,
     routeSwapTokens,

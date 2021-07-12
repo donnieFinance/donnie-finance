@@ -79,6 +79,8 @@ const defaultStyle = css`
         }
     `}
     
+    ${props => props.custom && props.custom};
+    
 `;
 
 export const Div = styled.div`
@@ -119,6 +121,7 @@ export const Hr = styled.hr`
     border-right: 0;
     border-bottom: 0;
     ${props => props.bw && `border-width: ${getValue(props.bw)};`};
+    ${props => props.custom && props.custom};
 `;
 
 export const Sticky = styled(Div)`
@@ -183,8 +186,8 @@ export const Layer = styled.div`
 export const GridColumns = styled(Div)`
     display: grid;
     grid-template-columns: ${props => hasValue(props.repeat) ? `repeat(${props.repeat}, 1fr)` : props.tempColumns };
-    grid-column-gap: ${props => props.colGap ? getValue(props.colGap) : getValue(34)};
-    grid-row-gap: ${props => props.rowGap ? getValue(props.rowGap) : getValue(34)};
+    grid-column-gap: ${props => hasValue(props.colGap) ? getValue(props.colGap) : getValue(34)};
+    grid-row-gap: ${props => hasValue(props.rowGap) ? getValue(props.rowGap) : getValue(34)};
 `;
 
 // export const GridProducts = styled(GridColumns)`

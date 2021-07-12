@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Div, Flex, GridColumns, Img, Right, Span} from "~/styledComponents/shared";
 import {Modal} from "antd";
-import {connectWalletModalState, depositERCModalState} from '~/hooks/atomState'
+import {connectWalletModalState, depositERCModalState, withdrawERCModalState} from '~/hooks/atomState'
 import {useRecoilState} from "recoil";
 import useWallet from "~/hooks/useWallet";
 import iostIWalletIcon from '~/assets/wallet_IWallet.png'
@@ -23,6 +23,7 @@ const ModalContent = () => {
     const [balance, setBalance] = useState(0);
     const [, setConnectWalletOpen] = useRecoilState(connectWalletModalState)
     const [, setDepositERCOpen] = useRecoilState(depositERCModalState)
+    const [, setWithdrawERCOpen] = useRecoilState(withdrawERCModalState)
 
     useEffect(() => {
         loadBalance()
@@ -46,6 +47,15 @@ const ModalContent = () => {
         }
         setConnectWalletOpen(false)
         setDepositERCOpen(true)
+    }
+
+    const onWithdrawERCClick = () => {
+        if (!address) {
+            window.$message.warning(t('PleaseConnect'))
+            return
+        }
+        setConnectWalletOpen(false)
+        setWithdrawERCOpen(true)
     }
 
     const wallet = WalletUtil.getMyWallet()
@@ -152,17 +162,27 @@ const ModalContent = () => {
                                 {/*<Div textAlign={'center'} mb={5}>*/}
                                 {/*    <a href={"https://www.iostabc.com/account/" + address} rel="external" target={"_blank"}>{t('ViewonEtherscan')}</a>*/}
                                 {/*</Div>*/}
-                                <GridColumns repeat={1} colGap={10}>
+
                                     <Button
                                         bc={'primary'}
                                         block
+                                        py={10}
+                                        mb={10}
+                                        fontSize={14}
                                         onClick={onDepositERCClick}
                                     >
-                                        <Div lineHeight={14}>
-                                            <Div fontSize={14} textAlign={'center'} py={10}>DON Swap ERC to IRC</Div>
-                                        </Div>
+                                        DON Swap ERC to IRC
                                     </Button>
-                                </GridColumns>
+                                    {/*<Button*/}
+                                    {/*    bc={'primary'}*/}
+                                    {/*    block*/}
+                                    {/*    py={10}*/}
+                                    {/*    fontSize={14}*/}
+                                    {/*    onClick={onWithdrawERCClick}*/}
+                                    {/*>*/}
+                                    {/*    DON Swap IRC to ERC*/}
+                                    {/*</Button>*/}
+
                             </Div>
                         }
                     </>

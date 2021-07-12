@@ -24,6 +24,9 @@ const getEthGasGwei = () => axios(properties.restAPIHost + '/ethGasGwei', { meth
 const sendWeiWithGasPrice = (ercAccount) => axios(properties.restAPIHost + '/swap/sendWeiWithGasPrice', { method: "post", params: {ercAccount},withCredentials: true, credentials: 'same-origin' })
 const donErcAccountWeiRetrieval = (ercAccount) => axios(properties.restAPIHost + '/swap/donErcAccountWeiRetrieval', { method: "post", params: {ercAccount},withCredentials: true, credentials: 'same-origin' })
 
+// erc Don 출금 WithdrawSequence 조회
+const getErcDonMaxWithdrawSequence  = () => axios(properties.restAPIHost + '/getErcDonMaxWithdrawSequence', { method: "get", withCredentials: true, credentials: 'same-origin' })
+
 //iw용
 const iwErcDepositSwap = (iwTokenName, eth, erc) => axiosSecure(properties.restAPIHost + '/iwErcDepositSwap', {method: "get", params: {iwTokenName:iwTokenName, eth:eth, erc:erc },  withCredentials: true, credentials: 'same-origin'})
 const getDonManagerIGas = () => axiosSecure(properties.restAPIHost + '/getDonManagerIGas', {method: "get", withCredentials: true, credentials: 'same-origin'})
@@ -56,12 +59,16 @@ const manualBnbDeposit = (depositNo) => axiosSecure(properties.restAPIHost + '/m
 // const bnbWithdrawSwap = () => axiosSecure(properties.restAPIHost + '/bnbWithdrawSwap', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const updateBnbSwapDepositFinished = (swapBnbNo) => axiosSecure(properties.restAPIHost + '/updateBnbSwapDepositFinished', {method: "post", params: {swapBnbNo:swapBnbNo},  withCredentials: true, credentials: 'same-origin'})
 const getBep20BNBBalance = (bep20Account) => axios(properties.restAPIHost + '/getBep20BNBBalance', { method: "post", params: {bep20Account},withCredentials: true, credentials: 'same-origin' })
-// bnb 수동 전송 관련 (출금)
+// bnb 수동 전송 관련 (출금) [셀안의기능]
 const sendUserBnbToExtAccount = ({withdrawSeq, receiverAddr, tokenAmount}) => axiosSecure(properties.restAPIHost + '/sendUserBnbToExtAccount', {method: "post", params: {withdrawSeq:withdrawSeq, receiverAddr:receiverAddr, tokenAmount:tokenAmount}, withCredentials: true, credentials: 'same-origin'})
+// don 수동 전송 관련 (출금) [셀안의기능]
+const sendUserErcDonToExtAccount = ({withdrawSeq, receiverAddr, tokenAmount}) => axiosSecure(properties.restAPIHost + '/sendUserErcDonToExtAccount', {method: "post", params: {withdrawSeq:withdrawSeq, receiverAddr:receiverAddr, tokenAmount:tokenAmount}, withCredentials: true, credentials: 'same-origin'})
 
-// iw, bnb 모두 사용가능
+// iw, bnb 모두 사용가능 (수동전송) [최상단 기능]
 const sendUserIwErcToExtAccountManual = (withdrawSeq, iwTokenName) => axiosSecure(properties.restAPIHost + '/sendUserIwErcToExtAccountManual', {method: "post", params: {withdrawSeq:withdrawSeq, iwTokenName:iwTokenName}, withCredentials: true, credentials: 'same-origin'})
-// const getIwSwapTotalAmount = (iwTokenName, ircAccount) => axiosSecure(properties.restAPIHost + '/getIwSwapTotalAmount', {method: "post", params: {iwTokenName:iwTokenName, ircAccount:ircAccount},  withCredentials: true, credentials: 'same-origin'})
+// don 수동 전송 [최상단 기능]
+const sendUserErcDonToExtAccountManual = (withdrawSeq) => axiosSecure(properties.restAPIHost + '/sendUserErcDonToExtAccountManual', {method: "post", params: {withdrawSeq:withdrawSeq}, withCredentials: true, credentials: 'same-origin'})
+
 
 const getIwSwapTotalAmount = async (iwTokenName, ircAccount) => {
     const {data} = await axiosSecure(properties.restAPIHost + '/getIwSwapTotalAmount', {method: "post", params: {iwTokenName:iwTokenName, ircAccount:ircAccount},  withCredentials: true, credentials: 'same-origin'})
@@ -94,6 +101,25 @@ const manualApprove0x34 = (iwTokenName, ircAccount) => axiosSecure(properties.re
 const setExContractHistory = (pageNo) => axios(properties.restAPIHost + '/setExContractHistory', { method: "post", params: {pageNo:pageNo}, withCredentials: true, credentials: 'same-origin' })
 //exchange contract history list
 const getExContractHistory = ({year}) => axios(properties.restAPIHost + '/exContractHistory', { method: "get", params:{year:year}, withCredentials: true, credentials: 'same-origin' })
+
+
+const getIdoList = () => axios(properties.restAPIHost + '/idoList', { method: "get", withCredentials: true, credentials: 'same-origin' })
+const getIdoWhiteList = (idoId) => axios(properties.restAPIHost + '/idoWhiteList', { method: "get", params:{idoId:idoId}, withCredentials: true, credentials: 'same-origin' })
+const getIdo = (idoId) => axios(properties.restAPIHost + '/ido', { method: "get", params:{idoId:idoId}, withCredentials: true, credentials: 'same-origin' })
+const setIdo = (data) => axios(properties.restAPIHost + '/ido', { method: "post", data: data, withCredentials: true, credentials: 'same-origin' })
+const setIdoDrawWhitelistTask = (idoId) => axios(properties.restAPIHost + '/idoDrawWhitelistTask', { method: "post", params: {idoId:idoId}, withCredentials: true, credentials: 'same-origin' })
+const setIdoWhitelistKYCApply = (idoId, account) => axios(properties.restAPIHost + '/idoWhitelistKYCApply', { method: "post", params: {idoId:idoId,account:account}, withCredentials: true, credentials: 'same-origin' })
+const retryContractKycAuth = (idoId, account) => axios(properties.restAPIHost + '/retryContractKycAuth', { method: "post", params: {idoId:idoId,account:account}, withCredentials: true, credentials: 'same-origin' })
+
+const setIdoWhitelistKYCApplyNot = (idoId, account, kycReason) => axios(properties.restAPIHost + '/idoWhitelistKYCApplyNot', { method: "post", params: {idoId:idoId,account:account,kycReason:kycReason}, withCredentials: true, credentials: 'same-origin' })
+// ido whitelist 추첨 종료
+const finishDrawWhitelist = (idoId) => axios(properties.restAPIHost + '/finishDrawWhitelist', { method: "post", params: {idoId:idoId}, withCredentials: true, credentials: 'same-origin' })
+
+// ido Token claim 가능하도록 설정
+const setClaimTokenStatus = (idoId) => axios(properties.restAPIHost + '/setClaimTokenStatus', { method: "post", params: {idoId:idoId, status:true}, withCredentials: true, credentials: 'same-origin' })
+
+// ido Token claim 가능여부 확인
+const checkClaimToken = (idoId) => axios(properties.restAPIHost + '/checkClaimToken', { method: "get", params:{idoId:idoId}, withCredentials: true, credentials: 'same-origin' })
 
 export default {
     ercDonDepositSwap,
@@ -134,5 +160,14 @@ export default {
     getIwSwapTotalAmount,
     getIwMaxWithdrawSequence,
     manualApprove0x34,
-    setExContractHistory, getExContractHistory
+
+    setExContractHistory, getExContractHistory,
+
+    getIdoList, getIdoWhiteList, getIdo, setIdo, setIdoDrawWhitelistTask, setIdoWhitelistKYCApply, finishDrawWhitelist, setIdoWhitelistKYCApplyNot,
+    retryContractKycAuth,
+    setClaimTokenStatus, checkClaimToken,
+
+    getErcDonMaxWithdrawSequence,
+    sendUserErcDonToExtAccount,
+    sendUserErcDonToExtAccountManual,
 }

@@ -87,7 +87,7 @@ const Item = styled(Flex)`
     `
 
 
-const CardPc = ({pathname, img, hoverImg, alt, title, desc, fg}) => {
+const CardPc = ({pathname, img, hoverImg, alt, title, desc, fg, isNew}) => {
 
     const history = useHistory()
 
@@ -101,7 +101,7 @@ const CardPc = ({pathname, img, hoverImg, alt, title, desc, fg}) => {
                     <img src={img} alt={alt} style={{width: '100%', height: '100%'}}/>
                     <img src={hoverImg} alt={alt} style={{width: '100%', height: '100%'}}/>
                 </Div>
-                <Div fontSize={25} textAlign={'center'}>
+                <Div fontSize={25} textAlign={'center'} notiNew={isNew}>
                     {title}
                 </Div>
                 <Div textAlign={'center'} fontSize={12.8} mt={10} px={30}>
@@ -134,6 +134,7 @@ export default ({store}) =>
                             title={item.title}
                             desc={item.desc}
                             fg={item.fg}
+                            isNew={item.isNew}
                         />
                     )
                 }

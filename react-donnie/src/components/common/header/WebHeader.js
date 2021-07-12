@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Button, Div, Flex, NavLink} from "~/styledComponents/shared";
 import {color} from "~/styledComponents/Properties";
-import {Tooltip} from "antd";
+import {Tooltip, Badge} from "antd";
 import {
     myAddressSelector,
     walletLoadingState,
@@ -27,7 +27,7 @@ const WebHeader = (props) => {
     const [address,] = useRecoilState(myAddressSelector)
     const [, setConnectWalletOpen] = useRecoilState(connectWalletModalState)
 
-    const {about, checking, loan, exchange, credit, payment, portfolio} = t('menu', {returnObjects: true})
+    const {about, checking, ido, exchange, credit, payment, portfolio} = t('menu', {returnObjects: true})
 
     // extract pathname from location
     const { pathname } = useLocation();
@@ -66,10 +66,25 @@ const WebHeader = (props) => {
                     </Tooltip>
                 </CustomNavLink>
             </Div>
-            <Div>
-                <CustomNavLink to={'/loan'} fg={fg}>
-                    <Tooltip title={loan.desc} placement="bottom">
-                        {loan.name}
+            <Div relative custom={`
+                &::after {
+                    content: "NEW";
+                    position: absolute;
+                    left: 80%;
+                    top: -16px;
+                    background: ${color.love};
+                    color: ${color.white};
+                    font-weight: 500;
+                    font-size: 10px;
+                    border-radius: 4px;
+                    padding: 0 5px;
+                    line-height: 16px;
+                    height: 15px;                
+            `}>
+
+                <CustomNavLink to={'/iostarter'} fg={fg}>
+                    <Tooltip title={ido.desc} placement="bottom">
+                        {ido.name}
                     </Tooltip>
                 </CustomNavLink>
             </Div>
@@ -95,7 +110,7 @@ const WebHeader = (props) => {
                 </CustomNavLink>
             </Div>
             <Flex>
-                <Div mr={5}>
+                <Div>
                     <Button bg={'white'} fg={'primary'} px={20} height={46}
                             onClick={() => setConnectWalletOpen(true)}
                     >
@@ -106,12 +121,11 @@ const WebHeader = (props) => {
                         />
                     </Button>
                 </Div>
-                <Div>
-                    <PopoverSelectLanguage>
-                        <Button bc={'background'} fg={'background'} height={46} px={20}>{t('lang')}</Button>
-                    </PopoverSelectLanguage>
-
-                </Div>
+                {/*<Div ml={5}>*/}
+                {/*    <PopoverSelectLanguage>*/}
+                {/*        <Button bc={'background'} fg={'background'} height={46} px={20}>{t('lang')}</Button>*/}
+                {/*    </PopoverSelectLanguage>*/}
+                {/*</Div>*/}
             </Flex>
         </Flex>
     );

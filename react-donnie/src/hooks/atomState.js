@@ -4,6 +4,7 @@ import coin_don_icon from "~/assets/coin_don.png";
 import coinList from "~/coinList";
 import ImgIost from "~/assets/coin_iost.png";
 import ImgDon from "~/assets/coin_don.png";
+import idoApi from "~/lib/idoApi";
 
 /*
     사용법 [useRecoilState]
@@ -304,3 +305,7 @@ export const allFilterClearState = atom({
     default: 0
 })
 
+export const idoTicketBalanceState = atom({
+    key: 'idoTicketBalanceState',
+    default: 0
+})

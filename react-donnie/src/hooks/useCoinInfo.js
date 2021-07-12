@@ -69,14 +69,36 @@ const useCoinInfo = ({delay = null}) => {
         refresh()
     }, refreshInterval);
 
+    const getUsd = (pool, tokenName) => {
+        if (pool) {
+            return Promise.all([getTotalSupply(pool), getCoinUsdPrice(tokenName)])
+        }
+    }
+
+    const getTotalUsd = async (list) => {
+        const promises = []
+        list.map(({pool, tokenName}) => {
+            if (pool) {
+                promises.push(getUsd(pool, tokenName))
+            }
+        })
+        const res = await Promise.all(promises)
+        let totalUsd = 0;
+        res.map(coin => {
+            const v_total = coin[0]         //
+            const v_usd = coin[1]
+            totalUsd = totalUsd + getCalcUsd(v_total, v_usd)
+        })
+        return totalUsd
+    }
+
     const refresh = async () => {
 
         const coins = []
 
+        //checking promises
         const allCoinPromises = Object.keys(properties.contractList).map(uniqueKey => {
-
             coins.push({uniqueKey: uniqueKey})
-
             return getCoinInfo(uniqueKey)
         })
 
@@ -113,8 +135,13 @@ const useCoinInfo = ({delay = null}) => {
 
         })
 
+        // Ido ticketing totalUsd
+        const totalIdoTicketingUsd = await getTotalUsd(Object.values(properties.idoTicketing))
+
         const _coinInfo = {
-            totalUsd: totalUsd,                                 //usd 합계
+            totalContractUsd: totalUsd,
+            totalIdoTicketingUsd: totalIdoTicketingUsd,
+            totalUsd: totalUsd + totalIdoTicketingUsd,                                 //usd 합계
             totalHarvestedDonBalance: totalHarvestedDonBalance, //현재까지 수확된 토큰수 합계(DON)
             list: coins                                         //상세 리스트
         }
@@ -136,8 +163,16 @@ const useCoinInfo = ({delay = null}) => {
         // console.log({tokens: coins, totalUsd})
     }
 
+    const getCalcUsd = (total, usd) => {
+        if (typeof (total) === 'number' && typeof (usd) === 'number') {
+            return new BigNumber(total).times(usd).toNumber();
+        }
+        return 0
+    }
+
     const getCoinInfo = (uniqueKey) => {
         const contract = properties.contractList[uniqueKey]
+
         const {tokenName, pool, totalDon} = contract
 
         return Promise.all([

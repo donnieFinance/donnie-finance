@@ -2,20 +2,18 @@ import React, {useEffect, useState} from 'react';
 import {Button, Div, Flex, GridColumns, Img, Right, Span} from "~/styledComponents/shared";
 import {Input, Modal, Space} from "antd";
 import { toChecksumAddress, isValidAddress } from 'ethereumjs-util';
-import {withdrawERCModalState} from '~/hooks/atomState'
+import {loadingState, withdrawERCModalState} from '~/hooks/atomState'
 import {useRecoilState} from "recoil";
 import useWallet from "~/hooks/useWallet";
-import {swapIrcToErc} from "~/lib/swapApi";
+import {ercDonWithdraw} from "~/lib/swapApi";
 import {useTranslation} from "react-i18next";
 import ComUtil from "~/util/ComUtil";
 import {BsBoxArrowInDown} from "react-icons/bs";
 import iostApi from "~/lib/iostApi";
 import styled from 'styled-components'
 import swapApi from "~/lib/swapApi";
-
+import BigNumber from "bignumber.js";
 import properties from "~/properties";
-import useInterval from "~/hooks/useInterval";
-import moment from 'moment-timezone'
 
 const StyledInputNumber = styled(Input)`
     & input {
@@ -32,6 +30,7 @@ const TestDiv = styled(Div)`
 `;
 const WithdrawERCContent = () => {
 
+    const [, setLoadingStatus] = useRecoilState(loadingState)
 
     const {t} = useTranslation()
     const [isOpen, setIsOpen] = useRecoilState(withdrawERCModalState)
@@ -47,15 +46,16 @@ const WithdrawERCContent = () => {
     // 이더리움 주소
     const [ercAccount, setErcAccount] = useState("");
 
-    // 메모
-    const [memo, setMemo] = useState("");
+    const [donFee,setDonFee] = useState(properties.DON_FEE)
 
+    // 메모
+    // const [memo, setMemo] = useState("");
     // 출금 passCode 관련
-    const [passCode, setPassCode] = useState("");
-    const [userPassCode, setUserPassCode] = useState("");
-    const [intervalTime, setIntervalTime] = useState(1000);
-    const [passCodeTime, setPassCodeTime] = useState(60*5*1000); // 5분
-    const [timerUI, setTimerUI] = useState("05:00");
+    // const [passCode, setPassCode] = useState("");
+    // const [userPassCode, setUserPassCode] = useState("");
+    // const [intervalTime, setIntervalTime] = useState(1000);
+    // const [passCodeTime, setPassCodeTime] = useState(60*5*1000); // 5분
+    // const [timerUI, setTimerUI] = useState("05:00");
 
     const tMessage = t('message', {returnObjects: true})
 
@@ -63,31 +63,29 @@ const WithdrawERCContent = () => {
         async function fetch() {
             const data = await iostApi.getTokenBalance({address: address, tokenName: properties.address.token});
             setBalance(data)
-            const {data:passCode} = await swapApi.getNewSwapPassCode(address);
-            setPassCode(passCode);
+
+            //don_fee 가져오기.
+            const {data:feeAmt} = await swapApi.getErcDonWithdrawFee();
+            setDonFee(feeAmt)
+
+            // const {data:passCode} = await swapApi.getNewSwapPassCode(address);
+            // setPassCode(passCode);
         }
         fetch()
     }, [])
 
-    const onWithDrawNumberChange_bak = (value) => {
-
-
-        setWithdrawAmount(ComUtil.replaceDecimalNumber(value, 8));
-        // setWithdrawAmount(value);
-    }
-
     const onWithDrawNumberChange = ({target}) => {
         const {value} = target
-        const res = ComUtil.replaceDecimalNumber(value, 8)
-        console.log({res})
-        setWithdrawAmount(res);
-        // setWithdrawAmount(value);
+        const val = new BigNumber(value).decimalPlaces(8).toNumber();
+        setWithdrawAmount(val);
     }
 
     const onWithDrawNumberBlur = ({target}) => {
         const {value} = target
-        if (value > balance) {
-            setWithdrawAmount(balance);
+        const val = new BigNumber(value).decimalPlaces(8).toNumber();
+        const valBalance = new BigNumber(balance).decimalPlaces(8).toNumber();
+        if (val > valBalance) {
+            setWithdrawAmount(valBalance);
         }
     }
 
@@ -98,7 +96,6 @@ const WithdrawERCContent = () => {
 
     const onWithdrawErc = async() => {
 
-        const donFee = properties.DON_FEE;
         if (hasIWallet() && isLogin()) {
 
             if(!withdrawAmount || withdrawAmount <= 0){
@@ -121,32 +118,38 @@ const WithdrawERCContent = () => {
 
 
             // await onSendIrcToManager();
+            // const {data:validPassCode} = await swapApi.isValidSwapPassCode(address, userPassCode);
+            // if(!validPassCode) {
+            //     alert("출금확인 passCode를 확인해주세요.");
+            //     return;
+            // }
 
-            const {data:validPassCode} = await swapApi.isValidSwapPassCode(address, userPassCode);
-            if(!validPassCode) {
-                alert("출금확인 passCode를 확인해주세요.");
-                return;
-            }
+            let gasLimit = 200000;
+            const contract = properties.ERC_DON_WITHDRAW_CONTRACT_ID;
 
-            const ircResult = await iostApi.onSendIrcDonToManagerBC(address, withdrawAmount, memo);
-            if(!ircResult.isSuccess) {
-                const {failedToSend} = t('withdrawErc', {returnObjects: true});
-                let errorMessage = failedToSend;
-                if (typeof ircResult.result === 'string') {
-                    if (ircResult.result.indexOf('{') > -1) {
-                        const error = JSON.parse(ircResult.result.substring(ircResult.result.indexOf('{'), ircResult.result.indexOf('}') + 1))
+            setLoadingStatus('confirmation')
+            const {result, isSuccess} = await iostApi.onErcDonWithdrawBC(gasLimit, contract, withdrawAmount, ercAccount);
+            setLoadingStatus('pending')
+
+            //res.result res.isSuccess 로 데이터 결과값 사용가능
+            if(!isSuccess) {
+                setLoadingStatus('failed')
+                let errorMessage = t(lang.failedToSend);
+                if (typeof result === 'string') {
+                    if (result.indexOf('{') > -1) {
+                        const error = JSON.parse(result.substring(result.indexOf('{'), result.indexOf('}') + 1))
                         if (error.code === 2) {
-                            let vFailedToSend = failedToSend;
+                            let vFailedToSend = t(lang.failedToSend);
                             if(error.message){
-                                vFailedToSend = vFailedToSend + "/n" + error.message.toString();
+                                vFailedToSend = vFailedToSend + "\n" + error.message.toString();
                             }
                             errorMessage = vFailedToSend
                         } else {
                             errorMessage = result
                         }
                     }
-                } else if (typeof ircResult.result === 'object') {
-                    if (ircResult.result.status_code === 'BALANCE_NOT_ENOUGH') {
+                } else if (typeof result === 'object') {
+                    if (result.status_code === 'BALANCE_NOT_ENOUGH') {
                         errorMessage = `${tMessage.lackOfIram}`;
                     }else if (result.status_code === 'RUNTIME_ERROR') {
                         errorMessage = `${tMessage.failedToSend}`;
@@ -158,34 +161,22 @@ const WithdrawERCContent = () => {
                 return
             }
 
-            // console.log(ircResult.result.tx_hash);
-            const data = {
-                ircAccount: address,
-                swapAccount: ercAccount,
-                ircDonAmount: withdrawAmount,
-                memo: memo,
-                passCode: userPassCode,
-                txHash: ircResult.result.tx_hash
-            }
-
-            let {data: result} = await swapIrcToErc(data);
-            //console.log("swapIrcToErc result ==",result)
-            if (result === 200) {
-                const {withdrawRequestComplateMsg} = t('withdrawErc', {returnObjects: true});
-                alert(withdrawRequestComplateMsg);
-                setIsOpen(false)
-            } else if(result === 101) {
-                alert("이미 출금이 진행중입니다.");
-                setIsOpen(false)
-            } else if(result === -1) {
-                alert("출금확인 passCode 확인 후 다시 요청해주세요.");
-                setIsOpen(false)
-            }else if(result === -100) {
-                alert("잘못된 요청입니다!");
-                setIsOpen(false)
-            }else if(result === -999) {
-                alert("잘못된 요청입니다!");
-                setIsOpen(false)
+            try{
+                let {data: result} = await ercDonWithdraw(address);
+                if (result) {
+                    setLoadingStatus('success')
+                    const {withdrawRequestComplateMsg} = t('withdrawErc', {returnObjects: true});
+                    alert(withdrawRequestComplateMsg);
+                    setIsOpen(false);
+                }else {
+                    setLoadingStatus('failed')
+                    alert(t('contactUs'));
+                    setIsOpen(false);
+                }
+            }catch (err){
+                console.slog(err)
+                setLoadingStatus('failed')
+                alert(t('contactUs'));
             }
         }
     }
@@ -211,49 +202,48 @@ const WithdrawERCContent = () => {
         setErcAccount(value);
     }
 
-    const onChangeMemo = ({target}) => {
-        const {value} = target
-        setMemo(value);
-    }
+    // const onChangeMemo = ({target}) => {
+    //     const {value} = target
+    //     setMemo(value);
+    // }
 
     const onPasteClick = async () => {
         const text = await ComUtil.pasteClipboardText()
         setErcAccount(text)
     }
 
-    const onChangePassCode = ({target}) => {
-        const {value} = target
-        setUserPassCode(value);
-    }
-
-    useInterval(()=>{
-
-        if(passCodeTime <= 0) {
-            setIntervalTime(null);
-            setPassCode("passCode 유효시간이 지났습니다.");
-            return;
-        }
-
-        let result = passCodeTime - 1000;
-        // console.log('codeTime : ' + result);
-        setPassCodeTime(result);
-        const momentTimer = moment.utc(result).format('mm:ss');
-        setTimerUI(momentTimer);
-    }, intervalTime);
+    // const onChangePassCode = ({target}) => {
+    //     const {value} = target
+    //     setUserPassCode(value);
+    // }
+    //
+    // useInterval(()=>{
+    //
+    //     if(passCodeTime <= 0) {
+    //         setIntervalTime(null);
+    //         setPassCode("passCode 유효시간이 지났습니다.");
+    //         return;
+    //     }
+    //
+    //     let result = passCodeTime - 1000;
+    //     // console.log('codeTime : ' + result);
+    //     setPassCodeTime(result);
+    //     const momentTimer = moment.utc(result).format('mm:ss');
+    //     setTimerUI(momentTimer);
+    // }, intervalTime);
 
     const lang = t('withdrawErc', {returnObjects: true})
 
     return (
 
-        <Div minWidth={450}>
+        <Div>
             {/*<Div p={10} bg={'danger'} fg={'white'} textAlign={'center'}>*/}
             {/*    {t('withdrawErc', {returnObjects: true}).confirmMsgTitle}*/}
             {/*</Div>*/}
             <Div p={24}>
                 <Div p={16} shadow={'md'} bc={'light'}>
-                    <h3>IOST</h3>
+                    <h3>IOST Account</h3>
                     <Div mt={15} mb={5}>
-                        <Div>Account</Div>
                         <Div textAlign={'center'} fontSize={16}>{address}</Div>
                     </Div>
                     <Div mt={10} mb={15}>
@@ -283,19 +273,19 @@ const WithdrawERCContent = () => {
                         {/*</Flex>*/}
                     </Div>
 
-                    <Flex my={10} >
-                        <Div>passCode를 아래에 입력해주세요 [{timerUI}]</Div>
-                        <Div fg={'danger'} ml={10}>{passCode}</Div>
-                    </Flex>
+                    {/*<Flex my={10} >*/}
+                    {/*    <Div>passCode를 아래에 입력해주세요 [{timerUI}]</Div>*/}
+                    {/*    <Div fg={'danger'} ml={10}>{passCode}</Div>*/}
+                    {/*</Flex>*/}
 
-                    <Div mb={10}>
-                        <Div>출금확인 passCode</Div>
-                        <Input name={'passCode'} placeholder={'passCode'} size={'large'} onChange={onChangePassCode} value={userPassCode}/>
-                    </Div>
-                    <Div>
-                        <Div>{lang.memo}</Div>
-                        <Input name={'memo'} placeholder={lang.memo} size={'large'} onChange={onChangeMemo} value={memo}/>
-                    </Div>
+                    {/*<Div mb={10}>*/}
+                    {/*    <Div>출금확인 passCode</Div>*/}
+                    {/*    <Input name={'passCode'} placeholder={'passCode'} size={'large'} onChange={onChangePassCode} value={userPassCode}/>*/}
+                    {/*</Div>*/}
+                    {/*<Div>*/}
+                    {/*    <Div>{lang.memo}</Div>*/}
+                    {/*    <Input name={'memo'} placeholder={lang.memo} size={'large'} onChange={onChangeMemo} value={memo}/>*/}
+                    {/*</Div>*/}
                 </Div>
 
                 <Flex justifyContent='center' my={20} fontSize={16}>
@@ -303,7 +293,7 @@ const WithdrawERCContent = () => {
                 </Flex>
 
                 <Div p={16} my={20} shadow={'md'} bc={'light'}>
-                    <h3>ETH</h3>
+                    <h3>ERC DON ADDRESS</h3>
 
                     <Div mt={10}>
                         <Flex mb={5} alignItems={'flex-end'}>
@@ -325,11 +315,11 @@ const WithdrawERCContent = () => {
                         </Flex>
                         <Flex dot>
                             <Div>{lang.fee}</Div>
-                            <Right>- {properties.DON_FEE} DON</Right>
+                            <Right>- {donFee} DON</Right>
                         </Flex>
                         <Flex dot fw={500}>
                             <Div>{lang.realWithdrawAmount}</Div>
-                            <Right>{ComUtil.minusFee(withdrawAmount || 0, properties.DON_FEE)} DON</Right>
+                            <Right>{ComUtil.minusFee(withdrawAmount || 0, donFee)} DON</Right>
                         </Flex>
                     </Div>
 
@@ -364,8 +354,12 @@ const WithdrawERCModal = () => {
     return (
         <Modal
             title={
-                // t('MyDONY')
-                'Withdrawal (Swap IRC to ERC)'
+                <Flex>
+                    <Img width={20} src={properties.tokenImages.don} />
+                    <Div pt={3} ml={5}>
+                        <Flex>Swap (IRC to ERC)</Flex>
+                    </Div>
+                </Flex>
             }
             visible={isOpen}
             onCancel={() => setIsOpen(false)}

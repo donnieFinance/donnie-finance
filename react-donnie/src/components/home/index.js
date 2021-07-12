@@ -7,6 +7,9 @@ import imgSavingWhite from '~/assets/savings_w.svg'
 import imgLoan from '~/assets/loan.svg'
 import imgLoanWhite from '~/assets/loan_w.svg'
 
+import imgIdo from '~/assets/ido.svg'
+import imgIdoWhite from '~/assets/ido_w.svg'
+
 import imgExchange from '~/assets/exchange.svg'
 import imgExchangeWhite from '~/assets/exchange_w.svg'
 
@@ -45,13 +48,14 @@ const store = [
         fg: '#758E4F'
     },
     {
-        pathname: '/loan',
-        img: imgLoan,
-        hoverImg: imgLoanWhite,
-        alt: 'Loan',
-        title: 'Loan',
-        desc: 'Borrow and Lend any cryptocurrency with an Algorithmic & Autonomous Interest Rate.',
-        fg: '#86BBD8'
+        pathname: '/iostarter',
+        img: imgIdo,
+        hoverImg: imgIdoWhite,
+        alt: 'IOSTarter',
+        title: 'IOSTarter',
+        desc: 'Join a IOSTarter,  built for cross-chain token offerings, which enables new projects to raise liquidity in a decentralized fair protocol.',
+        fg: '#86BBD8',
+        isNew:true
     },
     {
         pathname: '/credit',
@@ -60,7 +64,8 @@ const store = [
         alt: 'Credit Analysis',
         title: 'Credit Analysis',
         desc: 'Create a secure credit analytics system to be used within the decentralized financial ecosystem.',
-        fg: '#F6AE2D'
+        fg: '#F6AE2D',
+        isNew:false
     },
     {
         pathname: '/payment',

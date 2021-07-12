@@ -8,6 +8,8 @@ import loadable from '@loadable/component'
 // const Faq = loadable(() => import('~/components/admin/faq'));
 // const Error = loadable(() => import('~/components/common/templates/Error'));
 
+const IDO = loadable(() => import('~/components/admin/ido'));
+
 const ErcDonDepositSwap = loadable(() => import('~/components/admin/ercDonDepositSwap'));
 const ErcDonWithdrawSwap = loadable(() => import('~/components/admin/ercDonWithdrawSwap'));
 
@@ -65,14 +67,20 @@ export default () => {
             <PrivateRoute exact path="/admin/properties" type={'admin'}>
                 <Properties />
             </PrivateRoute>
+
+            <PrivateRoute exact path="/admin/ido" type={'admin'}>
+                <IDO />
+            </PrivateRoute>
+
+            {/*   don Token  */}
             <PrivateRoute exact path="/admin/ercDonDepositSwap" type={'admin'}>
                 <ErcDonDepositSwap />
             </PrivateRoute>
 
-            {/* ercDonWithdrawSwap 사용안함 */}
-            {/*<PrivateRoute exact path="/admin/ercDonWithdrawSwap" type={'admin'}>*/}
-            {/*    <ErcDonWithdrawSwap />*/}
-            {/*</PrivateRoute>*/}
+             {/*ercDonWithdrawSwap open 202104 */}
+            <PrivateRoute exact path="/admin/ercDonWithdrawSwap" type={'admin'}>
+                <ErcDonWithdrawSwap />
+            </PrivateRoute>
 
             {/*    bly Token  */}
             <PrivateRoute exact path="/admin/iwblyDepositSwap" type={'admin'}>

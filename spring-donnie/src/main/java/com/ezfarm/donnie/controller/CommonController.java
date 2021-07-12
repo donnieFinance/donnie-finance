@@ -3,6 +3,7 @@ package com.ezfarm.donnie.controller;
 import com.ezfarm.donnie.config.SecureUtil;
 import com.ezfarm.donnie.config.SessionUtil;
 import com.ezfarm.donnie.dataclass.CSRTokenRes;
+import com.ezfarm.donnie.dataclass.ImageData;
 import com.ezfarm.donnie.service.OpenApiService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,9 +17,12 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -77,13 +81,13 @@ public class CommonController {
 
 
     //defaultValue:서버구동시 사용. front에선 properties.js/////////////////////////////
-    public static String DON_DEFAULT_PRICE = "0.434";
-    public static String IOST_DEFAULT_PRICE = "0.019";
+    public static String DON_DEFAULT_PRICE = "0.473";
+    public static String IOST_DEFAULT_PRICE = "0.021";
     public static String PPT_DEFAULT_RATIO = "6.2";
 
-    public static String BLY_DEFAULT_PRICE = "0.03";
-    public static String BTC_DEFAULT_PRICE = "34350";
-    public static String BNB_DEFAULT_PRICE = "284";
+    public static String BLY_DEFAULT_PRICE = "0.026";
+    public static String BTC_DEFAULT_PRICE = "34251";
+    public static String BNB_DEFAULT_PRICE = "329";
 
 
     ////코인 가격들 local 캐시 한번 더 함.//////////////////////////////////////////////////////////////////

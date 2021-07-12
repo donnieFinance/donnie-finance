@@ -19,7 +19,7 @@ const CustomNavLink = ({to, isActive, onClose, children}) =>
 const MenuModal = ({t}) => {
     const {address} = useWallet()
     const [menuOpen, setMenuOpen] = useRecoilState(menuModalState)
-    const {about, checking, loan, exchange, credit, payment, portfolio} = t('menu', {returnObjects: true})
+    const {about, checking, ido, exchange, credit, payment, portfolio} = t('menu', {returnObjects: true})
     //exchange 라우터에 포함되는 경우
     const match = useRouteMatch('/exchange')
 
@@ -68,10 +68,24 @@ const MenuModal = ({t}) => {
                             {exchange.desc}
                         </Div>
                     </Div>
-                    <Div mb={12}>
-                        <CustomNavLink to={'/loan'} onClose={onClose} >{loan.name}</CustomNavLink>
+                    <Div mb={12} relative custom={`
+                        &::after {
+                            content: "NEW";
+                            position: absolute;
+                            left: 30%;
+                            top: 4px;
+                            background: ${color.love};
+                            color: ${color.white};
+                            font-weight: 500;
+                            font-size: 10px;
+                            border-radius: 4px;
+                            padding: 0 5px;
+                            line-height: 16px;
+                            height: 15px;                
+                    `}>
+                        <CustomNavLink to={'/iostarter'} onClose={onClose} >{ido.name}</CustomNavLink>
                         <Div fontSize={10} fg={'secondary'} lineHeight={15}>
-                            {loan.desc}
+                            {ido.desc}
                         </Div>
                     </Div>
                     <Div mb={12}>

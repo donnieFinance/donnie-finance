@@ -128,15 +128,8 @@ export default withTranslation()((props) => {
                                 </dd>
                             </dl>
                             <dl>
-                                <dt>Loan</dt>
-                                <dd>Borrow and lend any cryptocurrency with an Algorithmic &amp; Autonomous Interest
-                                    Rate
-                                </dd>
-                                <dd>Offer sustainable system by issuing dToken which used in smart contract to sign
-                                    and terminate
-                                </dd>
-                                <dd>Collateral ratio is calculated based on the type of the token and credit of
-                                    user
+                                <dt>IOSTarter</dt>
+                                <dd>Join a IOSTarter,  built for cross-chain token offerings, which enables new projects to raise liquidity in a decentralized fair protocol.
                                 </dd>
                             </dl>
                             <dl>

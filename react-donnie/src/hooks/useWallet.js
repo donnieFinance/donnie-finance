@@ -17,7 +17,7 @@ const useWallet = (props) => {
 
     const hasIWallet = (type) => {
         const myWallet = WalletUtil.getMyWallet(type);
-        //console.log("hasIWallet===",myWallet)
+        console.log("hasIWallet===",myWallet)
         if(!myWallet.wallet){
             return false
         }
@@ -27,7 +27,7 @@ const useWallet = (props) => {
     const isLogin = (type) => {
         if (hasIWallet(type)) {
             const myWallet = WalletUtil.getMyWallet(type);
-            //console.log("myWallet===",myWallet)
+            console.log("myWallet===",myWallet)
             if (myWallet.walletType == 'IWallet') {
                 //Tokenpocket IOST
                 if(tp.isConnected()){
