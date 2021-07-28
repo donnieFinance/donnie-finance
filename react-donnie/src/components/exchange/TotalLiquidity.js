@@ -33,7 +33,7 @@ const TotalLiquidity = (props) => {
     const [lpInfo] = useRecoilState(liquidityInfo)
     const {size, sizeValue} = useSize()
 
-    const {totalCurrentSupply, timesOfCall, loading, list} = lpInfo
+    const {totalCurrentSupply, totalCurrentPrice, timesOfCall, loading, list} = lpInfo
 
     return (
 
@@ -48,7 +48,7 @@ const TotalLiquidity = (props) => {
                 <Div fontSize={sizeValue(20, null,  17)} fw={500}>Total Liquidity</Div>
                 <Div fontSize={sizeValue(40, null,  30)} fw={700}>
                     {
-                        loading ? '...' : `$ ${ComUtil.addCommas(totalCurrentSupply.toFixed(2))}`
+                        loading ? '...' : `$ ${totalCurrentPrice ? ComUtil.addCommas(totalCurrentPrice.toFixed(2)):0}`
                     }
                 </Div>
             </Div>

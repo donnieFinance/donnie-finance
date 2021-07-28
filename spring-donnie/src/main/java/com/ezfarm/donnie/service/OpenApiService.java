@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -70,26 +71,51 @@ public class OpenApiService {
         CommonController.donProcessing = true;
 
         try {
-            //CMC에서 가져오기.
-            String newDonPrice = this.getCmcPrice(CMC_DON_ID);
 
+            String newDonPrice = this.getMxcPrice("DON_USDT");
+
+            //CMC에서 가져오기. - 202107 CMC에서 MXC가격 반영이 안되어 MXC우선으로 수정.
             if (StringUtils.isEmpty(newDonPrice)) {
-                //3줄은 coinOne에서 가져오기.
-                double donWonPrice = this.getDonWonFromCoineone();
-                double WonPerUsd = this.getLateUsdExchangeRate();
-                newDonPrice = String.valueOf(ComUtil.doubleDivide(donWonPrice, WonPerUsd)); //prev로 저장하면서 리턴.
+                newDonPrice = this.getCmcPrice(CMC_DON_ID);
             }
-
+//            //3줄은 coinOne에서 가져오기.(예전코드)
+//            if (StringUtils.isEmpty(newDonPrice)) {
+//                double donWonPrice = this.getDonWonFromCoineone();
+//                double WonPerUsd = this.getLateUsdExchangeRate();
+//                newDonPrice = String.valueOf(ComUtil.doubleDivide(donWonPrice, WonPerUsd)); //prev로 저장하면서 리턴.
+//            }
 
             CommonController.prevDonPrice = newDonPrice;
             return newDonPrice;
 
         } catch (Exception e){
             log.error("getDonReal" + e.toString());
-            return null;
+            return CommonController.prevDonPrice;
 
         } finally {
             CommonController.donProcessing = false;
+        }
+        //return null;
+    }
+
+    @Cacheable(value="cache10min9", key="'witchPrice'")
+    public String getWitchPriceReal() {
+        log.info("////////////getWichPriceReal 호출 ///////////");
+
+        CommonController.witchProcessing = true;
+
+        try {
+            String newPrice = this.getMxcPrice("WITCH_USDT");
+
+            CommonController.prevWitchPrice = newPrice;
+            return newPrice;
+
+        } catch (Exception e){
+            log.error("getWhichReal" + e.toString());
+            return CommonController.prevWitchPrice;
+
+        } finally {
+            CommonController.witchProcessing = false;
         }
         //return null;
     }
@@ -107,7 +133,8 @@ public class OpenApiService {
 
         } catch (Exception e){
             log.error("getIostPriceReal:" + e.toString());
-            return null;
+            return CommonController.prevIostPrice;
+
         } finally {
             CommonController.iostProcessing = false; //3
         }
@@ -142,7 +169,7 @@ public class OpenApiService {
 
         } catch (Exception e) {
             log.error("getPPTRatioReal:" + e.toString());
-            return null; //20210322 add.
+            return CommonController.prevPPTRatio ; //20210322 add.
         } finally {
             CommonController.pptProcessing = false;
         }
@@ -163,7 +190,7 @@ public class OpenApiService {
 
         } catch (Exception e){
             log.error("getBlyPriceReal:" + e.toString());
-            return null;
+            return CommonController.prevBlyPrice;
         } finally {
             CommonController.blyProcessing = false; //3
         }
@@ -183,7 +210,7 @@ public class OpenApiService {
 
         } catch (Exception e){
             log.error("getBtcPriceReal:" + e.toString());
-            return null;
+            return CommonController.prevBtcPrice;
         } finally {
             CommonController.btcProcessing = false; //3
         }
@@ -203,7 +230,7 @@ public class OpenApiService {
 
         } catch (Exception e){
             log.error("getBnbPriceReal:" + e.toString());
-            return null;
+            return CommonController.prevBnbPrice;
         } finally {
             CommonController.bnbProcessing = false; //3
         }
@@ -250,6 +277,14 @@ public class OpenApiService {
         return ret;
     }
 
+    @Cacheable(value="cache10min9", key="'witchhusdlp'")
+    public String getWitchHusdPrice(String pairKey, String price, String lpTokenName) {
+
+        String ret = getLpHusdPrice(pairKey,price,lpTokenName);
+        lpHusdPrev.put(pairKey, ret);
+
+        return ret;
+    }
 
     //lpValue의 상태 및 이전값 관리
     public static HashMap<String, Boolean> lpHusdInProcessing = new HashMap<>();
@@ -362,16 +397,68 @@ public class OpenApiService {
         //log.info("cache10min7  removed");
     }
 
+    //cache지우기 10min cache 지우는 함수 - 매 7분에 지움 : 스케쥴러에서 10분 단위로 호출. :주로 front첫화면.
+    @CacheEvict(value = {"cache10min8"}, allEntries = true)
+    public void removeCache10min8() {
+        //log.info("cache10min7  removed");
+    }
+
+    //cache지우기 10min cache 지우는 함수 - 매 7분에 지움 : 스케쥴러에서 10분 단위로 호출. :주로 front첫화면.
+    @CacheEvict(value = {"cache10min9"}, allEntries = true)
+    public void removeCache10min9() {
+        //log.info("cache10min7  removed");
+    }
 
     @CacheEvict(value = {"cache30min"}, allEntries = true)
     public void removeCache30min() {
         //log.info("cache10min7  removed");
     }
 
+    @CacheEvict(value = {"cache10sec"}, allEntries = true)
+    public void removeCache10sec() {
+        //log.info("cache10min7  removed");
+    }
 
 
 
     //////////////////// 아래는 공통 함수 //////////////////////////////////////////////
+
+    //mxc용도로 추가.
+    static HttpEntity<String> publicEntity;
+    static {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+        publicEntity = new HttpEntity<String>("parameters", headers);
+    }
+
+
+    public String getMxcPrice(String tokenSymbol) { //tokenSymbol = "DON_USDT" "WHICH_USDT" 등
+
+        String retPrice = null;
+
+        String resourceUrl = "https://www.mxc.co/open/api/v2/market/ticker?symbol=" + tokenSymbol
+                + "&api_key=mx0dpRZzb02ZTadGIj";
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(resourceUrl, HttpMethod.GET, publicEntity, String.class);
+            JsonNode root = mapper.readTree(response.getBody());
+            JsonNode data = root.path("data");
+
+            //data is array
+            if (data.isArray()) {
+                JsonNode blyData = data.get(0);
+
+                retPrice = blyData.get("last").asText();
+                log.info("mx getPrice, " + tokenSymbol + " :" + retPrice);
+            }
+
+        }catch (Exception e) {
+            log.error(e.toString());
+        }
+
+        return retPrice;
+    }
+
 
     //coinKey조회: https://pro-api.coinmarketcap.com/v1/cryptocurrency/map 로 전체 토큰key 조회 가능.
     //BTC = 1

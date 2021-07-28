@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Spin } from 'antd';
 import {Div, FilterGroup, Flex, Hr, Right, Span} from '~/styledComponents/shared'
 import styled from 'styled-components'
 import {color} from '~/styledComponents/Properties'
@@ -47,13 +48,17 @@ const IdoList = (props) => {
     const [gridApi, setGridApi] = useState()
 
     //ag-grid 옵션
-    const defaultColDef = {
-        filter: true,
-        resizable: true,
-        sortable: true,
-        floatingFilter: false
-    };
     const gridOptions = {
+        defaultColDef:{
+            filter: true,
+            resizable: true,
+            sortable: true,
+            floatingFilter: false,
+            filterParams: {
+                newRowsAction: 'keep'
+            }
+        },
+        rowHeight:35,
         columnDefs: [
             {
                 headerName: "IdoID", field: "idoId", width: 100,
@@ -98,6 +103,8 @@ const IdoList = (props) => {
             },
 
         ],
+        overlayLoadingTemplate: '<span class="ag-overlay-loading-center">...로딩중입니다...</span>',
+        overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">조회된 내역이 없습니다</span>',
         frameworkComponents: {
             idoIdRenderer: idoIdRenderer,
             drawRenderer:drawRenderer,
@@ -256,7 +263,7 @@ const IdoList = (props) => {
             gridApi.showLoadingOverlay();
         }
         const {data} = await AdminApi.getIdoList();
-        console.log(data);
+        //console.log(data);
         setData(data);
         setLoading(false);
         if(gridApi) {
@@ -345,15 +352,16 @@ const IdoList = (props) => {
             </FilterContainer>
 
             <Div my={10}>
-                <Div className="ag-theme-balham" height={600}>
-                    <AgGridReact
-                        defaultColDef={defaultColDef}
-                        gridOptions={gridOptions}
-                        rowData={data}
-                        onCellDoubleClicked={copy}
-                    >
-                    </AgGridReact>
-                </Div>
+                <Spin spinning={loading}>
+                    <Div className="ag-theme-balham" height={600}>
+                        <AgGridReact
+                            gridOptions={gridOptions}
+                            rowData={data}
+                            onCellDoubleClicked={copy}
+                        >
+                        </AgGridReact>
+                    </Div>
+                </Spin>
             </Div>
             <Modal
                 title={"IDO "+ (selected?'수정':'등록')}

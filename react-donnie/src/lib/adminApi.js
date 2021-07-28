@@ -56,6 +56,9 @@ const getBnbGasPrice = () => axiosSecure(properties.restAPIHost + '/getBnbGasPri
 const bnbDepositSwap = () => axiosSecure(properties.restAPIHost + '/bnbDepositSwap', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const manualBnbDeposit = (depositNo) => axiosSecure(properties.restAPIHost + '/manualBnbDeposit', {method: "post", params: {depositNo:depositNo},  withCredentials: true, credentials: 'same-origin'})
 
+//ido용
+const getIdoManagerBalance = (idoTokenName) => axiosSecure(properties.restAPIHost + '/getIdoManagerBalance', {method: "get", params: {idoTokenName:idoTokenName}, withCredentials: true, credentials: 'same-origin'})
+
 // const bnbWithdrawSwap = () => axiosSecure(properties.restAPIHost + '/bnbWithdrawSwap', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const updateBnbSwapDepositFinished = (swapBnbNo) => axiosSecure(properties.restAPIHost + '/updateBnbSwapDepositFinished', {method: "post", params: {swapBnbNo:swapBnbNo},  withCredentials: true, credentials: 'same-origin'})
 const getBep20BNBBalance = (bep20Account) => axios(properties.restAPIHost + '/getBep20BNBBalance', { method: "post", params: {bep20Account},withCredentials: true, credentials: 'same-origin' })
@@ -121,6 +124,20 @@ const setClaimTokenStatus = (idoId) => axios(properties.restAPIHost + '/setClaim
 // ido Token claim 가능여부 확인
 const checkClaimToken = (idoId) => axios(properties.restAPIHost + '/checkClaimToken', { method: "get", params:{idoId:idoId}, withCredentials: true, credentials: 'same-origin' })
 
+
+//idoERC관련함수
+const getManagerIdoErcBalance = (iwTokenName) => axios(properties.restAPIHost + '/getManagerIdoErcBalance', {method: "get", params: {iwTokenName:iwTokenName}, withCredentials: true, credentials: 'same-origin'})
+const idoErcDepositSwap = (iwTokenName, eth, idoErc) => axios(properties.restAPIHost + '/idoErcDepositSwap', {method: "get", params: {iwTokenName:iwTokenName, eth:eth, idoErc:idoErc},  withCredentials: true, credentials: 'same-origin'})
+const updateIdoErcSwapFinished = (iwTokenName, swapErcToIrcNo) => axios(properties.restAPIHost + '/updateIdoErcSwapFinished', {method: "post", params: {iwTokenName:iwTokenName, swapErcToIrcNo:swapErcToIrcNo},  withCredentials: true, credentials: 'same-origin'})
+const issueIdoIrcToUser = ({swapErcToIrcNo, iwTokenName, ircAccount, ercTokenAmount}) => axiosSecure(properties.restAPIHost + '/issueIdoIrcToUser', {method: "post", params: {swapErcToIrcNo:swapErcToIrcNo, iwTokenName:iwTokenName, ircAccount:ircAccount, ercTokenAmount:ercTokenAmount}, withCredentials: true, credentials: 'same-origin'})
+
+ //idoErc-출금
+const idoErcWidthdrawSwap = (iwTokenName) => axios(properties.restAPIHost + '/idoErcWidthdrawSwap', {method: "get", params: {iwTokenName:iwTokenName},withCredentials: true, credentials: 'same-origin'})
+const sendUserIdoErcToExtAccountManual = (iwTokenName, withdrawSeq) => axios(properties.restAPIHost + '/sendUserIdoErcToExtAccountManual', {method: "post", params: {iwTokenName:iwTokenName, withdrawSeq:withdrawSeq}, withCredentials: true, credentials: 'same-origin'})
+const sendUserIdoErcToExtAccount = ({iwTokenName, withdrawSeq, receiverAddr, tokenAmount}) => axios(properties.restAPIHost + '/sendUserIdoErcToExtAccount', {method: "post", params: {iwTokenName:iwTokenName, withdrawSeq:withdrawSeq, receiverAddr:receiverAddr, tokenAmount:tokenAmount}, withCredentials: true, credentials: 'same-origin'})
+
+
+
 export default {
     ercDonDepositSwap,
     ercDonWidthdrawSwap,
@@ -135,6 +152,18 @@ export default {
     getIwEthErcBalance,
     getEthGasGwei,
     sendWeiWithGasPrice, donErcAccountWeiRetrieval,
+
+    //idoERC관련
+    getManagerIdoErcBalance,    //copy getManagerDonBalance
+    idoErcDepositSwap,          //copy ercDonDepositSwap
+    updateIdoErcSwapFinished,   //copy from updateErcSwapFinished
+    issueIdoIrcToUser,          //copy from issueIwIrcToUser
+
+    //idoErc-출금.
+    idoErcWidthdrawSwap,              //copy from ercDonWidthdrawSwap,
+    sendUserIdoErcToExtAccountManual, //copy from sendUserErcDonToExtAccountManual,
+    sendUserIdoErcToExtAccount,
+
 
     iwErcDepositSwap,
     getDonManagerIGas,
@@ -151,6 +180,9 @@ export default {
     iwErcAccountWeiRetrieval,
     issueIwIrcToUser,
     issueIwIrcToUserFinish,
+
+    getIdoManagerBalance,
+
     getBnbManagerAccount, getBnbManagerBalance, getBnbGasPrice,
     bnbDepositSwap,manualBnbDeposit,
     // bnbWithdrawSwap,

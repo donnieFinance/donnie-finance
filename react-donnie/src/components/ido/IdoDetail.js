@@ -131,7 +131,7 @@ const IdoDetail = withTranslation()(({t, history}) => {
                 <ProcessCircle circleLeft={25} active={applyWhiteListDurationStatus.rangeState !== 2} textTop={-20}><StyledButton bg={'primary'} fg={'white'} px={10} py={2} rounded={10} custom={`& a {color:white;}`}><A href={idoContract.surveyUrl} target={'_blank'}>Whitelist Survey</A></StyledButton></ProcessCircle>
                 <ProcessCircle circleLeft={50} active={applyWhiteListDurationStatus.rangeState === 1} textTop={24}>Whitelist Draw</ProcessCircle>
                 <ProcessCircle circleLeft={75} active={kycDurationStatus.rangeState === 1} textTop={-20}>KYC</ProcessCircle>
-                <ProcessCircle circleLeft={100} active={idoJoinDurationStatus === 1} textTop={24}>Join IDO</ProcessCircle>
+                <ProcessCircle circleLeft={100} active={idoJoinDurationStatus.rangeState === 1} textTop={24}>Join IDO</ProcessCircle>
             </>
         )
     }
@@ -192,7 +192,7 @@ const IdoDetail = withTranslation()(({t, history}) => {
         const resCheckDrawFinished = await checkDrawFinished(idoContract && idoContract.applyWhitelistContract);
         let vCheckDrawFinished = false;
         if(resCheckDrawFinished !== null){
-            console.log("resCheckDrawFinished===",resCheckDrawFinished)
+            //console.log("resCheckDrawFinished===",resCheckDrawFinished)
             vCheckDrawFinished = resCheckDrawFinished;
             setIsIdoCheckDrawFinished(resCheckDrawFinished);
         }
@@ -652,7 +652,7 @@ const IdoDetail = withTranslation()(({t, history}) => {
 
                                                 <Div mt={16}>
                                                     {
-                                                        (idoStatus.state > 0) &&
+                                                        (idoStatus.state >= 0) &&
                                                         <Flex mb={5}>
                                                             {
                                                                 applyWhiteListDurationStatus.rangeState === 2 ? <Badge color={'#000000'} />:<Badge status={applyWhiteListDurationStatus.rangeState === 1 ? "processing":'error'}/>
@@ -697,7 +697,7 @@ const IdoDetail = withTranslation()(({t, history}) => {
                                             <Div p={16} py={20}>
                                                 <Div>
                                                     {
-                                                        (idoStatus.state > 0) &&
+                                                        (idoStatus.state >= 0) &&
                                                         <Flex mb={5}>
                                                             {
                                                                 kycDurationStatus.rangeState === 2 ? <Badge color={'#000000'} />:<Badge status={kycDurationStatus.rangeState === 1 ? "processing":'error'}/>
@@ -773,7 +773,7 @@ const IdoDetail = withTranslation()(({t, history}) => {
                                                     {/*Allocation: <Span bold>{idoContract.minPay} ~ {idoContract.maxPay} {idoContract.payingToken} </Span><br/>*/}
 
                                                     {
-                                                        (idoStatus.state > 0) &&
+                                                        (idoStatus.state >= 0) &&
                                                         <Flex mb={5}>
                                                             {
                                                                 idoJoinDurationStatus.rangeState === 2 && <Badge color={'#000000'} />
@@ -806,24 +806,37 @@ const IdoDetail = withTranslation()(({t, history}) => {
                                                             }
                                                         />
                                                     </Skeleton>
-                                                    {(idoStatus.state == 2) &&
-                                                        <Div fontSize={12} mt={10} >
-                                                            {ComUtil.idoTokenName(idoContract.tokenName)} exchange :
-                                                            <Link to={'/exchange/swap'} >
-                                                                <u>Exchange menu Swap tab</u>
-                                                            </Link><br/>
-                                                            {ComUtil.idoTokenName(idoContract.tokenName)} transfer :
-                                                            <Link to={'/exchange/bridge'} >
-                                                                <u>Exchange menu Bridge tab</u>
-                                                            </Link>
+                                                    {
+                                                        (idoStatus.state == 2) &&
+                                                        <>
+                                                        <Div fontSize={12} mt={10}>
+                                                            <Span fg={'red'}>
+                                                                {
+                                                                    idoContract.tokenName && idoContract.tokenName.toUpperCase().includes('BNB') &&
+                                                                        <Span>Claimed Token on IOSTarter is “iwToken”.<br/> You must use Bridge for BEP20-BSC Token.</Span>
+                                                                }
+                                                                {
+                                                                    idoContract.tokenName && idoContract.tokenName.toUpperCase().includes('IW') &&
+                                                                        <Span>Claimed Token on IOSTarter is “iwToken”.<br/> You must use Bridge for ERC20 Token.</Span>
+                                                                }
+                                                            </Span>
                                                         </Div>
+                                                        <Div fontSize={12} mt={5}>
+                                                            <Space>
+                                                                <StyledButton style={{minWidth: 90}} bg={'primary'} fg={'white'} px={10} py={2}>
+                                                                    <Link to={'/exchange/swap'} >Swap</Link>
+                                                                </StyledButton>
+                                                                <StyledButton style={{minWidth: 90}} bg={'primary'} fg={'white'} px={10} py={2}>
+                                                                    <Link to={'/exchange/liquidity'} >Liquidity</Link>
+                                                                </StyledButton>
+                                                                <StyledButton style={{minWidth: 90}} bg={'primary'} fg={'white'} px={10} py={2}>
+                                                                    <Link to={'/exchange/bridge'} >Bridge</Link>
+                                                                </StyledButton>
+                                                            </Space>
+                                                        </Div>
+                                                        </>
                                                     }
                                                 </Div>
-                                                {/*<Div mt={10}>*/}
-                                                {/*    <Link to={'/exchange/bridge'} >*/}
-                                                {/*        <u>How to swap out?</u>*/}
-                                                {/*    </Link>*/}
-                                                {/*</Div>*/}
                                             </Div>
                                             <Hr />
                                             <Div p={16}>

@@ -3,8 +3,12 @@ import AdminRoutes from '~/router/AdminRoutes'
 import {Div, Flex, Link} from '~/styledComponents/shared'
 import {useHistory, Redirect} from 'react-router-dom'
 import {AiFillHome} from 'react-icons/ai'
+import {FcCurrencyExchange} from 'react-icons/fc'
 import {BsFillGridFill, BsFillPersonFill} from 'react-icons/bs'
-import {BiCoinStack} from 'react-icons/bi'
+import {RiCoupon3Line} from 'react-icons/ri'
+import {BiDollarCircle,BiCoinStack,BiHistory} from 'react-icons/bi'
+import {VscSymbolProperty} from 'react-icons/vsc'
+
 import { Layout, Menu, Button, Space } from 'antd'
 import styled from 'styled-components'
 import {color} from '~/styledComponents/Properties'
@@ -12,60 +16,115 @@ import {color} from '~/styledComponents/Properties'
 import {fakeAuth} from "~/router/PrivateRoute";
 import {adminState} from "~/hooks/atomState";
 import {useRecoilState} from 'recoil'
+import properties from "~/properties";
 
 // import AdminToProviderLinkButton from '~/components/common/buttons/AdminToProviderLoginButton'
 
 const store = [
-    // {
-    //     key: 'submenu1',
-    //     icon: <AiFillHome/>,
-    //     name: '비디오관리',
-    //     children: [
-    //         {to: '/admin', name:'Home'}
-    //     ]
-    // },
-    // {
-    //     key: 'submenu2',
-    //     icon: <BsFillGridFill/>,
-    //     name: '메뉴관리',
-    //     children: [
-    //         {to: '/admin/menu01', name:'menu01'},
-    //         {to: '/admin/menu02', name:'menu02'},
-    //         {to: '/admin/menu03', name:'menu03'},
-    //     ]
-    // },
     {
-        key: 'submenu3',
-        icon: <BsFillPersonFill/>,
-        name: '정보관리',
+        key: 'home',
+        icon: <AiFillHome/>,
+        menuLvl: 1,
+        isOpen:false,
         children: [
-            {to: '/admin/home', name:'대시보드'},
-            {to: '/admin/exchange', name:'Exchange'},
-            {to: '/admin/properties', name:'Properties'},
-            {to: '/admin/exContractHistory', name:'Ex히스토리'},
-            {to: '/admin/ido', name:'IDO관리'},
-            // {to: '/admin/ercDonDepositSwap', name:'DON토큰입금'},
-            // {to: '/admin/ercDonWithdrawSwap', name:'DON토큰출금'}, //사용하지 않음
-            // {to: '/admin/iwlinkDepositSwap', name:'iwlink토큰입금'},
-            // {to: '/admin/iwlinkWithdrawSwap', name:'iwlink토큰출금'},
-            // {to: '/admin/notice', name:'menu 3'},
-            // {to: '/admin/iwlinkDepositSwap', name:'iwlink토큰입금'},
-            // {to: '/admin/iwlinkWithdrawSwap', name:'iwlink토큰출금'},
+            {to: '/admin/home', name:'대시보드'}
         ]
     },
     {
+        key: 'exchange',
+        icon: <FcCurrencyExchange/>,
+        menuLvl: 1,
+        isOpen:false,
+        children: [
+            {to: '/admin/exchange', name:'Exchange현황'}
+        ]
+    },
+    {
+        key: 'properties',
+        icon: <VscSymbolProperty/>,
+        menuLvl: 1,
+        isOpen:false,
+        children: [
+            {to: '/admin/properties', name:'Properties'}
+        ]
+    },
+    {
+        key: 'exContractHistory',
+        icon: <BiHistory/>,
+        menuLvl: 1,
+        isOpen:false,
+        children: [
+            {to: '/admin/exContractHistory', name:'Ex히스토리'}
+        ]
+    },
+    {
+        key: 'ido',
+        icon: <BiDollarCircle/>,
+        menuLvl: 2,
+        name:'IDO관리',
+        isOpen:true,
+        children: [
+            {to: '/admin/ido', name:'IDO관리', icon: <RiCoupon3Line/>},
+            {
+                key: 'submenu_Witch',
+                icon: <img src={properties.tokenImages.witch} width={14} height={14}/>,
+                menuLvl: 2,
+                name: 'IDO Witch 토큰 관리',
+                children: [
+                    {to: '/admin/idoWitchDepositSwap', name:'witch토큰입금'},
+                    {to: '/admin/idoWitchWithdrawSwap', name:'witch토큰출금'}
+                ]
+            },
+        ]
+    },
+    // {
+    //     key: 'submenu3',
+    //     icon: <BsFillPersonFill/>,
+    //     menuLvl: 2,
+    //     name: '정보관리',
+    //     children: [
+    //         // {to: '/admin/ercDonDepositSwap', name:'DON토큰입금'},
+    //         // {to: '/admin/ercDonWithdrawSwap', name:'DON토큰출금'}, //사용하지 않음
+    //         // {to: '/admin/iwlinkDepositSwap', name:'iwlink토큰입금'},
+    //         // {to: '/admin/iwlinkWithdrawSwap', name:'iwlink토큰출금'},
+    //         // {to: '/admin/notice', name:'menu 3'},
+    //         // {to: '/admin/iwlinkDepositSwap', name:'iwlink토큰입금'},
+    //         // {to: '/admin/iwlinkWithdrawSwap', name:'iwlink토큰출금'},
+    //     ]
+    // },
+    {
         key: 'submenu_Don',
-        icon: <BiCoinStack/>,
+        //icon: <BiCoinStack/>,
+        icon: <img src={properties.tokenImages.don} width={14} height={14}/>,
+        menuLvl: 2,
         name: 'DON 토큰 관리',
+        isOpen:false,
         children: [
             {to: '/admin/ercDonDepositSwap', name:'DON토큰입금'},
             {to: '/admin/ercDonWithdrawSwap', name:'DON토큰출금'}
         ]
     },
+
+    // {
+    //     key: 'submenu_Witch',
+    //     //icon: <BiCoinStack/>,
+    //     icon: <img src={properties.tokenImages.witch} width={14} height={14}/>,
+    //     menuLvl: 2,
+    //     name: 'ido Witch토큰 관리',
+    //     children: [
+    //         {to: '/admin/idoWitchDepositSwap', name:'witch토큰입금'},
+    //         {to: '/admin/idoWitchWithdrawSwap', name:'witch토큰출금'}
+    //     ]
+    // },
+
+
     {
         key: 'submenu_iwBLY',
-        icon: <BiCoinStack/>,
+        //icon: <BiCoinStack/>,
+        icon: <img src={properties.tokenImages.bly} width={14} height={14}/>,
         name: 'iwBLY 토큰 관리',
+        menuLvl: 2,
+        isOpen:false,
         children: [
             {to: '/admin/iwblyDepositSwap', name:'iwBLY토큰입금'},
             {to: '/admin/iwblyWithdrawSwap', name:'iwBLY토큰출금'}
@@ -73,8 +132,11 @@ const store = [
     },
     {
         key: 'submenu_iwBTC',
-        icon: <BiCoinStack/>,
+        //icon: <BiCoinStack/>,
+        icon: <img src={properties.tokenImages.wbtc} width={14} height={14}/>,
         name: 'iwBTC 토큰 관리',
+        menuLvl: 2,
+        isOpen:false,
         children: [
             {to: '/admin/iwbtcDepositSwap', name:'iwBTC토큰입금'},
             {to: '/admin/iwbtcWithdrawSwap', name:'iwBTC토큰출금'}
@@ -82,8 +144,11 @@ const store = [
     },
     {
         key: 'submenu_BNB',
-        icon: <BiCoinStack/>,
+        //icon: <BiCoinStack/>,
+        icon: <img src={properties.tokenImages.bnb} width={14} height={14}/>,
         name: 'BNB 토큰 관리',
+        menuLvl: 2,
+        isOpen:false,
         children: [
             {to: '/admin/bnbDepositSwap', name:'BNB토큰입금'},
             {to: '/admin/bnbWithdrawSwap', name:'BNB토큰출금'}
@@ -135,7 +200,9 @@ const AdminTemplate = (props) => {
 
     const [to, setTo] = useState(pathname)      //initial value
     //const [openKeys, setOpenKeys] = useState([store[0].key, store[1].key, store[2].key])
-    const [openKeys, setOpenKeys] = useState([store[0].key, store[1].key, store[2].key, store[3].key, store[4].key])
+    const [openKeys, setOpenKeys] = useState([
+        store[4].key
+    ]);
 
     useEffect(() => {
         //pathname에 해당하는 메뉴 펼치기
@@ -205,7 +272,7 @@ const AdminTemplate = (props) => {
                             setTo(key)
                         }}
                         selectedKeys={[to]}
-
+                        inlineIndent={12}
                         openKeys={openKeys}
                         onOpenChange={(keys)=>{
                             //console.log(keys)
@@ -215,14 +282,50 @@ const AdminTemplate = (props) => {
                         style={{ height: '100%', borderRight: 0, fontSize:'small' }}
                     >
                         {
-                            store.map(({key, icon, name, children}, index) => (
-                                <SubMenu key={key} icon={icon} title={' ' + name}>
-                                    {
-                                        children.map(({to, name}) => <Menu.Item key={to} style={{fontSize:'small'}}><Link to={to}>{name}</Link></Menu.Item>)
-                                    }
-                                </SubMenu>
-                            ))
+                            store.map(({key, icon, name, menuLvl, children}, index) => {
 
+                                if (menuLvl === 1) {
+                                    return (
+                                        <>
+                                        {
+                                            children.map(({to, name}) =>
+                                                <Menu.Item key={to} icon={icon} style={{fontSize: 'small'}}>
+                                                    <Link to={to}>{name}</Link>
+                                                </Menu.Item>
+                                            )
+                                        }
+                                        </>
+                                    )
+                                }
+                                if (menuLvl === 2) {
+                                    return (
+                                        <SubMenu key={key} icon={icon} title={' ' + name}>
+                                            {
+                                                children.map((item2) => {
+                                                  if(item2.key){
+                                                      return (
+                                                          <SubMenu key={item2.key} icon={item2.icon} title={' ' + item2.name}>
+                                                              {
+                                                                  item2.children.map(({to, name}) =>
+                                                                      <Menu.Item key={to} style={{fontSize: 'small'}}>
+                                                                          <Link to={to}>{name}</Link>
+                                                                      </Menu.Item>
+                                                                  )
+                                                              }
+                                                          </SubMenu>
+                                                      )
+                                                  }else {
+                                                      return (
+                                                          <Menu.Item key={item2.to} icon={item2.icon||null} style={{fontSize: 'small'}}>
+                                                              <Link to={item2.to}>{item2.name}</Link>
+                                                          </Menu.Item>
+                                                      )
+                                                  }
+                                                })
+                                            }
+                                        </SubMenu>)
+                                }
+                            })
                         }
                     </Menu>
                 </SSider>

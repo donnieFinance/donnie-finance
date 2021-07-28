@@ -1,23 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Div, Flex, GridColumns, Img, Right, Span} from "~/styledComponents/shared";
-import {Input, Modal, Space} from "antd";
+import {Button, Div, Flex, Img, Right} from "~/styledComponents/shared";
+import {Input, Modal} from "antd";
 import { toChecksumAddress, isValidAddress } from 'ethereumjs-util';
-import {loadingState, bridgeWithdrawModalState, withdrawBNBModalState} from '~/hooks/atomState'
+import {loadingState, bridgeWithdrawModalState} from '~/hooks/atomState'
 import {useRecoilState} from "recoil";
 import useWallet from "~/hooks/useWallet";
-import {swapIrcToErc} from "~/lib/swapApi";
 import {useTranslation} from "react-i18next";
 import ComUtil from "~/util/ComUtil";
-import {BsBoxArrowInDown} from "react-icons/bs";
+import {BsBoxArrowInDown,BsArrowRightShort} from "react-icons/bs";
 import iostApi from "~/lib/iostApi";
-import styled from 'styled-components'
 import swapApi from "~/lib/swapApi";
+import styled from 'styled-components'
 import properties from "~/properties";
-import moment from 'moment-timezone'
-import {BsArrowRightShort} from 'react-icons/bs'
-import Loading from "~/components/common/loading";
 import BigNumber from "bignumber.js";
-import ImgBnb from "~/assets/coin_bnb_wine.svg";
 
 const StyledInputNumber = styled(Input)`
     & input {
@@ -38,9 +33,9 @@ const BridgeWithdrawContent = () => {
 
 
     const {t} = useTranslation()
-    const [birdgeWithdrawState, setBridgeWithdrawState] = useRecoilState(bridgeWithdrawModalState)
+    const [bridgeWithdrawState, setBridgeWithdrawState] = useRecoilState(bridgeWithdrawModalState)
 
-    const TOKEN = birdgeWithdrawState.tokenName && properties.exchange.bridgeTokenList.find((token)=>token.tokenName === birdgeWithdrawState.tokenName);
+    const TOKEN = bridgeWithdrawState.tokenName && properties.exchange.bridgeTokenList.find((token)=>token.tokenName === bridgeWithdrawState.tokenName);
 
     // IOST account
     const {address, hasIWallet, isLogin} = useWallet()
@@ -87,7 +82,7 @@ const BridgeWithdrawContent = () => {
                 setBalance(data);
 
                 // 해당 iwBNB 풀의 수수료없음
-                if(!TOKEN.ercTokenName === 'BNB') {
+                if(TOKEN.ercTokenName !== 'BNB') {
                     const {data: feeAmt} = await swapApi.getIwWithdrawFee(TOKEN.tokenName);
                     setCoinFee(feeAmt)
                 }
@@ -133,14 +128,14 @@ const BridgeWithdrawContent = () => {
                 window.$message.error(lang.withdrawAmountConfirmMsg);
                 return;
             }
-            if(!TOKEN.ercTokenName === 'BNB') {
+            if(TOKEN.ercTokenName !== 'BNB') {
                 if (withdrawAmount <= iwFee) {
                     window.$message.error(t(lang.withdrawAmountLimitConfirmMsg,{x:iwFee+" "+coinLabel}));
                     return;
                 }
             }
 
-            if(TOKEN.ercTokenName === 'BNB') {
+            if(TOKEN.tokenType === 'BEP20') {
                 // BNB BEP 주소 체크
                 if (!checkSumAccount(accountInfo)) {
                     alert(lang.receptionBepAddressConfirmMsg);
@@ -208,20 +203,34 @@ const BridgeWithdrawContent = () => {
                             onModalClose();
                         }
                     } else {
-                        const data = {
-                            iwTokenName: birdgeWithdrawState.tokenName.toLowerCase(),
-                            ircAccount: address
-                        }
-                        //iwTokenName, ircAccount
-                        let {data: result} = await swapApi.withdrawIwErc(data);
-                        if (result) {
-                            setLoadingStatus('success')
-                            alert(lang.withdrawRequestMsg);
-                            onModalClose();
-                        } else {
-                            setLoadingStatus('failed')
-                            alert(t('delayWithdraw'));
-                            onModalClose();
+                        if (TOKEN.isIdo) {
+                            //tokenName, ircAccount
+                            let {data: result} = await swapApi.idoErcWithdraw(bridgeWithdrawState.tokenName.toLowerCase(),address);
+                            if (result) {
+                                setLoadingStatus('success')
+                                alert(lang.withdrawRequestMsg);
+                                onModalClose();
+                            } else {
+                                setLoadingStatus('failed')
+                                alert(t('delayWithdraw'));
+                                onModalClose();
+                            }
+                        }else {
+                            const data = {
+                                iwTokenName: bridgeWithdrawState.tokenName.toLowerCase(),
+                                ircAccount: address
+                            }
+                            //iwTokenName, ircAccount
+                            let {data: result} = await swapApi.withdrawIwErc(data);
+                            if (result) {
+                                setLoadingStatus('success')
+                                alert(lang.withdrawRequestMsg);
+                                onModalClose();
+                            } else {
+                                setLoadingStatus('failed')
+                                alert(t('delayWithdraw'));
+                                onModalClose();
+                            }
                         }
                     }
                 }
@@ -254,7 +263,7 @@ const BridgeWithdrawContent = () => {
     }
 
     const onAccount = ({target}) => {
-        const {name, value} = target
+        const {value} = target
         setAccountInfo(value);
     }
 
@@ -303,17 +312,14 @@ const BridgeWithdrawContent = () => {
             </Flex>
 
             <Div p={16} my={20} shadow={'md'} bc={'light'}>
-                {
-                    TOKEN.ercTokenName === 'BNB' ?
-                        <Flex>
-                            <Img mr={2} width={20} src={ImgBnb} />
-                            <h3>
-                                {amtLabel}(BEP20-BSC)
-                            </h3>
-                        </Flex>
-                        :
-                        <h3>{amtLabel}(ERC)</h3>
-                }
+                <Flex>
+                    {
+                        TOKEN && TOKEN.ercTokenName && <Img mr={2} width={20} src={properties.tokenImages[TOKEN.ercTokenName.toLowerCase()]} />
+                    }
+                    <h3>
+                        {amtLabel}{TOKEN && TOKEN.tokenType ==='BEP20'?'('+TOKEN.tokenType+'-BSC)':"("+TOKEN.tokenType+")"}
+                    </h3>
+                </Flex>
                 <Div mt={10}>
                     <Flex mb={5} alignItems={'flex-end'}>
                         <Div>{lang.address}</Div>
@@ -321,8 +327,15 @@ const BridgeWithdrawContent = () => {
                             <Button bg={'primary'} fg={'white'} px={8} py={5} rounded={3} onClick={onPasteClick} fontSize={13}>{lang.paste}</Button>
                         </Right>
                     </Flex>
-                    <Input name={'bep20'} style={{fontSize:14.7}} placeholder={lang.receptionBepAddress} size={'large'} onChange={onAccount} value={accountInfo}/>
-                    <Div fg={'danger'} textAlign={'center'} mt={4} fontSize={12}>{lang.confirmMsgTitle}</Div>
+                    <Input style={{fontSize:14.7}} placeholder={TOKEN.ercTokenName === 'BNB' ?lang.receptionBepAddress:t(lang.receptionErcAddress,{x:TOKEN.ercTokenName+"(ERC20)"})} size={'large'} onChange={onAccount} value={accountInfo}/>
+                    <Div fg={'danger'} textAlign={'center'} mt={4} fontSize={12}>
+                        {
+                            TOKEN && TOKEN.ercTokenName === 'BNB' ?
+                                lang.confirmMsgTitle
+                                :
+                                t(lang.confirmMsgTitle,{x:TOKEN.ercTokenName+"(ERC20)"})
+                        }
+                    </Div>
                 </Div>
             </Div>
 
@@ -386,9 +399,9 @@ const BridgeWithdrawModal = () => {
                     <Flex mx={10}><BsArrowRightShort /></Flex>
                     <Flex pt={4}>
                         {
-                            TOKEN.ercTokenName === 'BNB' && <Img width={20} src={ImgBnb} />
+                            TOKEN.ercTokenName && <Img width={20} src={properties.tokenImages[TOKEN.ercTokenName.toLowerCase()]} />
                         }
-                        {`${TOKEN.ercTokenName}`}{TOKEN.ercTokenName === 'BNB' ? '(BEP20-BSC)':''}
+                        {`${TOKEN.ercTokenName}`}{TOKEN.tokenType === 'BEP20'? '('+TOKEN.tokenType+'-BSC)':'('+TOKEN.tokenType+')'}
                     </Flex>
                 </Flex>
             )

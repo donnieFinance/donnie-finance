@@ -1,7 +1,6 @@
-import React from 'react';
+import React, {useState}from 'react';
 import properties from "~/properties";
 import {Div, Button, Fixed} from "~/styledComponents/shared";
-
 const TestRemote = (props) => {
 
     const onCookieClearClick = () => {
@@ -11,8 +10,8 @@ const TestRemote = (props) => {
         localStorage.removeItem("updateTime")
     }
 
-    if (!properties.isDev)
-        return null
+    if (!properties.isDev || window.location.pathname.toString().includes("/admin")) return null
+
     return (
         <Fixed top={100} left={20} zIndex={999} p={10} bc={'dark'} bg={'rgba(255, 255, 255, 0.5)'} rounded={5}>
             <Div>
@@ -24,5 +23,4 @@ const TestRemote = (props) => {
         </Fixed>
     )
 };
-
 export default TestRemote;

@@ -5,7 +5,7 @@ import BigNumber from "bignumber.js";
 
 import properties from "~/properties";
 import {Div, Flex, Img, Right} from "~/styledComponents/shared";
-import { List, Card } from 'antd';
+import { List, Card, Spin } from 'antd';
 import ComUtil from "~/util/ComUtil";
 import useCoinInfo from "~/hooks/useCoinInfo";
 import useInterval from "~/hooks/useInterval";
@@ -20,7 +20,6 @@ const Home = (props) => {
     //useCoinInfo 내부에서 전역 변수인 useUsdPrice 값이 세팅 되면 coinInfo 정보를 가져오기 시작함
     useUsdPrice()
     const {coinInfo, refresh, loading} = useCoinInfo({delay:5000})
-
     const {totalUsd, totalHarvestedDonBalance, list: coins} = coinInfo
 
     return (
@@ -47,6 +46,7 @@ const Home = (props) => {
                         </Flex>
                     </Flex>
                 </Flex>
+                <Spin spinning={loading}>
                 <List
                     grid={{
                         gutter: 16,
@@ -75,6 +75,7 @@ const Home = (props) => {
                         </List.Item>
                     )}
                 />
+                </Spin>
             </Div>
         </Div>
     );

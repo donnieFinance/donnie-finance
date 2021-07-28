@@ -23,6 +23,7 @@ import {} from "~/hooks/atomState";
 import useWallet from "~/hooks/useWallet";
 import {useTranslation} from "react-i18next";
 import iostApi from "~/lib/iostApi";
+import priceApi from "~/lib/priceApi";
 import useSize from "~/hooks/useSize";
 import useInterval from "~/hooks/useInterval";
 import {BsQuestionCircle} from 'react-icons/bs'
@@ -104,6 +105,20 @@ const Swap = (props) => {
     })
 
     const [routeHusdAmountStr, setRouteHusdAmountStr] = useState("0.0")
+
+    //상단 current Price at Donnie Dex용: properties.exchange.tokenList만큰 가격 관리. (husd는 존재하지만 미사용)
+    const [dexCurrentPriceList ,setDexCurrentPriceList] = useState(
+        properties.exchange.tokenList.map( token => {
+                return '..'; //'loading..';
+            })
+    )
+
+    useEffect(() => {
+        priceApi.getAllDonnieDexPrice().then(({data}) => {
+            setDexCurrentPriceList(data)
+        })
+    }, [])
+
 
     //Calculate all footer values
     useEffect(() => {
@@ -800,7 +815,17 @@ const Swap = (props) => {
             })
         }
 
+        //백엔드에선 10초에 한번씩 DEX current가격 조회중. res.data = [price,price..]
+        priceApi.getAllDonnieDexPrice().then(({data}) => {
+            setDexCurrentPriceList(data)
+        })
+
+        //console.log(dexCurrentPriceList);
     }, [5000])
+
+
+
+
 
     // const getPriceImpactStep
 
@@ -832,6 +857,36 @@ const Swap = (props) => {
 
     return (
         <Div width={sizeValue(436, null, '95%')} minHeight={721}>
+
+            {/* Current price at Donnie Dex */}
+            <Div bg={'white'} minHeight={100} rounded={10} mb={30} >
+                <Div>
+                    <Div relative>
+                        <Heading
+                            desc='Current price at Donnie DEX'
+                        />
+                    </Div>
+                    <Hr bc={'light'}></Hr>
+
+                    {
+                        properties.exchange.tokenList.map( (token, idx) => {
+                            if (token.tokenName !== 'husd')
+                            return (
+                                <Flex mx={24} my={2}>
+                                    <img src={properties.tokenImages[token.tokenName]} height={16}/>
+                                    <Div ml={5} mt={4}> {ComUtil.getDisplayTokenName(token.tokenName)} </Div>
+
+                                    <Right>{dexCurrentPriceList[idx]}</Right>
+
+                                </Flex>
+                            )
+
+                        }
+                    )}
+
+                </Div>
+            </Div>
+
             <Div bg={'white'} minHeight={400} rounded={10} shadow={'lg'}>
                 {/* Card */}
                 <Div>

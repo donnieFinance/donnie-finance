@@ -22,6 +22,9 @@ export const withdrawIwErc = ({iwTokenName, ircAccount}) => axios(properties.res
 export const ercDonWithdraw = (ircAccount) => axios(properties.restAPIHost + '/swap/ercDonWithdraw', { method: "post", params:{ircAccount}, withCredentials: true, credentials: 'same-origin'})
 export const getErcDonWithdrawFee = () => axios(properties.restAPIHost + '/swap/getErcDonWithdrawFee', { method: "get", withCredentials: true, credentials: 'same-origin' })
 
+// idoErc 출금
+export const idoErcWithdraw = (tokenName, ircAccount) => axios(properties.restAPIHost + '/swap/idoErcWithdraw', { method: "post", params:{tokenName:tokenName, ircAccount:ircAccount}, withCredentials: true, credentials: 'same-origin'})
+
 //export const getNewSwapPassCode =(ircAccount) => axiosSecure(properties.restAPIHost + '/swap/getNewSwapPassCode', { method: "post", params:{ircAccount}, withCredentials: true, credentials: 'same-origin' })
 //export const isValidSwapPassCode = (ircAccount, passCode) => axiosSecure(properties.restAPIHost + '/swap/isValidSwapPassCode', { method: "get", params:{ircAccount, passCode}, withCredentials: true, credentials: 'same-origin' })
 
@@ -41,7 +44,7 @@ export default {
     getIwMinimumDeposit,
     getIwWithdrawFee,
 
-    ercDonWithdraw, //TODO
+    ercDonWithdraw,
     getErcDonWithdrawFee,
     // getNewSwapPassCode,
     // isValidSwapPassCode,
@@ -50,5 +53,6 @@ export default {
     allocateBnbSwapAccount,
     updateLastCheckDayBnbAccount,
     getBnbMinimumDeposit,
-    bnbWithdraw
+    bnbWithdraw,
+    idoErcWithdraw
 }

@@ -350,7 +350,7 @@ export const getLpTokenList = async () => {
     let list = []
     const swapPairsData = await getSwapPairs();
     const promises = swapPairsData.map(async (swapPairKey, i) => {
-
+        const sortNo = i + 1;
         const swapSymbol = swapPairKey.split('_');
         const symbol1 = swapSymbol[0];
         const symbol2 = swapSymbol[1];
@@ -368,6 +368,7 @@ export const getLpTokenList = async () => {
         console.log("allData==currentSupply=",currentSupply)
 
         list.push({
+            sortNo:sortNo,
             dpLpTokenName: dpLpTokenName,
             lpTokenName: lpTokenName,
             symbol1: symbol1,
@@ -378,7 +379,7 @@ export const getLpTokenList = async () => {
 
     });
     await Promise.all(promises);
-    ComUtil.sortByKey(list, 'dpLpTokenName')
+    ComUtil.sortNumber(list, 'sortNo',false)
     return list
 }
 
@@ -416,6 +417,8 @@ export const getMyLpTokenListInfo = async (address) => {
 
         const promises = swapPairsData.map(async (swapPairKey, i) => {
 
+            const sortNo = i + 1;
+
             const swapSymbol = swapPairKey.split('_');
             const symbol1 = swapSymbol[0];
             const symbol2 = swapSymbol[1];
@@ -448,6 +451,7 @@ export const getMyLpTokenListInfo = async (address) => {
                 listDataBalanceChk = listDataBalanceChk + 1;
             }
             list.push({
+                sortNo: sortNo,
                 dpLpTokenName: dpLpTokenName,
                 lpTokenName: lpTokenName,
                 symbol1: symbol1,
@@ -462,12 +466,13 @@ export const getMyLpTokenListInfo = async (address) => {
                 swapPairKey:swapPairKey,
                 currentSupply: currentSupply,
                 lpTokenBalanceRate: (myAllBalance / currentSupply) * 100,
-                myStakedBalance: myStakedBalance
+                myStakedBalance: myStakedBalance,
+                isDeposit: symbol1 === 'iwwitch' ? false:true
             });
 
         });
         await Promise.all(promises);
-        ComUtil.sortByKey(list, 'dpLpTokenName')
+        ComUtil.sortNumber(list, 'sortNo',false)
         return list;
     }else{
         return null
@@ -645,6 +650,7 @@ export const getSwapPairs = async () => {
             key_fields:[{key:"swapPairs"}],
             by_longest_chain:true});
         const arrJsonTokenNames = JSON.parse(res.data.datas[0]);
+        //console.log("arrJsonTokenNames",arrJsonTokenNames)
         // if(symbol1 && symbol2){
         //     return arrJsonTokenNames.filter((item)=>{
         //         if(item === (symbol1 + '_' + symbol2) || item === (symbol2 + '_' + symbol1)){
@@ -672,6 +678,28 @@ export const getAmountData = async (pairKey) => {
         // console.log("========getRewardRate:");
         // console.log(res);
         return JSON.parse(res.data.datas[0]);
+    }catch (err){
+        console.log(err.message)
+        return null
+    }
+}
+
+export const getLpTokenInfo = async (pairKey) => {
+    try{
+        const tokenPairKey = pairKey;
+        const res = await axios.post(properties.IOST_ADDR + "/getBatchContractStorage", {
+            id:EXCHANGE_CONTRACT_ID,
+            key_fields: [
+                {key: tokenPairKey, field:"lpTokenName"},
+                {key: tokenPairKey, field:"amountData"},
+            ],
+            by_longest_chain:true});
+        // console.log("========lpTokenName:");
+        // console.log(res);
+        const LpTokenName = res.data.datas[0];
+        const AmountData = JSON.parse(res.data.datas[1]);
+        const TokenCurrentSupply = await getTokenCurrentSupply(LpTokenName);
+        return {LpTokenName, AmountData, TokenCurrentSupply};
     }catch (err){
         console.log(err.message)
         return null
@@ -739,6 +767,7 @@ export default {
     exchangeAddLiquidity,
     exchangeWithdrawLiquidityWithLp,
 
+    getLpTokenInfo,
     getSwapPairs,
     getAmountData,
     getLpTokenName,

@@ -121,7 +121,8 @@ const KycSingleImageUploader = (props) => {
                 ref={refFile => setFile(refFile)}
                 onClick={onFileClick}
                 onChange={onImageChange}
-                accept='image/jpeg, image/png'
+                accept="image/*"
+                capture
             />
         </StyledItem>
     )

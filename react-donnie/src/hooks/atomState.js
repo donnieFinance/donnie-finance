@@ -280,6 +280,7 @@ export const liquidityInfo = atom({
     key: 'liquidityInfo',
     default: {
         totalCurrentSupply: 0,
+        totalCurrentPrice: 0,
         list: [],
         loading: true,
         timesOfCall: 0

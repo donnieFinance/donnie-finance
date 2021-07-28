@@ -1,20 +1,21 @@
 import React, {useState, useEffect} from 'react';
-import iostApi from "~/lib/iostApi";
+import iostApi, {getAmountData} from "~/lib/iostApi";
 import {useRecoilState} from "recoil";
-import {liquidityInfo} from "~/hooks/atomState";
+import {liquidityInfo, usdPriceState} from "~/hooks/atomState";
 import openApi from "~/lib/openApi";
+import ComUtil from "~/util/ComUtil";
+import BigNumber from "bignumber.js";
+import properties from "~/properties";
 
 //exchange 의 최상단 total 에서 사용 중
 const useLpInfo = ({delay = null}) => {
 
     const [lpInfo, setLpInfo] = useRecoilState(liquidityInfo)
 
-    // const [lpInfo, setLpInfo] = useState({
-    //     totalCurrentSupply: 0,
-    //     list: []
-    // })
-    // const [loading, setLoading] = useState(true)
     const [refreshInterval, setRefreshInterval] = useState(delay)
+
+    //1분마다 갱신되는 usdPrice
+    const [usdPrice] = useRecoilState(usdPriceState)
 
     const refresh = async () => {
 
@@ -26,54 +27,62 @@ const useLpInfo = ({delay = null}) => {
                 openApi.getIostContract()
             ])
 
-            console.log({result})
-
             let temp_pairsData = result[0]//swapPairsData;
 
             let totalCurrentSupply = 0;
-            const res = await temp_pairsData.map(async (item, idx) => {
+            let totalCurrentPrice = 0;
+            const res = await temp_pairsData.map(async (itemPairkey, idx) => {
+                return iostApi.getLpTokenInfo(itemPairkey).then(async(item)=>{
+                    const lpTokenName = item && item.LpTokenName || null;
+                    const amountItemData = item && item.AmountData || null;
+                    const currentSupply = item && item.TokenCurrentSupply || null;
 
-                // 해당 pair의 lpTokenName 가져오기
-                const lpTokenName = await iostApi.getLpTokenName(item);
-                // console.log({lpTokenName});
+                    const swapSymbol = itemPairkey.split('_');
+                    const symbol1 = swapSymbol[0];
+                    const symbol2 = swapSymbol[1];
 
-                // lpToken의 현재 발행량 가져오기
-                const currentSupply = await iostApi.getTokenCurrentSupply(lpTokenName);
-                // console.log({currentSupply});
+                    //symbol1 밸런스
+                    const symbol1Liquidity = new BigNumber(amountItemData && amountItemData[symbol1])
 
-                totalCurrentSupply += currentSupply
+                    //symbol2 밸런스
+                    const symbol2Liquidity = new BigNumber(amountItemData && amountItemData[symbol2])
 
-                return iostApi.getAmountData(item).then(async(res)=>{
-                    return {"idx":idx+1,"swapPairKey":item,"amountData":JSON.stringify(res), "lpTokenName":lpTokenName, "currentSupply":currentSupply};
+                    //symbol1 달러
+                    const symbol1LiquidityUsd = symbol1Liquidity.multipliedBy(usdPrice && usdPrice[symbol1] || properties.USD_PRICE[symbol1])
+                    //symbol2 달러
+                    const symbol2LiquidityUsd = symbol2Liquidity.multipliedBy(usdPrice && usdPrice[symbol2] || properties.USD_PRICE[symbol2])
+
+                    //평가 가치 (Estimated value)
+                    const totalLiquidity = parseFloat(symbol1LiquidityUsd.plus(symbol2LiquidityUsd).toFixed());
+
+                    return {"idx":idx+1,"swapPairKey":itemPairkey,"amountData":JSON.stringify(amountItemData), "lpTokenName":lpTokenName, "currentSupply":currentSupply, "currentPrice":totalLiquidity};
                 });
             });
             const dataResult = await Promise.all(res);
 
+            dataResult.map(dataItem => {
+                totalCurrentSupply += dataItem.currentSupply;
+                totalCurrentPrice += dataItem.currentPrice;
+            });
+
             const newLpInfo = {
                 totalCurrentSupply: totalCurrentSupply,
+                totalCurrentPrice: totalCurrentPrice,
                 timesOfCall: result[1].total,
                 list: dataResult,
                 loading: false
             }
 
-            console.log({newLpInfo})
+            //console.log({newLpInfo})
 
             setLpInfo(newLpInfo)
         }catch (err) {
 
         }
-
-
     }
 
     useEffect(() => {
         refresh()
-
-
-        // openApi.getIostContract(1,1).then(result => console.log({result}))
-
-        // axios.get(`https://www.iostabc.com/api/contract/ContractL3GFG4Wo5XmpUpoJ8LctTA3VFbwTi9x9AEWDKNzg1VR/actions?page=1&size=50`).then(result => console.log({result}))
-
     }, [])
 
     return {lpInfo, setRefreshInterval}

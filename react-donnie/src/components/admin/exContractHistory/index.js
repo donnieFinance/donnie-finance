@@ -187,7 +187,7 @@ const ExContractHistory = (props) => {
 
         console.log(groupData)
 
-        ComUtil.sortByKey(groupData, 'txCount')
+        ComUtil.sortNumber(groupData, 'txCount')
 
         setGroupData(groupData)
 

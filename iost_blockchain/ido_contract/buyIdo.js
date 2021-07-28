@@ -306,5 +306,13 @@ class Test_buyIdo {
         }
     }
 
+    withdrawPayToken(account) {
+        if (tx.publisher !== blockchain.contractOwner()){
+            throw new Error("tx.publisher is not contractOwner.");
+        }
+
+        let balance = blockchain.callWithAuth("token.iost", "balanceOf", [PAY_TOKEN, blockchain.contractName()]);
+        blockchain.callWithAuth("token.iost", "transfer", [PAY_TOKEN, blockchain.contractName(), account, new Float64(balance), ""]);
+    }
 }
 module.exports = Test_buyIdo;

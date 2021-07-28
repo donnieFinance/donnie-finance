@@ -26,7 +26,7 @@ import {color} from "~/styledComponents/Properties";
 const Item = loadable( () => import("~/components/checking/Item"));
 const LiquidityWithdraw = loadable( () => import("~/components/common/contents/LiquidityWithdraw"));
 
-const LiquidityItem = ({dataIdx, data, onLinkClick, onDepositLpTokenClick, onRemoveLiquidityClick, onClose, t, tExchange}) => {
+const LiquidityItem = ({dataIdx, data, isDeposit, onLinkClick, onDepositLpTokenClick, onRemoveLiquidityClick, onClose, t, tExchange}) => {
 
     const {sizeValue} = useSize()
 
@@ -218,19 +218,22 @@ const LiquidityItem = ({dataIdx, data, onLinkClick, onDepositLpTokenClick, onRem
 
                     <Flex justifyContent={'center'}>
 
-                        <Button
-                            // bc={'info'}
-                            px={10}
-                            bg={'donnie'}
-                            fg={'white'}
-                            rounded={5}
-                            onClick={onDepositLpTokenClick}
-                            //항상 [Lp Token 에치] 버튼이 보이도록 주석 처리함
-                            // disabled={data.lpTokenBalance > 0 ? false:true}
-                            mr={10}
-                        >
-                            {t('depositLpToken')}
-                        </Button>
+                        {
+                            isDeposit &&
+                                <Button
+                                    // bc={'info'}
+                                    px={10}
+                                    bg={'donnie'}
+                                    fg={'white'}
+                                    rounded={5}
+                                    onClick={onDepositLpTokenClick}
+                                    //항상 [Lp Token 에치] 버튼이 보이도록 주석 처리함
+                                    // disabled={data.lpTokenBalance > 0 ? false:true}
+                                    mr={10}
+                                >
+                                    {t('depositLpToken')}
+                                </Button>
+                        }
 
                         <Button
                             // bc={'info'}
@@ -430,6 +433,7 @@ const Liquidity = (props) => {
                                                                onClose={onWithDrawClose}
                                                                t={t}
                                                                tExchange={tExchange}
+                                                               isDeposit={myLpTokenItem.isDeposit}
                                                 />
                                             )
                                             :

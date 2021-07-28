@@ -406,11 +406,22 @@ export default class ComUtil {
         }
     }
 
-    static sortByKey (array, key) {
-        return array.sort(function (a, b) {
-            let x = a[key];
-            let y = b[key];
-            return ((x > y) ? -1 : ((x > y) ? 1 : 0));
+    /*******************************************************
+     array object 를 숫자키를 이용해 정렬하여 반환
+     @Param : array object, number(정렬 할 key), bool(desc 여부)
+     @Return :  rowData 자체를 바꿔서 다시 return. (return 없다고 봐도 됨)
+     *******************************************************/
+    static sortNumber = (rowData, key, isDesc) => {
+        return rowData.sort((a, b) => {
+            const aVal = a[key];
+            const bVal = b[key];
+
+            if (isDesc) {
+                return bVal - aVal;
+            }
+            else {
+                return aVal - bVal;
+            }
         })
     }
 
@@ -457,7 +468,7 @@ export default class ComUtil {
             if(tokenNm.toUpperCase() === 'BNB'){
                 return 'BEP20-BSC';
             }
-            return 'ERC';
+            return 'ERC20';
         }
     }
 

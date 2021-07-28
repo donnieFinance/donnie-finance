@@ -17,10 +17,15 @@ export const getCoinUsdPrice = (name) => axios(properties.restAPIHost + '/getCoi
 //전체 코인 usdPrice 조회
 export const getAllCoinUsdPrice = () => axios(properties.restAPIHost + '/getAllCoinUsdPrice', { method: "get", withCredentials: true, credentials: 'same-origin' })
 
+//exchange/swap 즉 DEX용 코인들 donnie current price 조회.
+export const getAllDonnieDexPrice = () => axios(properties.restAPIHost + '/getAllDonnieDexPrice', { method: "get", withCredentials: true, credentials: 'same-origin' })
+
+
 export default {
     getCmcUsd,
     //getIostUsd,
     //getDonUsd,
     getCoinUsdPrice,
-    getAllCoinUsdPrice
+    getAllCoinUsdPrice,
+    getAllDonnieDexPrice
 }

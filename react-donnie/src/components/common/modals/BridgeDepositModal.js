@@ -9,7 +9,7 @@ import {
     getBnbMinimumDeposit,
     allocateBnbSwapAccount,
     updateLastCheckDayBnbAccount,
-    updateLastCheckDayErcAccount,
+    updateIwLastCheckDayErcAccount,
     getIwMinimumDeposit,
     getIwSwapErcAccount
 } from "~/lib/swapApi";
@@ -44,7 +44,7 @@ const DepositModalContent = () => {
 
     const getAccount = async() => {
         if(TOKEN){
-
+            //aa
             const minCoin = TOKEN.ercTokenName;
 
             if(TOKEN.ercTokenName === 'BNB') {
@@ -56,10 +56,11 @@ const DepositModalContent = () => {
                 // 최소 입금 수량
                 const {data:minAmt} = await getBnbMinimumDeposit();
                 setXMin(minAmt+' '+minCoin);
-            }else{
+            }
+            else{
                 const {data:ercAccount} = await getIwSwapErcAccount(address,TOKEN.tokenName);
                 setAddressInfo(ercAccount);
-                updateLastCheckDayErcAccount(address, ercAccount);
+                updateIwLastCheckDayErcAccount(address, ercAccount, TOKEN.tokenName.toLowerCase());
 
                 // 최소 입금 수량
                 const {data:minAmt} = await getIwMinimumDeposit(TOKEN.tokenName);
@@ -78,7 +79,8 @@ const DepositModalContent = () => {
 
     if(
         (TOKEN.ercTokenName && TOKEN.ercTokenName.toUpperCase() === 'BNB' && !addressConfirm) ||
-        (TOKEN.ercTokenName && TOKEN.ercTokenName.toUpperCase() === 'WBTC' && !addressConfirm)
+        (TOKEN.ercTokenName && TOKEN.ercTokenName.toUpperCase() === 'WBTC' && !addressConfirm) ||
+        (TOKEN.ercTokenName && TOKEN.ercTokenName.toUpperCase() === 'WITCH' && !addressConfirm)
     ){
         return (
             <Div minWidth={260}>
@@ -86,21 +88,22 @@ const DepositModalContent = () => {
                     <Div p={16} shadow={'md'} bc={'light'}>
                         <Flex justifyContent={'center'} mb={10}>
                             {
-                                TOKEN.ercTokenName.toUpperCase() === 'BNB' && <Img width={60} src={ImgBnb}/>
-                            }
-                            {
-                                TOKEN.ercTokenName.toUpperCase() === 'WBTC' && <Img width={60} src={ImgWbtc}/>
+                                TOKEN && TOKEN.ercTokenName && <Img width={60} src={properties.tokenImages[TOKEN.ercTokenName.toLowerCase()]}/>
                             }
                         </Flex>
                         <Div textAlign={'center'} fg={'danger'}>
-                            {TOKEN.ercTokenName.toUpperCase() === 'BNB' && tDepositLang.confirmMsgTitle3}
-                            {TOKEN.ercTokenName.toUpperCase() === 'WBTC' && t(tDepositLang.confirmMsgTitle3, {x:TOKEN.ercTokenName+'(ERC)'})}
+                            {
+                                TOKEN && TOKEN.ercTokenName && TOKEN.ercTokenName.toUpperCase() === 'BNB' ?
+                                    tDepositLang.confirmMsgTitle3
+                                    :
+                                    t(tDepositLang.confirmMsgTitle3, {x:TOKEN.ercTokenName+'(ERC20)'})
+                            }
                         </Div>
                         {
                             TOKEN.ercTokenName.toUpperCase() === 'WBTC' &&
-                            <Div textAlign={'center'} fg={'danger'} bold>
-                                WBTC = Wrapped Bitcoin
-                            </Div>
+                                <Div textAlign={'center'} fg={'danger'} bold>
+                                    WBTC = Wrapped Bitcoin
+                                </Div>
                         }
                         <Flex justifyContent='center' my={20} fontSize={16}>
                             <Button mr={10} bg={'primary'} fg={'white'} rounded={3} px={10} py={5} onClick={() => onModalClose()}>
@@ -187,7 +190,7 @@ const BridgeDepositModal = () => {
         return(
             <Flex>
                 {
-                    TOKEN && TOKEN.ercTokenName.toUpperCase() === 'BNB' && <Img width={20} src={ImgBnb} />
+                    TOKEN && TOKEN.ercTokenName && <Img width={20} src={properties.tokenImages[TOKEN.ercTokenName.toLowerCase()]} />
                 }
                 <Flex pt={4}>
                     {TOKEN.ercTokenName}{TOKEN.ercTokenName.toUpperCase() === 'BNB' ? '(BEP20-BSC)':'(ERC20)'}

@@ -7,7 +7,7 @@ import AdminApi from '~/lib/adminApi'
 import FilterContainer from "~/components/common/gridFilter/FilterContainer";
 import InputFilter from "~/components/common/gridFilter/InputFilter";
 import CheckboxFilter from "~/components/common/gridFilter/CheckboxFilter";
-import {Button, Select, Radio} from "antd";
+import {Button, Select, Radio, Spin} from "antd";
 import styled from "styled-components";
 import {color} from "~/styledComponents/Properties";
 import {getValue} from "~/styledComponents/Util";
@@ -114,6 +114,8 @@ const IdoWhiteListContent = (props) => {
                 cellRenderer: "claimRenderer"
             },
         ],
+        overlayLoadingTemplate: '<span class="ag-overlay-loading-center">...로딩중입니다...</span>',
+        overlayNoRowsTemplate: '<span class="ag-overlay-loading-center">조회된 내역이 없습니다</span>',
         frameworkComponents: {
             kYCLevelRenderer:kYCLevelRenderer,
             kYCNotCountryRenderer:kYCNotCountryRenderer,
@@ -447,15 +449,17 @@ const IdoWhiteListContent = (props) => {
                 </Div>
             </SearchBox>
             <Div my={10} pb={10} pl={10} pr={10}>
-                <Div className="ag-theme-balham" height={600}>
-                    <AgGridReact
-                        gridOptions={gridOptions}
-                        rowData={dataList}
-                        onCellDoubleClicked={copy}
-                        onSelectionChanged={onSelectionChanged}
-                    >
-                    </AgGridReact>
-                </Div>
+                <Spin spinning={loading}>
+                    <Div className="ag-theme-balham" height={550}>
+                        <AgGridReact
+                            gridOptions={gridOptions}
+                            rowData={dataList}
+                            onCellDoubleClicked={copy}
+                            onSelectionChanged={onSelectionChanged}
+                        >
+                        </AgGridReact>
+                    </Div>
+                </Spin>
             </Div>
         </div>
     )

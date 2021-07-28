@@ -13,6 +13,11 @@ const IDO = loadable(() => import('~/components/admin/ido'));
 const ErcDonDepositSwap = loadable(() => import('~/components/admin/ercDonDepositSwap'));
 const ErcDonWithdrawSwap = loadable(() => import('~/components/admin/ercDonWithdrawSwap'));
 
+//idoErc추가 ///////////////////////
+const IdoErcDepositSwap = loadable(() => import('~/components/admin/idoErcDepositSwap'));
+const IdoErcWithdrawSwap = loadable(() => import('~/components/admin/idoErcWithdrawSwap'));
+
+
 const IwDepositSwap = loadable(() => import('~/components/admin/iwDepositSwap'));
 const IwWithdrawSwap = loadable(() => import('~/components/admin/iwWithdrawSwap'));
 
@@ -42,6 +47,11 @@ const iwStore = {
     //     ercTokenName: 'LINK'
     // }
 }
+
+//idoErc 추가
+const IdoWitchDepositSwap = (props) => <IdoErcDepositSwap {...props}/>
+const IdoWitchWithdrawSwap = (props) => <IdoErcWithdrawSwap {...props}/>
+
 
 //Wrapper 를 통해 새로운 객체로 인식해서 didMount 를 일으켜 주기 위함
 const IwBlyDepositSwap = (props) => <IwDepositSwap {...props}/>
@@ -81,6 +91,16 @@ export default () => {
             <PrivateRoute exact path="/admin/ercDonWithdrawSwap" type={'admin'}>
                 <ErcDonWithdrawSwap />
             </PrivateRoute>
+
+
+            {/*   ido witch Token  */}
+            <PrivateRoute exact path="/admin/idoWitchDepositSwap" type={'admin'}>
+                <IdoWitchDepositSwap iwTokenName={'iwwitch'} ercTokenName={'WITCH'}/>
+            </PrivateRoute>
+            <PrivateRoute exact path="/admin/idoWitchWithdrawSwap" type={'admin'}>
+                <IdoWitchWithdrawSwap iwTokenName={'iwwitch'} ercTokenName={'WITCH'}/>
+            </PrivateRoute>
+
 
             {/*    bly Token  */}
             <PrivateRoute exact path="/admin/iwblyDepositSwap" type={'admin'}>

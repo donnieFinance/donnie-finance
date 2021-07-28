@@ -66,6 +66,17 @@
             ],
             "amountLimit": [],
             "description": ""
+        },
+        {
+            "name": "withdrawPayToken",
+            "args": [
+                "string"
+            ],
+            "amountLimit": [{
+                "token": "*",
+                "val": "unlimited"
+            }],
+            "description": ""
         }
     ]
 }

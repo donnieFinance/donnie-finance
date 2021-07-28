@@ -23,6 +23,7 @@ import useIdoTicketBalance from "~/hooks/useIdoTicketBalance";
 import {FaTelegramPlane, FaTwitter, FaMediumM, FaLink} from 'react-icons/fa'
 import witch_project_banner from '~/assets/ido/witch_project_banner.jpg'
 import etherscan_icon from '~/assets/etherscan-logo.svg'
+import ComUtil from "~/util/ComUtil";
 const IdoTicketCard = loadable(() => import('~/components/common/layouts/IdoTicketCard'))
 const IdoCard = loadable(() => import('~/components/common/layouts/IdoCard'))
 
@@ -77,6 +78,8 @@ function ProcessLineMobile() {
     )
 }
 
+
+
 export default withTranslation()((props) => {
     const {t} = props;
 
@@ -96,6 +99,9 @@ export default withTranslation()((props) => {
     }
 
     const {idoTicketBalance, refetch} = useIdoTicketBalance()
+
+    //Group Project 우측: Closed or Sold Out 용도.
+    const Circle = ({bg}) => <Div bg={bg} width={6} height={6} rounded={'50%'} mr={10}></Div>
 
     return (
         <Div>
@@ -248,6 +254,21 @@ export default withTranslation()((props) => {
                                     <Div px={20} pt={30} pb={16}>
                                         <Flex fontSize={22} bold fg={'white'}>
                                             <Div>{group.title}</Div>
+
+                                            {group.closeStatus && ComUtil.isStarted(group.closeTime) &&(
+                                                <Flex ml={20} mr={20} bg={'white'} fg={'red'}
+                                                      minWidth={80}
+                                                      maxWidth={150}
+                                                      minHeight={21}
+                                                      fontSize={13}
+                                                      px={10} style={{borderTopLeftRadius:9, borderTopRightRadius:9, borderBottomLeftRadius:9, borderBottomRightRadius:9}}>
+
+                                                      <Circle bg={'red'} /> {group.closeStatus}
+
+                                                </Flex>
+                                            )}
+
+
                                             <Right custom={`
                                             & svg:hover {
                                                 color: ${color.white};

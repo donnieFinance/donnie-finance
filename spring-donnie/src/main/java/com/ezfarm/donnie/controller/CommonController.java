@@ -1,9 +1,11 @@
 package com.ezfarm.donnie.controller;
 
+import com.ezfarm.donnie.config.ComUtil;
 import com.ezfarm.donnie.config.SecureUtil;
 import com.ezfarm.donnie.config.SessionUtil;
 import com.ezfarm.donnie.dataclass.CSRTokenRes;
 import com.ezfarm.donnie.dataclass.ImageData;
+import com.ezfarm.donnie.service.IostService;
 import com.ezfarm.donnie.service.OpenApiService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,6 +34,9 @@ public class CommonController {
 
     @Autowired
     OpenApiService openApiService;
+
+    @Autowired
+    IostService iostService;
 
     @Autowired
     SessionUtil sessionUtil;
@@ -67,8 +72,11 @@ public class CommonController {
     }
 
     /////총 7개 coin + 3개 LP 관리 중.//////////////
-    public static List<String> ALL_COIN_NAME = Arrays.asList("don", "iost", "ppt", "husd", "iwbly", "iwbtc", "iwbnb", "donhusdlp", "iosthusdlp", "doniostlp", "bnbhusdlp");
+    public static List<String> ALL_COIN_NAME = Arrays.asList("don", "iost", "ppt", "husd", "iwbly", "iwbtc", "iwbnb", "iwwitch","donhusdlp", "iosthusdlp", "doniostlp", "bnbhusdlp", "witchhusdlp");
 
+
+    //Donnie_DEX_Price용. (husd는 미사용- 개수맞춤용으로 추가) //TODO  FRONT의 properties.exchange.tokenList  EXCHANGE_COIN_NAME 순서와 개수가 같아야 함.
+    public static List<String> EXCHANGE_COIN_NAME = Arrays.asList("don", "iost", "husd", "iwbnb", "iwwitch");
 
 
     /**
@@ -81,13 +89,15 @@ public class CommonController {
 
 
     //defaultValue:서버구동시 사용. front에선 properties.js/////////////////////////////
-    public static String DON_DEFAULT_PRICE = "0.473";
-    public static String IOST_DEFAULT_PRICE = "0.021";
+    public static String WITCH_DEFAULT_PRICE = "1.166"; //1.5$
+
+    public static String DON_DEFAULT_PRICE = "0.45";
+    public static String IOST_DEFAULT_PRICE = "0.023";
     public static String PPT_DEFAULT_RATIO = "6.2";
 
-    public static String BLY_DEFAULT_PRICE = "0.026";
-    public static String BTC_DEFAULT_PRICE = "34251";
-    public static String BNB_DEFAULT_PRICE = "329";
+    public static String BLY_DEFAULT_PRICE = "0.023";
+    public static String BTC_DEFAULT_PRICE = "39840";
+    public static String BNB_DEFAULT_PRICE = "314";
 
 
     ////코인 가격들 local 캐시 한번 더 함.//////////////////////////////////////////////////////////////////
@@ -184,6 +194,21 @@ public class CommonController {
         return openApiService.getBnbPriceReal();
     }
 
+    /////////witch ////////////////
+    public static boolean witchProcessing = false;
+    public static String prevWitchPrice = CommonController.WITCH_DEFAULT_PRICE;
+
+    //get작업중이면 prev리턴.
+    public synchronized String getWitchPrice() {
+
+        if (witchProcessing)  {
+            log.info("witchProcessing");
+            return prevWitchPrice; //default or prev is Better
+        }
+
+        //log.info("////////////getBlyPriceReal 호출 ///////////");
+        return openApiService.getWitchPriceReal();
+    }
 
 
     /**
@@ -208,7 +233,14 @@ public class CommonController {
 
 
         try{
-            if(name.equals("don")) {
+            if (name.equals("iwwitch")){
+
+                coinUsdPrice = this.getWitchPrice();
+                if (StringUtils.isEmpty(coinUsdPrice)) {
+                    coinUsdPrice = WITCH_DEFAULT_PRICE;
+                }
+
+            } else if(name.equals("don")) {
                 coinUsdPrice = this.getDonPrice();
                 if (StringUtils.isEmpty(coinUsdPrice)) {
                     coinUsdPrice = DON_DEFAULT_PRICE;
@@ -319,6 +351,20 @@ public class CommonController {
                     }
 
                     String lpPrice = openApiService.getDonIostPrice(pairKey, donPrice, iostPrice, name);
+                    //log.info("lpPrice:" + lpPrice + ", name:" + name);
+
+                    return lpPrice;
+                }
+                if(name.startsWith("witchhusd")) { //which liquidity 전용 (checking에선 안씀)
+
+                    String pairKey = "iwwitch_husd";
+                    String witchPrice = this.getWitchPrice();
+
+                    if (OpenApiService.lpLpInProcessing) { //caching 안되게 하려고 여기서 processing체크.
+                        return OpenApiService.lpLpPrev;
+                    }
+
+                    String lpPrice = openApiService.getWitchHusdPrice(pairKey, witchPrice, name);
                     //log.info("lpPrice:" + lpPrice + ", name:" + name);
 
                     return lpPrice;
@@ -441,6 +487,47 @@ public class CommonController {
             return rCSRTokenRes.getToken();
         }
         return null;
+    }
+
+
+    //Exchane swap메뉴용 DEX토큰들 가격 가져오기
+    @ResponseBody
+    @GetMapping(value = "/restapi/getAllDonnieDexPrice")
+    public List<String> getAllDonnieDexPrice() {
+
+        ArrayList<String> priceList = new ArrayList<>();
+
+        //전체 코인별 가격, 하나씩 조회해서 추가.
+        // "don": "0.5"
+        // "husd": "1.0"
+        //... 형태로 모두 추가.
+
+        for (String coinName : EXCHANGE_COIN_NAME) {
+
+            priceList.add(getDonnieDexPrice(coinName));
+        }
+
+        return priceList;
+    }
+
+
+    //token_husd pair상 가격 조회. amountData가 [100,100] 이면 1달러. [200,100] 이면 $0.500 리턴.
+    public String getDonnieDexPrice(String coinName) {
+        if (coinName.equals("husd")) {
+            return "...";//loading.."; //husd가격은 미사용.
+        }
+
+        try {
+            String[] amountData = iostService.getLpPairAmountData(coinName + "_husd");
+
+            double price3 = ComUtil.doubleDivide3(Double.valueOf(amountData[1]), Double.valueOf(amountData[0]));
+
+            log.info("getDonnieDexPrice:" + coinName + "," + price3);
+            return "$" + price3;
+
+        }catch (Exception e) {
+            return "...";//loading..";
+        }
     }
 
 }
