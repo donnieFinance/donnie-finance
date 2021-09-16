@@ -437,7 +437,7 @@ public class OpenApiService {
 
         String retPrice = null;
 
-        String resourceUrl = "https://www.mxc.co/open/api/v2/market/ticker?symbol=" + tokenSymbol
+        String resourceUrl = "https://www.mexc.com/open/api/v2/market/ticker?symbol=" + tokenSymbol
                 + "&api_key=mx0dpRZzb02ZTadGIj";
         try {
             ResponseEntity<String> response = restTemplate.exchange(resourceUrl, HttpMethod.GET, publicEntity, String.class);

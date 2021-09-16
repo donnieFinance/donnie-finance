@@ -136,6 +136,13 @@ const BridgeWithdrawContent = () => {
             }
 
             if(TOKEN.tokenType === 'BEP20') {
+
+                console.log('--////2--' + withdrawAmount)
+                if (withdrawAmount < 0.05) {
+                    alert('Minimum withdraw amount is 0.05');
+                    return;
+                }
+
                 // BNB BEP 주소 체크
                 if (!checkSumAccount(accountInfo)) {
                     alert(lang.receptionBepAddressConfirmMsg);

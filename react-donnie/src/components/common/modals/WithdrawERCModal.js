@@ -170,13 +170,13 @@ const WithdrawERCContent = () => {
                     setIsOpen(false);
                 }else {
                     setLoadingStatus('failed')
-                    alert(t('contactUs'));
+                    alert(t('delayWithdraw'));
                     setIsOpen(false);
                 }
             }catch (err){
                 console.slog(err)
                 setLoadingStatus('failed')
-                alert(t('contactUs'));
+                alert(t('delayWithdraw'));
             }
         }
     }

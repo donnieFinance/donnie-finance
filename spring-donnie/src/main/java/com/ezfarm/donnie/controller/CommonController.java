@@ -89,15 +89,15 @@ public class CommonController {
 
 
     //defaultValue:서버구동시 사용. front에선 properties.js/////////////////////////////
-    public static String WITCH_DEFAULT_PRICE = "1.166"; //1.5$
+    public static String WITCH_DEFAULT_PRICE = "1.301"; //1.5$
 
-    public static String DON_DEFAULT_PRICE = "0.45";
-    public static String IOST_DEFAULT_PRICE = "0.023";
+    public static String DON_DEFAULT_PRICE = "0.829";
+    public static String IOST_DEFAULT_PRICE = "0.075";
     public static String PPT_DEFAULT_RATIO = "6.2";
 
-    public static String BLY_DEFAULT_PRICE = "0.023";
-    public static String BTC_DEFAULT_PRICE = "39840";
-    public static String BNB_DEFAULT_PRICE = "314";
+    public static String BLY_DEFAULT_PRICE = "0.030";
+    public static String BTC_DEFAULT_PRICE = "48348";
+    public static String BNB_DEFAULT_PRICE = "432";
 
 
     ////코인 가격들 local 캐시 한번 더 함.//////////////////////////////////////////////////////////////////
@@ -522,7 +522,7 @@ public class CommonController {
 
             double price3 = ComUtil.doubleDivide3(Double.valueOf(amountData[1]), Double.valueOf(amountData[0]));
 
-            log.info("getDonnieDexPrice:" + coinName + "," + price3);
+            //log.info("getDonnieDexPrice:" + coinName + "," + price3);
             return "$" + price3;
 
         }catch (Exception e) {

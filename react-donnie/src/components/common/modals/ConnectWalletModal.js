@@ -129,7 +129,7 @@ const ModalContent = () => {
                 }
 
                 {
-                    tp.isConnected() &&
+                    (tp.isConnected() || properties.isTestMode) &&
                     <>
                         <Flex height={56} bg={'white'} px={15} shadow={'lg'} mb={20}>
                             <Flex>
@@ -171,7 +171,7 @@ const ModalContent = () => {
                                         fontSize={14}
                                         onClick={onDepositERCClick}
                                     >
-                                        DON Swap ERC to IRC
+                                        DON Swap from Coinone
                                     </Button>
                                     {/*<Button*/}
                                     {/*    bc={'primary'}*/}
@@ -180,7 +180,7 @@ const ModalContent = () => {
                                     {/*    fontSize={14}*/}
                                     {/*    onClick={onWithdrawERCClick}*/}
                                     {/*>*/}
-                                    {/*    DON Swap IRC to ERC*/}
+                                    {/*    DON Swap to Coinone*/}
                                     {/*</Button>*/}
 
                             </Div>

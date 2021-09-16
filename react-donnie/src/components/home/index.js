@@ -24,6 +24,7 @@ import imgPortfolio from '~/assets/fund_management.svg'
 import imgPortfolioWhite from '~/assets/fund_management_w.svg'
 import useSize from "~/hooks/useSize";
 import ComUtil from "~/util/ComUtil";
+import properties from "~/properties";
 
 const Web = loadable(() => import('./Web'))
 const Mobile = loadable(() => import('./Mobile'))
@@ -55,7 +56,7 @@ const store = [
         title: 'IOSTarter',
         desc: 'Join a IOSTarter,  built for cross-chain token offerings, which enables new projects to raise liquidity in a decentralized fair protocol.',
         fg: '#86BBD8',
-        isNew:true
+        isNew: (properties.isNewIdoExist)? true:false
     },
     {
         pathname: '/credit',

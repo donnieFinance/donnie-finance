@@ -127,6 +127,11 @@ const WithdrawBNBContent = () => {
                 return;
             }
 
+            console.log('--////--' + withdrawAmount)
+            if (withdrawAmount < 0.05) {
+                alert('Minimum withdraw amount is 0.05');
+                return;
+            }
             // if (withdrawAmount <= iwFee) {
             //     window.$message.error(t(lang.withdrawAmountLimitConfirmMsg,{x:iwFee+" "+coinLabel}));
             //     return;

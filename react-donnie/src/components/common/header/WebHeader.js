@@ -14,6 +14,7 @@ import SpinnerWrap from '~/components/common/spinnerWrap'
 import PopoverSelectLanguage from "~/components/common/header/PopoverSelectLanguage";
 import useScrollPosition from "~/hooks/useScrollPosition";
 import { useLocation, useRouteMatch } from 'react-router-dom';
+import properties from "~/properties";
 
 const CustomNavLink = ({to, fg, children, pathName, isActive}) =>
     <NavLink to={to} fg={fg} activeStyle={{color: color.white}} isActive={isActive}>
@@ -66,28 +67,39 @@ const WebHeader = (props) => {
                     </Tooltip>
                 </CustomNavLink>
             </Div>
-            <Div relative custom={`
-                &::after {
-                    content: "NEW";
-                    position: absolute;
-                    left: 80%;
-                    top: -16px;
-                    background: ${color.love};
-                    color: ${color.white};
-                    font-weight: 500;
-                    font-size: 10px;
-                    border-radius: 4px;
-                    padding: 0 5px;
-                    line-height: 16px;
-                    height: 15px;                
-            `}>
+            { (properties.isNewIdoExist) ? //new IDO 존재할때만 new출력.
+                <Div relative custom={`
+                        &::after {
+                            content: "NEW";
+                            position: absolute;
+                            left: 80%;
+                            top: -16px;
+                            background: ${color.love};
+                            color: ${color.white};
+                            font-weight: 500;
+                            font-size: 10px;
+                            border-radius: 4px;
+                            padding: 0 5px;
+                            line-height: 16px;
+                            height: 15px;                
+                    `}>
 
-                <CustomNavLink to={'/iostarter'} fg={fg}>
-                    <Tooltip title={ido.desc} placement="bottom">
-                        {ido.name}
-                    </Tooltip>
-                </CustomNavLink>
-            </Div>
+                    <CustomNavLink to={'/iostarter'} fg={fg}>
+                        <Tooltip title={ido.desc} placement="bottom">
+                            {ido.name}
+                        </Tooltip>
+                    </CustomNavLink>
+                </Div>
+                :
+                <Div>
+                    <CustomNavLink to={'/iostarter'} fg={fg}>
+                        <Tooltip title={ido.desc} placement="bottom">
+                             {ido.name}
+                        </Tooltip>
+                    </CustomNavLink>
+                </Div>
+            }
+
             <Div>
                 <CustomNavLink to={'/credit'} fg={fg}>
                     <Tooltip title={credit.desc} placement="bottom">

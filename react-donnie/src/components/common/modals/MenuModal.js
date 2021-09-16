@@ -8,6 +8,7 @@ import {GrClose} from 'react-icons/gr'
 import {color} from "~/styledComponents/Properties";
 import useWallet from "~/hooks/useWallet";
 import {useRouteMatch} from "react-router-dom";
+import properties from "~/properties";
 
 const themeColor = color.donnie
 
@@ -68,26 +69,35 @@ const MenuModal = ({t}) => {
                             {exchange.desc}
                         </Div>
                     </Div>
-                    <Div mb={12} relative custom={`
-                        &::after {
-                            content: "NEW";
-                            position: absolute;
-                            left: 30%;
-                            top: 4px;
-                            background: ${color.love};
-                            color: ${color.white};
-                            font-weight: 500;
-                            font-size: 10px;
-                            border-radius: 4px;
-                            padding: 0 5px;
-                            line-height: 16px;
-                            height: 15px;                
-                    `}>
-                        <CustomNavLink to={'/iostarter'} onClose={onClose} >{ido.name}</CustomNavLink>
-                        <Div fontSize={10} fg={'secondary'} lineHeight={15}>
-                            {ido.desc}
+                    { (properties.isNewIdoExist) ? //new IDO 존재할때만 new출력.
+                        <Div mb={12} relative custom={`
+                            &::after {
+                                content: "NEW";
+                                position: absolute;
+                                left: 30%;
+                                top: 4px;
+                                background: ${color.love};
+                                color: ${color.white};
+                                font-weight: 500;
+                                font-size: 10px;
+                                border-radius: 4px;
+                                padding: 0 5px;
+                                line-height: 16px;
+                                height: 15px;                
+                        `}>
+                            <CustomNavLink to={'/iostarter'} onClose={onClose} >{ido.name}</CustomNavLink>
+                            <Div fontSize={10} fg={'secondary'} lineHeight={15}>
+                                {ido.desc}
+                            </Div>
                         </Div>
-                    </Div>
+                        :
+                        <Div>
+                            <CustomNavLink to={'/iostarter'} onClose={onClose} >{ido.name}</CustomNavLink>
+                            <Div fontSize={10} fg={'secondary'} lineHeight={15}>
+                                {ido.desc}
+                            </Div>
+                        </Div>
+                    }
                     <Div mb={12}>
                         <CustomNavLink to={'/credit'} onClose={onClose} >{credit.name}</CustomNavLink>
                         <Div fontSize={10} fg={'secondary'} lineHeight={15}>
