@@ -71,12 +71,12 @@ public class CommonController {
         return priceMap;
     }
 
-    /////총 7개 coin + 3개 LP 관리 중.//////////////
-    public static List<String> ALL_COIN_NAME = Arrays.asList("don", "iost", "ppt", "husd", "iwbly", "iwbtc", "iwbnb", "iwwitch","donhusdlp", "iosthusdlp", "doniostlp", "bnbhusdlp", "witchhusdlp");
+    /////총 7개 coin + x개 LP 관리 중.//////////////
+    public static List<String> ALL_COIN_NAME = Arrays.asList("don", "iost", "ppt", "husd", "iwbly", "iwbtc", "iwbnb", "iwwitch","donhusdlp", "iosthusdlp", "doniostlp", "bnbhusdlp", "witchhusdlp", "zunahusdlp");
 
 
     //Donnie_DEX_Price용. (husd는 미사용- 개수맞춤용으로 추가) //TODO  FRONT의 properties.exchange.tokenList  EXCHANGE_COIN_NAME 순서와 개수가 같아야 함.
-    public static List<String> EXCHANGE_COIN_NAME = Arrays.asList("don", "iost", "husd", "iwbnb", "iwwitch");
+    public static List<String> EXCHANGE_COIN_NAME = Arrays.asList("don", "iost", "husd", "iwbnb", "iwwitch", "zuna");
 
 
     /**
@@ -89,16 +89,18 @@ public class CommonController {
 
 
     //defaultValue:서버구동시 사용. front에선 properties.js/////////////////////////////
-    public static String WITCH_DEFAULT_PRICE = "1.095"; //1.5$
 
-    public static String DON_DEFAULT_PRICE = "0.797";
-    public static String IOST_DEFAULT_PRICE = "0.051";
+    public static String DON_DEFAULT_PRICE = "0.328";
+    public static String IOST_DEFAULT_PRICE = "0.029";
+    public static String BLY_DEFAULT_PRICE = "0.022";
+    public static String BTC_DEFAULT_PRICE = "42855";
+    public static String BNB_DEFAULT_PRICE = "428";
+
+    public static String WITCH_DEFAULT_PRICE = "0.415";
+    public static String ZUNA_DEFAULT_PRICE = "0.13";
+
+
     public static String PPT_DEFAULT_RATIO = "6.2";
-
-    public static String BLY_DEFAULT_PRICE = "0.030";
-    public static String BTC_DEFAULT_PRICE = "62299";
-    public static String BNB_DEFAULT_PRICE = "470";
-
 
     ////코인 가격들 local 캐시 한번 더 함.//////////////////////////////////////////////////////////////////
 
@@ -210,6 +212,21 @@ public class CommonController {
         return openApiService.getWitchPriceReal();
     }
 
+    /////////zuna ////////////////
+    public static boolean zunaProcessing = false;
+    public static String prevZunaPrice = CommonController.ZUNA_DEFAULT_PRICE;
+
+    //get작업중이면 prev리턴.
+    public synchronized String getZunaPrice() {
+
+        if (zunaProcessing)  {
+            log.info("zunaProcessing");
+            return prevZunaPrice; //default or prev is Better
+        }
+
+        //log.info("////////////getBlyPriceReal 호출 ///////////");
+        return openApiService.getZunaPriceReal();
+    }
 
     /**
      * 공용 코인명으로 캐시된 코인원에서 USD로 가져오기. (USD는 별도 table로 환율관리)
@@ -238,6 +255,12 @@ public class CommonController {
                 coinUsdPrice = this.getWitchPrice();
                 if (StringUtils.isEmpty(coinUsdPrice)) {
                     coinUsdPrice = WITCH_DEFAULT_PRICE;
+                }
+
+            } else if(name.equals("zuna")) {
+                coinUsdPrice = this.getZunaPrice();
+                if (StringUtils.isEmpty(coinUsdPrice)) {
+                    coinUsdPrice = ZUNA_DEFAULT_PRICE;
                 }
 
             } else if(name.equals("don")) {
@@ -293,6 +316,23 @@ public class CommonController {
                 if (sessionUtil.isStage()) { //stage는 로그만 찍음
                     name = name.replaceAll("lp$", "tt");
                     //log.info("stage - lptoken name:" + name);
+                }
+
+                if(name.startsWith("zunahusd")) {
+
+                    String pairKey = "zuna_husd";
+                    String zunaPrice = this.getZunaPrice();
+
+                    if (Boolean.TRUE == OpenApiService.lpHusdInProcessing.get(pairKey)) { //caching 안되게 하려고 여기서 processing체크.
+                        return OpenApiService.lpHusdPrev.containsKey(pairKey)? OpenApiService.lpHusdPrev.get(pairKey) : "1.0";
+                    }
+
+                    //lp AmountData(don:100, husd:300), supply 600개이면
+                    //donAD * donPrice + husdAD / 600 공식.
+                    String lpPrice =  openApiService.getZunaHusdPrice(pairKey, zunaPrice, name);
+                    //log.info("lpPrice:" + lpPrice + ", name:" + name);
+
+                    return lpPrice;
                 }
 
                 if(name.startsWith("donhusd")) {

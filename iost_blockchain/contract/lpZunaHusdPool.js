@@ -1,12 +1,10 @@
 
 const DON_TOKEN = 'don';
 const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
+const STAKE_TOKEN = 'zunahusdlp';
 
-const STAKE_TOKEN = 'iwbtc';
-const STAKE_TOKEN_ADDRESS = 'ContractBWgi917ZzJM8fR4pHtcAS7gdy9uRRcGmajWLyEYh9NUR';
-
-const START_TIME = 1644278400;      // 20220208:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:
-const DURATION = 24 * 3600 * 56;    // 56일, in Seconds
+const START_TIME = 1644278400;      // 20220208:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:ContractHzLZDad63bGyRG4gAJrcaAU8tmdrYKEAMPeQywgp7hyG
+const DURATION = 24 * 3600 * 70;    // 8주=56일, 4주-1일=27일, in Seconds //todo 27->70일
 // const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;
 const TO_FIXED = 4;   //소수점 4자리까지 저장.
@@ -26,7 +24,7 @@ const USER_RPTP_MAPKEY = "userrptp";     // rptp=rewardPerTokenPaid
 const USER_REWARD_MAPKEY = "userreward"; // Unclaimed rewards
 
 
-class IwDonBtcPool {
+class LpZunaHusdPool {
     init() {
         storage.put(TOTAL_SUPPLY_KEY, "0");
         storage.put(OPEN_KEY, "true");
@@ -196,8 +194,7 @@ class IwDonBtcPool {
         balance = balance.plus(amount);
         storage.mapPut(USER_BALANCE_MAPKEY, tx.publisher, balance.toString());
 
-        //blockchain.callWithAuth("token.iost", "transfer", [STAKE_TOKEN, tx.publisher, blockchain.contractName(), amount, "stake"]);
-        blockchain.callWithAuth(STAKE_TOKEN_ADDRESS, "transfer", [STAKE_TOKEN,  tx.publisher, blockchain.contractName(), amount, "stake"]);
+        blockchain.callWithAuth("token.iost", "transfer", [STAKE_TOKEN, tx.publisher, blockchain.contractName(), amount, "stake"]);
     }
 
     //return void.
@@ -229,8 +226,7 @@ class IwDonBtcPool {
         totalSupply = totalSupply.minus(amount);
         storage.put(TOTAL_SUPPLY_KEY, totalSupply.toString());
 
-        //blockchain.callWithAuth("token.iost", "transfer", [STAKE_TOKEN, blockchain.contractName(), tx.publisher, amount, "withdraw"]);
-        blockchain.callWithAuth(STAKE_TOKEN_ADDRESS, "transfer", [STAKE_TOKEN, blockchain.contractName(), tx.publisher, amount, "withdraw"]);
+        blockchain.callWithAuth("token.iost", "transfer", [STAKE_TOKEN, blockchain.contractName(), tx.publisher, amount, "withdraw"]);
     }
 
     //return void
@@ -375,6 +371,5 @@ class IwDonBtcPool {
             throw new Error("addRewardAmount Authority Error:" + tx.publisher + ",isopen:" + isOpen );
         }
     }
-
 }
-module.exports = IwDonBtcPool;
+module.exports = LpZunaHusdPool;

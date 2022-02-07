@@ -22,11 +22,16 @@ import {BiChevronDown, BiChevronUp} from 'react-icons/bi'
 import useModal from "~/hooks/useModal";
 import styled from 'styled-components'
 import {color} from "~/styledComponents/Properties";
+import useUsdPrice from "~/hooks/useUsdPrice";
 
 const Item = loadable( () => import("~/components/checking/Item"));
 const LiquidityWithdraw = loadable( () => import("~/components/common/contents/LiquidityWithdraw"));
 
 const LiquidityItem = ({dataIdx, data, isDeposit, onLinkClick, onDepositLpTokenClick, onRemoveLiquidityClick, onClose, t, tExchange}) => {
+
+
+    useUsdPrice(); //20210923 추가. (total Liquidity 금액오류 해결)  swap.js에는 없어도 되는지 확인필요.
+
 
     const {sizeValue} = useSize()
 

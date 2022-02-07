@@ -60,7 +60,7 @@ const TotalHarvestedDon = (props) => {
                     }
 
                 </Div>
-                <Div fontSize={sizeValue(17, null, 16)} lighter>+ 1,000,000 DON (airdrop)</Div>
+                <Div fontSize={sizeValue(17, null, 16)} lighter>+ 2,000,000 DON (airdrop + swap)</Div>
             </Div>
 
         </Box>

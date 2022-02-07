@@ -98,6 +98,33 @@ public class OpenApiService {
         //return null;
     }
 
+    @Cacheable(value="cache10min8", key="'zunaPrice'")
+    public String getZunaPriceReal() {
+        log.info("////////////getZunaPriceReal 호출 ///////////");
+
+        CommonController.zunaProcessing = true;
+
+        try {
+            //TODO : zuna가 상장이 안되어서, 그냥 donnie dex가격을 리턴중.  String newPrice = this.getMxcPrice("WITCH_USDT");
+
+            String[] amountData = iostService.getLpPairAmountData("zuna_husd");
+            double price3 = ComUtil.doubleDivide3(Double.valueOf(amountData[1]), Double.valueOf(amountData[0]));
+
+            String newPrice = String.valueOf(price3);
+
+            CommonController.prevZunaPrice = newPrice;
+            return newPrice;
+
+        } catch (Exception e){
+            log.error("getZunaReal" + e.toString());
+            return CommonController.prevZunaPrice;
+
+        } finally {
+            CommonController.zunaProcessing = false;
+        }
+        //return null;
+    }
+
     @Cacheable(value="cache10min9", key="'witchPrice'")
     public String getWitchPriceReal() {
         log.info("////////////getWichPriceReal 호출 ///////////");
@@ -239,6 +266,15 @@ public class OpenApiService {
 
 
     //////////LP토큰 가격 추정///////////////////////////////
+
+    @Cacheable(value="cache10min8", key="'zunahusdlp'")
+    public String getZunaHusdPrice(String pairKey, String price, String lpTokenName) {
+
+        String ret = getLpHusdPrice(pairKey,price,lpTokenName);
+        lpHusdPrev.put(pairKey, ret);
+
+        return ret;
+    }
 
     //donhusdlp price
     @Cacheable(value="cache10min3", key="'donhusdlp'")

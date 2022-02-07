@@ -516,6 +516,7 @@ export default class ComUtil {
 
     static getDPLpTokenName = (lpTokenName) => {
         const dpLpTokenName = lpTokenName.toString()
+            .replace(/zuna/g,'Zuna')
             .replace(/don/g,'Don').replace(/husd/g,'Husd').replace(/iost/g,'Iost').replace(/bnb/g,'Bnb').replace(/witch/g,'Witch')
             .replace(/lp$/g,'LP')  //production
             .replace(/tt$/g,'TT'); //stage
@@ -525,6 +526,9 @@ export default class ComUtil {
     //exchange image 세팅용도
     static getLpTokenNames = (lpTokenName) => {
         const dpLpTokenName = lpTokenName.toString();
+        if(dpLpTokenName.includes('zunahusd')){
+            return ['zuna','husd']
+        }
         if(dpLpTokenName.includes('donhusd')){
             return ['don','husd']
         }
