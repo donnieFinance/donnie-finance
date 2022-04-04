@@ -5,7 +5,7 @@ const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
 const STAKE_TOKEN = 'iwbtc';
 const STAKE_TOKEN_ADDRESS = 'ContractBWgi917ZzJM8fR4pHtcAS7gdy9uRRcGmajWLyEYh9NUR';
 
-const START_TIME = 1644278400;      // 20220208:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:
+const START_TIME = 1649116800;      // 20220405:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:
 const DURATION = 24 * 3600 * 56;    // 56일, in Seconds
 // const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;
