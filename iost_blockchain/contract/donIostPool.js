@@ -3,7 +3,7 @@ const DON_TOKEN = 'don';
 const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
 const STAKE_TOKEN = 'iost'; //IOST
 
-const START_TIME = 1649116800;      // 20220405:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:
+const START_TIME = 1653955200;      // 20220531:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:
 const DURATION = 24 * 3600 * 56;    // 28일, in Seconds
 // const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;

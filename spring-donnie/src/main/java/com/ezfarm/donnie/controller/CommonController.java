@@ -90,14 +90,14 @@ public class CommonController {
 
     //defaultValue:서버구동시 사용. front에선 properties.js/////////////////////////////
 
-    public static String DON_DEFAULT_PRICE = "0.252";
-    public static String IOST_DEFAULT_PRICE = "0.028";
-    public static String BLY_DEFAULT_PRICE = "0.021";
-    public static String BTC_DEFAULT_PRICE = "39797";
-    public static String BNB_DEFAULT_PRICE = "408";
+    public static String DON_DEFAULT_PRICE = "0.132";
+    public static String IOST_DEFAULT_PRICE = "0.017";
+    public static String BLY_DEFAULT_PRICE = "0.011";
+    public static String BTC_DEFAULT_PRICE = "30135";
+    public static String BNB_DEFAULT_PRICE = "315";
 
-    public static String WITCH_DEFAULT_PRICE = "0.438";
-    public static String ZUNA_DEFAULT_PRICE = "0.048";
+    public static String WITCH_DEFAULT_PRICE = "0.244";
+    public static String ZUNA_DEFAULT_PRICE = "0.029";
 
 
     public static String PPT_DEFAULT_RATIO = "6.2";
