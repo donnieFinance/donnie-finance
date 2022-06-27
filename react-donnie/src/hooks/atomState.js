@@ -218,6 +218,24 @@ export const withdrawBNBModalState = atom({
     }
 })
 
+export const depositAVAXModalState = atom({
+    key: 'depositAVAXModalState',
+    default: {
+        uniqueKey:'',
+        tokenName:'',
+        isOpen:false
+    }
+})
+// Withdraw iwBNB(IRC) to BNB(BEP) modal state
+export const withdrawAVAXModalState = atom({
+    key: 'withdrawAVAXModalState',
+    default: {
+        uniqueKey:'',
+        tokenName:'',
+        isOpen:false
+    }
+})
+
 /* ==== Wallet 정보 END ==== */
 
 

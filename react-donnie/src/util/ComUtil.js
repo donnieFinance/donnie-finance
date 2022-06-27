@@ -468,6 +468,9 @@ export default class ComUtil {
             if(tokenNm.toUpperCase() === 'BNB'){
                 return 'BEP20-BSC';
             }
+            if(tokenNm.toUpperCase() === 'AVAX'){
+                return 'C-CHAIN';
+            }
             return 'ERC20';
         }
     }

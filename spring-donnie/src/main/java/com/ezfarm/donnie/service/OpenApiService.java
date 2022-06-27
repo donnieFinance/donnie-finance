@@ -57,6 +57,7 @@ public class OpenApiService {
     private int CMC_DON_ID = 8814;
     private int CMC_BNB_ID = 1839;
     private int CMC_BTC_ID = 1;
+    private int CMC_AVAX_ID = 5805;
 
 //    private int CMD_ETH_ID = 1027;
 //    private int CMD_BLY_ID = 6283;
@@ -168,40 +169,40 @@ public class OpenApiService {
         //return null;
     }
 
-    @Cacheable(value="cache10min3", key="'pptPrice'")
-    public String getPPTRatioReal() {
-        CommonController.pptProcessing = true;
-
-        String retPrice = null;
-
-        String resourceUrl="https://otbtrade.com/api/getCurrentTx/ppt";
-        //log.info("getPPTPrice==");
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        //headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
-        headers.add("user-agent", "Application");
-        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(resourceUrl, HttpMethod.GET, entity, String.class);
-        //log.info("getPPTPrice=response2=",response);
-        //가격 파싱 추가////////
-        try {
-            JsonNode root = mapper.readTree(response.getBody());
-            double parsePrice = root.get("price").asDouble();
-            log.info("getPPTPrice:" + parsePrice);
-            retPrice = String.valueOf(parsePrice);
-
-            CommonController.prevPPTRatio = retPrice;
-            return retPrice;
-
-        } catch (Exception e) {
-            log.error("getPPTRatioReal:" + e.toString());
-            return CommonController.prevPPTRatio ; //20210322 add.
-        } finally {
-            CommonController.pptProcessing = false;
-        }
-        //return null;
-    }
+//    @Cacheable(value="cache10min3", key="'pptPrice'")
+//    public String getPPTRatioReal() {
+//        CommonController.pptProcessing = true;
+//
+//        String retPrice = null;
+//
+//        String resourceUrl="https://otbtrade.com/api/getCurrentTx/ppt";
+//        //log.info("getPPTPrice==");
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+//        //headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
+//        headers.add("user-agent", "Application");
+//        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+//        RestTemplate restTemplate = new RestTemplate();
+//        ResponseEntity<String> response = restTemplate.exchange(resourceUrl, HttpMethod.GET, entity, String.class);
+//        //log.info("getPPTPrice=response2=",response);
+//        //가격 파싱 추가////////
+//        try {
+//            JsonNode root = mapper.readTree(response.getBody());
+//            double parsePrice = root.get("price").asDouble();
+//            log.info("getPPTPrice:" + parsePrice);
+//            retPrice = String.valueOf(parsePrice);
+//
+//            CommonController.prevPPTRatio = retPrice;
+//            return retPrice;
+//
+//        } catch (Exception e) {
+//            log.error("getPPTRatioReal:" + e.toString());
+//            return CommonController.prevPPTRatio ; //20210322 add.
+//        } finally {
+//            CommonController.pptProcessing = false;
+//        }
+//        //return null;
+//    }
 
 
     @Cacheable(value="cache10min4", key="'blyPrice'")
@@ -260,6 +261,25 @@ public class OpenApiService {
             return CommonController.prevBnbPrice;
         } finally {
             CommonController.bnbProcessing = false; //3
+        }
+        //return null;
+    }
+    @Cacheable(value="cache10min3", key="'avaxPrice'")
+    public String getAvaxPriceReal() {
+        CommonController.avaxProcessing = true; //1
+        try {
+            String price = this.getCmcPrice(CMC_AVAX_ID);
+
+            log.info("getAvaxPriceReal Caching:" + price);
+
+            CommonController.prevAvaxPrice = price; //2
+            return price;
+
+        } catch (Exception e){
+            log.error("getAvaxPriceReal:" + e.toString());
+            return CommonController.prevAvaxPrice;
+        } finally {
+            CommonController.avaxProcessing = false; //3
         }
         //return null;
     }

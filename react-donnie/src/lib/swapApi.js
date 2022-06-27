@@ -34,6 +34,13 @@ export const updateLastCheckDayBnbAccount = (ircAccount, ercAccount) => axiosSec
 export const getBnbMinimumDeposit = () => axiosSecure(properties.restAPIHost + '/swap/getBnbMinimumDeposit', { method: "get", withCredentials: true, credentials: 'same-origin' })
 export const bnbWithdraw = (ircAccount) => axios(properties.restAPIHost + '/swap/bnbWithdraw', { method: "post", params:{ircAccount:ircAccount}, withCredentials: true, credentials: 'same-origin' })
 
+// avax입금계좌
+export const allocateAvaxSwapAccount = (ircAccount) => axiosSecure(properties.restAPIHost + '/swap/allocateAvaxSwapAccount', { method: "post", params:{ircAccount}, withCredentials: true, credentials: 'same-origin' })
+export const updateLastCheckDayAvaxAccount = (ircAccount, ercAccount) => axiosSecure(properties.restAPIHost + '/swap/updateLastCheckDayAvaxAccount' , { method: "post", params:{ircAccount, ercAccount}, withCredentials: true, credentials: 'same-origin' })
+export const getAvaxMinimumDeposit = () => axiosSecure(properties.restAPIHost + '/swap/getAvaxMinimumDeposit', { method: "get", withCredentials: true, credentials: 'same-origin' })
+export const avaxWithdraw = (ircAccount) => axios(properties.restAPIHost + '/swap/avaxWithdraw', { method: "post", params:{ircAccount:ircAccount}, withCredentials: true, credentials: 'same-origin' })
+
+
 export default {
     getSwapErcAccount,
     updateLastCheckDayErcAccount,
@@ -50,9 +57,15 @@ export default {
     // isValidSwapPassCode,
 
     withdrawIwErc,
+    idoErcWithdraw,
+
     allocateBnbSwapAccount,
     updateLastCheckDayBnbAccount,
     getBnbMinimumDeposit,
     bnbWithdraw,
-    idoErcWithdraw
+
+    allocateAvaxSwapAccount,
+    updateLastCheckDayAvaxAccount,
+    getAvaxMinimumDeposit,
+    avaxWithdraw,
 }

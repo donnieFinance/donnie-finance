@@ -23,19 +23,19 @@ const SearchBox = styled.div`
     }
 `;
 
-const BnbWithdrawSwap = () => {
+const AvaxWithdrawSwap = () => {
 
-    const iwTokenName = "iwbnb";
-    const bepTokenName = "BNB";
+    const iwTokenName = "iwavax";
+    const bepTokenName = "AVAX";
 
     const [gridApi, setGridApi] = useState(null);
 
     // 로딩 표시
-    const [bnbManagerLoading, setBnbManagerLoading] = useState(true);
+    const [managerLoading, setManagerLoading] = useState(true);
     const [loading, setLoading] = useState(true);
 
 
-    const [bnbManagerAccount, setBnbManagerAccount] = useState("");
+    const [managerAccount, setManagerAccount] = useState("");
     /*
     // [0] manager 실 보유: (고객예치금 제외)
     // [1] manager 보유금: (고객예치금 포함)
@@ -43,14 +43,14 @@ const BnbWithdrawSwap = () => {
     // [3] 고객 총입금
     // [4] 고객 총출금
     */
-    const [bnbManagerBalance, setBnbManagerBalance] = useState({
+    const [managerBalance, setManagerBalance] = useState({
         managerRealBalance:0,
         managerBalance:0,
         consumerBalance:0,
         consumerTotalDeposit:0,
         consumerTotalWithdraw:0
     });
-    const [bnbGasPrice, setBnbGasPrice] = useState(0);
+    const [gasPrice, setGasPrice] = useState(0);
 
     // 출금 리스트
     const [data, setData] = useState([]);
@@ -104,13 +104,13 @@ const BnbWithdrawSwap = () => {
                 headerName: "ERC출금(-fee)", field: "ercWithdrawAmount", width: 150
             },
             {
-                headerName: "BNB계정", field: "ercAccount", width: 150, cellRenderer: 'bepAccountRenderer'
+                headerName: "AVAX계정", field: "ercAccount", width: 150, cellRenderer: 'bepAccountRenderer'
             },
             {
                 headerName: "IRC Status", field: "status", width: 120, cellRenderer: 'ircStatusRenderer'
             },
             {
-                headerName: "BNB 전송시간", field: "ercRequestTime",
+                headerName: "AVAX 전송시간", field: "ercRequestTime",
                 width: 130,
                 cellStyle:ComUtil.getCellStyle({cellAlign: 'left'}),
                 valueGetter: function(params){
@@ -118,7 +118,7 @@ const BnbWithdrawSwap = () => {
                 }
             },
             {
-                headerName: "BNB 전송완료시간", field: "ercDoneTime",
+                headerName: "ERC 전송완료시간", field: "ercDoneTime",
                 width: 130,
                 cellStyle:ComUtil.getCellStyle({cellAlign: 'left'}),
                 valueGetter: function(params){
@@ -126,10 +126,10 @@ const BnbWithdrawSwap = () => {
                 }
             },
             {
-                headerName: "BNB txHash", field: "ercTxHash", width: 200
+                headerName: "ERC txHash", field: "ercTxHash", width: 200
             },
             {
-                headerName: "BNB Status", field: "ercStatus", width: 200,
+                headerName: "ERC Status", field: "ercStatus", width: 200,
                 cellStyle:ComUtil.getCellStyle({cellAlign: 'left'}),
                 cellRenderer: 'sudongSendRenderer'
             }
@@ -144,7 +144,7 @@ const BnbWithdrawSwap = () => {
 
     useEffect(() => {
         search();
-        managerBalance();
+        getManagerBalance();
         if(gridApi) {
             gridApi.setColumnDefs([]);
             gridApi.setColumnDefs(gridOptions.columnDefs);
@@ -153,12 +153,11 @@ const BnbWithdrawSwap = () => {
 
 
     function bepAccountRenderer ({value}) {
-        let bscScanUrl = 'https://bscscan.com/address/';
-        const testnetBscScanUrl = 'https://testnet.bscscan.com/address/'
+        let bscScanUrl = 'https://snowtrace.io/address/';
         if(properties.isTestMode){
-            bscScanUrl = testnetBscScanUrl;
+            bscScanUrl = 'https://testnet.snowtrace.io/address/';
         }
-        return value && <><a href={`${bscScanUrl}${value}`} target={'_blank'} fg={'primary'} ml={10} ><u>BscScan</u></a> <span>{value}</span></>
+        return value && <><a href={`${bscScanUrl}${value}`} target={'_blank'} fg={'primary'} ml={10} ><u>AvaxScan</u></a> <span>{value}</span></>
     }
 
     function ircStatusRenderer({value, data:rowData}) {
@@ -188,14 +187,14 @@ const BnbWithdrawSwap = () => {
     function sudongSendRenderer(props) {
         const rowData = props.data;
         const onHandleClick = async() => {
-            if(window.confirm('BNB토큰을 수동전송 하시겠습니까?(실패가 확실할때만 해야합니다)')) {
+            if(window.confirm('AVAX토큰을 수동전송 하시겠습니까?(실패가 확실할때만 해야합니다)')) {
                 const params = {
                     withdrawSeq: rowData.withdrawSeq,
                     receiverAddr: rowData.ercAccount,
                     tokenAmount: rowData.amount
                 }
                 //approve된 Iw ERC토큰 수동 전송 기능
-                let {data: result} = await AdminApi.sendUserBnbToExtAccount(params);
+                let {data: result} = await AdminApi.sendUserAvaxToExtAccount(params);
                 alert(result);
                 if (window.confirm('다시 재 검색하시겠습니까?')) {
                     search();
@@ -203,16 +202,16 @@ const BnbWithdrawSwap = () => {
             }
         }
         let status = '요청';
-        const bnbStatus = rowData.ercStatus;
-        if(bnbStatus === 0) status = '요청'
-        else if(bnbStatus === 1) status = '전송중'
-        else if(bnbStatus === 2) status = '전송완료'
+        const ercStatus = rowData.ercStatus;
+        if(ercStatus === 0) status = '요청'
+        else if(ercStatus === 1) status = '전송중'
+        else if(ercStatus === 2) status = '전송완료'
 
         return(
             <div>
                 {status}
                 {
-                    bnbStatus < 2 &&
+                    ercStatus < 2 &&
                     <Span ml={10}>
                         <button onClick={onHandleClick}>수동전송(위험)</button>
                     </Span>
@@ -221,28 +220,28 @@ const BnbWithdrawSwap = () => {
         )
     }
 
-    async function managerBalance() {
+    async function getManagerBalance() {
 
-        setBnbManagerLoading(true);
+        setManagerLoading(true);
 
-        // BNB ManagerAccount
-        const {data:bnbManagerAccountData} = await AdminApi.getBnbManagerAccount(); //erc SwapManager
-        setBnbManagerAccount(bnbManagerAccountData);
+        // AVAX ManagerAccount
+        const {data:managerAccountData} = await AdminApi.getAvaxManagerAccount(); //erc SwapManager
+        setManagerAccount(managerAccountData);
 
-        // BNB SwapManager Balance
+        // AVAX SwapManager Balance
         // [0] manager 실 보유: (고객예치금 제외)
         // [1] manager 보유금: (고객예치금 포함)
         // [2] 고객예치금.
         // [3] 고객 총입금
         // [4] 고객 총출금
-        const {data:bnbManagerBalanceData} = await AdminApi.getBnbManagerBalance();
-        if(bnbManagerBalanceData) {
-            setBnbManagerBalance({
-                managerRealBalance:bnbManagerBalanceData[0],
-                managerBalance:bnbManagerBalanceData[1],
-                consumerBalance:bnbManagerBalanceData[2],
-                consumerTotalDeposit:bnbManagerBalanceData[3],
-                consumerTotalWithdraw:bnbManagerBalanceData[4]
+        const {data:managerBalanceData} = await AdminApi.getAvaxManagerBalance();
+        if(managerBalanceData) {
+            setManagerBalance({
+                managerRealBalance:managerBalanceData[0],
+                managerBalance:managerBalanceData[1],
+                consumerBalance:managerBalanceData[2],
+                consumerTotalDeposit:managerBalanceData[3],
+                consumerTotalWithdraw:managerBalanceData[4]
             });
         }
 
@@ -254,11 +253,11 @@ const BnbWithdrawSwap = () => {
         const {data:managerIram} = await AdminApi.getDonManagerIRam(); //iw토큰들은 donswap아닌 donmanager 이용.
         setManagerIRam(managerIram);
 
-        // BNB gas Price
-        const {data:bnbGasPriceData} = await AdminApi.getBnbGasPrice();
-        setBnbGasPrice(bnbGasPriceData);
+        // Avax gas Price
+        const {data:gasPriceData} = await AdminApi.getAvaxGasPrice();
+        setGasPrice(gasPriceData);
 
-        setBnbManagerLoading(false);
+        setManagerLoading(false);
     }
 
 
@@ -267,14 +266,14 @@ const BnbWithdrawSwap = () => {
         const {data:sequence} = await AdminApi.getIwMaxWithdrawSequence(iwTokenName)
         setWithdrawSequence(sequence);
 
-        // const {data} = await AdminApi.bnbWithdrawSwap();
-        const {data} = await AdminApi.iwIrcWithdrawSwap('iwbnb');
+
+        const {data} = await AdminApi.iwIrcWithdrawSwap(iwTokenName);
         if(data) {
             data.map(item => {
                 item.withdrawSeq = parseFloat(item.withdrawSeq)
                 item.amount = parseFloat(item.amount)
                 item.checkTotalSwapAmount = function () {
-                    checkTotalSwap('iwbnb', item);
+                    checkTotalSwap(iwTokenName, item);
                 }
             });
 
@@ -332,22 +331,22 @@ const BnbWithdrawSwap = () => {
                 <Div>
                     <Div>
                         <Div>
-                            Manager 계좌 정보 <Button loading={bnbManagerLoading} onClick={managerBalance}>BNB Manager 검색</Button>
+                            Manager 계좌 정보 <Button loading={managerLoading} onClick={getManagerBalance}>AVAX Manager 검색</Button>
                         </Div>
-                        <Div ml={5}>BnbManagerAccount : {bnbManagerAccount}</Div>
+                        <Div ml={5}>AvaxManagerAccount : {managerAccount}</Div>
                         <Div ml={5}>
                             <Flex ml={10}>
                                 <Div mr={10}>
-                                    BnbManager BNB : <Span fg="blue">{ComUtil.toCurrency(bnbManagerBalance.managerRealBalance)} </Span> <Span>({ComUtil.toCurrency(bnbManagerBalance.managerBalance)})</Span> <br/>
+                                    AvaxManager AVAX : <Span fg="blue">{ComUtil.toCurrency(managerBalance.managerRealBalance)} </Span> <Span>({ComUtil.toCurrency(managerBalance.managerBalance)})</Span> <br/>
                                 </Div>
                                 <Div ml={20}>
-                                    고객예치금 : <Span fg="blue">{ComUtil.toCurrency(bnbManagerBalance.consumerBalance)}</Span> <br/>
+                                    고객예치금 : <Span fg="blue">{ComUtil.toCurrency(managerBalance.consumerBalance)}</Span> <br/>
                                 </Div>
                                 <Div ml={20}>
-                                    고객 총입금 : <Span fg="blue">{ComUtil.toCurrency(bnbManagerBalance.consumerTotalDeposit)}</Span> <br/>
+                                    고객 총입금 : <Span fg="blue">{ComUtil.toCurrency(managerBalance.consumerTotalDeposit)}</Span> <br/>
                                 </Div>
                                 <Div ml={20}>
-                                    고객 총출금 : <Span fg="blue">{ComUtil.toCurrency(bnbManagerBalance.consumerTotalWithdraw)}</Span>
+                                    고객 총출금 : <Span fg="blue">{ComUtil.toCurrency(managerBalance.consumerTotalWithdraw)}</Span>
                                 </Div>
                             </Flex>
                         </Div>
@@ -360,7 +359,7 @@ const BnbWithdrawSwap = () => {
                                     DonManager IRam : <Span fg="blue">{ComUtil.toCurrency(managerIRam && managerIRam.toFixed(2))}</Span> <br/>
                                 </Div>
                                 <Div ml={20}>
-                                    BnbGasPrice : <Span fg="blue">{ComUtil.toCurrency(bnbGasPrice && bnbGasPrice.toFixed(2))}</Span>
+                                    AvaxGasPrice : <Span fg="blue">{ComUtil.toCurrency(gasPrice && gasPrice.toFixed(2))}</Span>
                                 </Div>
                             </Flex>
                         </Div>
@@ -408,4 +407,4 @@ const BnbWithdrawSwap = () => {
     )
 }
 
-export default BnbWithdrawSwap;
+export default AvaxWithdrawSwap;

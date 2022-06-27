@@ -90,17 +90,18 @@ public class CommonController {
 
     //defaultValue:서버구동시 사용. front에선 properties.js/////////////////////////////
 
-    public static String DON_DEFAULT_PRICE = "0.132";
-    public static String IOST_DEFAULT_PRICE = "0.017";
-    public static String BLY_DEFAULT_PRICE = "0.011";
-    public static String BTC_DEFAULT_PRICE = "30135";
-    public static String BNB_DEFAULT_PRICE = "315";
+    public static String DON_DEFAULT_PRICE = "0.102";
+    public static String IOST_DEFAULT_PRICE = "0.015";
+    public static String BLY_DEFAULT_PRICE = "0.010";
+    public static String BTC_DEFAULT_PRICE = "22000";
+    public static String BNB_DEFAULT_PRICE = "250";
+    public static String AVAX_DEFAULT_PRICE = "20.5";
 
-    public static String WITCH_DEFAULT_PRICE = "0.244";
-    public static String ZUNA_DEFAULT_PRICE = "0.029";
+    public static String WITCH_DEFAULT_PRICE = "0.295";
+    public static String ZUNA_DEFAULT_PRICE = "0.025";
 
 
-    public static String PPT_DEFAULT_RATIO = "6.2";
+//    public static String PPT_DEFAULT_RATIO = "6.2";
 
     ////코인 가격들 local 캐시 한번 더 함.//////////////////////////////////////////////////////////////////
 
@@ -135,18 +136,18 @@ public class CommonController {
     }
 
     /////////ppt ////////////////
-    public static boolean pptProcessing = false;
-    public static String prevPPTRatio = CommonController.PPT_DEFAULT_RATIO;
+//    public static boolean pptProcessing = false;
+//    public static String prevPPTRatio = CommonController.PPT_DEFAULT_RATIO;
 
     //get작업중이면 prev리턴.
-    public synchronized String getPPTRatio() {
-
-        if (pptProcessing)  {
-            //log.info("pptProcessing");
-            return prevPPTRatio; //default or prev is Better
-        }
-        return openApiService.getPPTRatioReal();
-    }
+//    public synchronized String getPPTRatio() {
+//
+//        if (pptProcessing)  {
+//            //log.info("pptProcessing");
+//            return prevPPTRatio; //default or prev is Better
+//        }
+//        return openApiService.getPPTRatioReal();
+//    }
 
     /////////bly ////////////////
     public static boolean blyProcessing = false;
@@ -194,6 +195,22 @@ public class CommonController {
 
         //log.info("////////////getBlyPriceReal 호출 ///////////");
         return openApiService.getBnbPriceReal();
+    }
+
+    /////////avax ////////////////
+    public static boolean avaxProcessing = false;
+    public static String prevAvaxPrice = CommonController.AVAX_DEFAULT_PRICE;
+
+    //get작업중이면 prev리턴.
+    public synchronized String getAvaxPrice() {
+
+        if (avaxProcessing)  {
+            log.info("avaxProcessing");
+            return prevAvaxPrice; //default or prev is Better
+        }
+
+        //log.info("////////////getBlyPriceReal 호출 ///////////");
+        return openApiService.getAvaxPriceReal();
     }
 
     /////////witch ////////////////
@@ -310,6 +327,12 @@ public class CommonController {
                 coinUsdPrice = this.getBnbPrice();
                 if (StringUtils.isEmpty(coinUsdPrice)) {
                     coinUsdPrice = BNB_DEFAULT_PRICE;
+                }
+
+            }else if(name.startsWith("iwavax")) { //_t1 가능.
+                coinUsdPrice = this.getAvaxPrice();
+                if (StringUtils.isEmpty(coinUsdPrice)) {
+                    coinUsdPrice = AVAX_DEFAULT_PRICE;
                 }
 
             }else { ///LP 토큰들 가격 추정.///////////////////////////////

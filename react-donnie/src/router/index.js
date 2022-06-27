@@ -48,6 +48,9 @@ const DepositIWERCModal = loadable(() => import('~/components/common/modals/Depo
 const WithdrawIWERCModal = loadable(() => import('~/components/common/modals/WithdrawIWERCModal'))
 const DepositBNBModal = loadable(() => import('~/components/common/modals/DepositBNBModal'))
 const WithdrawBNBModal = loadable(() => import('~/components/common/modals/WithdrawBNBModal'))
+const DepositAVAXModal = loadable(() => import('~/components/common/modals/DepositAVAXModal'))
+const WithdrawAVAXModal = loadable(() => import('~/components/common/modals/WithdrawAVAXModal'))
+
 const NoticeModal = loadable(() => import('~/components/common/modals/NoticeModal'))
 
 const BridgeDepositModal = loadable(() => import('~/components/common/modals/BridgeDepositModal'))
@@ -200,6 +203,10 @@ export default () => {
 
                             <DepositBNBModal/>
                             <WithdrawBNBModal/>
+
+                            <DepositAVAXModal/>
+                            <WithdrawAVAXModal/>
+
 
                             <NoticeModal/>
 

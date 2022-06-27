@@ -24,6 +24,9 @@ const IwWithdrawSwap = loadable(() => import('~/components/admin/iwWithdrawSwap'
 const BnbDepositSwap = loadable(() => import('~/components/admin/bnbDepositSwap'));
 const BnbWithdrawSwap = loadable(() => import('~/components/admin/bnbWithdrawSwap'));
 
+const AvaxDepositSwap = loadable(() => import('~/components/admin/avaxDepositSwap'));
+const AvaxWithdrawSwap = loadable(() => import('~/components/admin/avaxWithdrawSwap'));
+
 const Home = loadable(() => import('~/components/admin/home'));
 const Exchange = loadable(() => import('~/components/admin/exchange'));
 const Properties = loadable(() => import('~/components/admin/properties'));
@@ -132,6 +135,14 @@ export default () => {
             </PrivateRoute>
             <PrivateRoute exact path="/admin/bnbWithdrawSwap" type={'admin'}>
                 <BnbWithdrawSwap />
+            </PrivateRoute>
+
+            {/* avax Token*/}
+            <PrivateRoute exact path="/admin/avaxDepositSwap" type={'admin'}>
+                <AvaxDepositSwap />
+            </PrivateRoute>
+            <PrivateRoute exact path="/admin/avaxWithdrawSwap" type={'admin'}>
+                <AvaxWithdrawSwap />
             </PrivateRoute>
 
             <PrivateRoute exact path="/admin/exContractHistory" type={'admin'}>

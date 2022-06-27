@@ -3,8 +3,8 @@ const DON_TOKEN = 'don';
 const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
 const STAKE_TOKEN = 'bnbhusdlp';
 
-const START_TIME = 1650326400;      // 20220419:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:ContractCWZ9wTtdzrHwoWgphmQiEqqCQDD6P3kDMo7JW3cMm7B1
-const DURATION = 24 * 3600 * 70;    // 8주=56일, 4주=28일, in Seconds
+const START_TIME = 1656374400;      // 20220628:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:ContractCWZ9wTtdzrHwoWgphmQiEqqCQDD6P3kDMo7JW3cMm7B1
+const DURATION = 24 * 3600 * 28;    // 8주=56일, 4주=28일, in Seconds
 // const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;
 const TO_FIXED = 4;   //소수점 4자리까지 저장.

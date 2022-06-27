@@ -9,7 +9,8 @@ import {withTranslation} from "react-i18next";
 import {
     connectWalletModalState,
     depositIWERCModalState, withdrawIWERCModalState,
-    depositBNBModalState, withdrawBNBModalState
+    depositBNBModalState, withdrawBNBModalState,
+    depositAVAXModalState, withdrawAVAXModalState,
 } from "~/hooks/atomState";
 import {useRecoilState} from "recoil";
 import properties from "~/properties";
@@ -53,6 +54,10 @@ const IWTokenBigCard = ({
     const [, setdepositBNBState] = useRecoilState(depositBNBModalState)
     const [, setWithdrawBNBOpen] = useRecoilState(withdrawBNBModalState)
 
+    //AVAX
+    const [, setdepositAVAXState] = useRecoilState(depositAVAXModalState)
+    const [, setWithdrawAVAXOpen] = useRecoilState(withdrawAVAXModalState)
+
     const onDepositIWClick = () => {
 
         // if(properties.serverMode === 'production'){
@@ -69,13 +74,20 @@ const IWTokenBigCard = ({
         // alert("Temporarily Stoped Deposit.")
         // return ;
 
+        console.log(ercTokenName)
         if(ercTokenName.toUpperCase() === "BNB"){
             setdepositBNBState({
                 uniqueKey: uniqueKey,
                 tokenName: name.toLowerCase(),
                 isOpen: true
             })
-        }else {
+        }else if(ercTokenName.toUpperCase() === "AVAX"){
+            setdepositAVAXState({
+                uniqueKey: uniqueKey,
+                tokenName: name.toLowerCase(),
+                isOpen: true
+            })
+        } else {
             setdepositIWERCState({
                 uniqueKey: uniqueKey,
                 tokenName: name.toLowerCase(),
@@ -103,7 +115,13 @@ const IWTokenBigCard = ({
                 tokenName: name.toLowerCase(),
                 isOpen: true
             });
-        }else {
+        }else if(ercTokenName.toUpperCase() === "AVAX"){
+            setWithdrawAVAXOpen({
+                uniqueKey: uniqueKey,
+                tokenName: name.toLowerCase(),
+                isOpen: true
+            });
+        } else {
             setWithdrawIWERCOpen({
                 uniqueKey: uniqueKey,
                 tokenName: name.toLowerCase(),

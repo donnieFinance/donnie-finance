@@ -154,6 +154,18 @@ const store = [
             {to: '/admin/bnbWithdrawSwap', name:'BNB토큰출금'}
         ]
     },
+    {
+        key: 'submenu_AVAX',
+        //icon: <BiCoinStack/>,
+        icon: <img src={properties.tokenImages.iwavax} width={14} height={14}/>,
+        name: 'AVAX 토큰 관리',
+        menuLvl: 2,
+        isOpen:false,
+        children: [
+            {to: '/admin/avaxDepositSwap', name:'AVAX토큰입금'},
+            {to: '/admin/avaxWithdrawSwap', name:'AVAX토큰출금'}
+        ]
+    },
     // {
     //     key: 'submenu_iwETH',
     //     icon: <BiCoinStack/>,

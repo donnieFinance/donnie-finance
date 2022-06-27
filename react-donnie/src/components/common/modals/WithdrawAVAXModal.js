@@ -1,18 +1,22 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Div, Flex, Img, Right} from "~/styledComponents/shared";
-import {Input, Modal} from "antd";
+import {Button, Div, Flex, GridColumns, Img, Right, Span} from "~/styledComponents/shared";
+import {Input, Modal, Space} from "antd";
 import { toChecksumAddress, isValidAddress } from 'ethereumjs-util';
-import {loadingState, bridgeWithdrawModalState} from '~/hooks/atomState'
+import {loadingState, withdrawAVAXModalState} from '~/hooks/atomState'
 import {useRecoilState} from "recoil";
 import useWallet from "~/hooks/useWallet";
 import {useTranslation} from "react-i18next";
 import ComUtil from "~/util/ComUtil";
-import {BsBoxArrowInDown,BsArrowRightShort} from "react-icons/bs";
+import {BsBoxArrowInDown} from "react-icons/bs";
 import iostApi from "~/lib/iostApi";
-import swapApi from "~/lib/swapApi";
 import styled from 'styled-components'
+import swapApi from "~/lib/swapApi";
 import properties from "~/properties";
+import moment from 'moment-timezone'
+import {BsArrowRightShort} from 'react-icons/bs'
+import Loading from "~/components/common/loading";
 import BigNumber from "bignumber.js";
+import ImgAvax from "~/assets/coin_avax.png";
 
 const StyledInputNumber = styled(Input)`
     & input {
@@ -27,15 +31,13 @@ const TestDiv = styled(Div)`
         height: 30px;
     }
 `;
-const BridgeWithdrawContent = () => {
+const WithdrawAVAXContent = () => {
 
     const [, setLoadingStatus] = useRecoilState(loadingState)
 
 
     const {t} = useTranslation()
-    const [bridgeWithdrawState, setBridgeWithdrawState] = useRecoilState(bridgeWithdrawModalState)
-
-    const TOKEN = bridgeWithdrawState.tokenName && properties.exchange.bridgeTokenList.find((token)=>token.tokenName === bridgeWithdrawState.tokenName);
+    const [withdrawAVAXState, setWithdrawAVAXState] = useRecoilState(withdrawAVAXModalState)
 
     // IOST account
     const {address, hasIWallet, isLogin} = useWallet()
@@ -46,47 +48,47 @@ const BridgeWithdrawContent = () => {
     // 출금금액
     const [withdrawAmount, setWithdrawAmount] = useState("");
 
-    // 주소
-    const [accountInfo, setAccountInfo] = useState("");
+    // AVAX BEP 주소
+    const [bepAccount, setBepAccount] = useState("");
 
     // 메모
     const [memo, setMemo] = useState("");
 
     // 해당 코인 가격 표현
-    const [coinFee,setCoinFee] = useState(0)
-    const [coinLabel, setCoinLabel] = useState('');
-    const [amtLabel, setAmtLabel] = useState('');
+    const [coinFee,setCoinFee] = useState(0.1) //backend application.yml도 추가필요.
+    const [coinLabel, setCoinLabel] = useState("iwAVAX");
+    const [amtLabel, setAmtLabel] = useState("AVAX");
 
     const [realWithdrawAmount, setRealWithdrawAmount] = useState(0)
 
     // lang (en or ko)
     const tMessage = t('message', {returnObjects: true})
-    const lang = TOKEN && TOKEN.ercTokenName === 'BNB' ? t('withdrawBNB', {returnObjects: true}):t('withdrawIWErc', {returnObjects: true})
+    const lang = t('withdrawBNB', {returnObjects: true})
+
+    //수정필요한 메시지 3개.
+    //confirmMsgTitle:'Please check your BNB(BEP20-BSC) address once more before withdrawal!',
+    //receptionBepAddress:'Reception BNB(BEP20-BSC) Address',
+    //receptionBepAddressConfirmMsg:'Please check the recipient BNB(BEP20-BSC) address.',
 
     useEffect(() => {
+
+        // console.log(new BigNumber(300.8 - 150.01).toString())
+
         async function fetch() {
-            if(TOKEN){
-                //토큰에 해당하는 금액 표시
-                setAmtLabel(TOKEN.ercTokenName);
-                setCoinLabel(TOKEN.ircTokenName);
+            //토큰에 해당하는 금액 표시
 
-                // 해당 풀의 잔액 (iwBNB ...)
-                let data = await iostApi.getTokenBalance({address: address, tokenName: TOKEN.tokenName});
-                //iw 일 경우 destroy amount
-                if (TOKEN.ercTokenName.toUpperCase() === 'BLY') {
-                    data = new BigNumber(data).minus(ComUtil.getDestroyBlyAmount(address)).toNumber()
-                }
-                else if (TOKEN.ercTokenName.toUpperCase() === 'WBTC') {
-                    data = new BigNumber(data).minus(ComUtil.getDestroyBtcAmount(address)).toNumber()
-                }
-                setBalance(data);
+            const v_UniqueKey = withdrawAVAXState.uniqueKey;
+            const {tokenName, ircTokenName, ercTokenName} = properties.contractList[v_UniqueKey];
+            setAmtLabel(ercTokenName);
+            setCoinLabel(ircTokenName);
 
-                // 해당 iwBNB 풀의 수수료없음: 202206 수수료추가.
-                // if(TOKEN.ercTokenName !== 'BNB') {
-                    const {data: feeAmt} = await swapApi.getIwWithdrawFee(TOKEN.tokenName);
-                    setCoinFee(feeAmt)
-                // }
-            }
+            // 해당 풀의 잔액 (iwAVAX ...)
+            const data = await iostApi.getTokenBalance({address: address, tokenName: tokenName});
+            setBalance(data);
+
+            // 해당 iwavax 수수료추가.
+            const {data:feeAmt} = await swapApi.getIwWithdrawFee(tokenName);
+            setCoinFee(feeAmt)
         }
         fetch()
     }, [])
@@ -98,6 +100,7 @@ const BridgeWithdrawContent = () => {
 
     const onWithDrawNumberChange = ({target}) => {
         const {value} = target
+        //const res = ComUtil.replaceDecimalNumber(value, 8)
         const val = new BigNumber(value).decimalPlaces(8).toNumber();
         setWithdrawAmount(val);
         setRealWithdrawAmount(parseFloat(new BigNumber(val).minus(coinFee).toNumber().toFixed(8)))
@@ -128,43 +131,32 @@ const BridgeWithdrawContent = () => {
                 window.$message.error(lang.withdrawAmountConfirmMsg);
                 return;
             }
-            if(TOKEN.ercTokenName !== 'BNB') {
-                if (withdrawAmount <= iwFee) {
-                    window.$message.error(t(lang.withdrawAmountLimitConfirmMsg,{x:iwFee+" "+coinLabel}));
-                    return;
-                }
+
+            console.log('--////--' + withdrawAmount)
+            if (withdrawAmount < 0.5) {
+                alert('Minimum withdraw amount is 0.5');
+                return;
+            }
+            if (withdrawAmount <= iwFee) { //fee 3.
+                window.$message.error(t(lang.withdrawAmountLimitConfirmMsg,{x:iwFee+" "+coinLabel}));
+                return;
             }
 
-            if(TOKEN.tokenType === 'BEP20') {
-
-                console.log('--////2--' + withdrawAmount)
-                if (withdrawAmount < 0.05) {
-                    alert('Minimum withdraw amount is 0.05');
-                    return;
-                }
-
-                // BNB BEP 주소 체크
-                if (!checkSumAccount(accountInfo)) {
-                    alert(lang.receptionBepAddressConfirmMsg);
-                    return;
-                }
-            }else{
-                if(!checkSumAccount(accountInfo)){
-                    alert(lang.receptionErcAddressConfirmMsg);
-                    return;
-                }
+            // BEP 주소 체크
+            if(!checkBepAccount(bepAccount)){
+                alert('Please check the recipient AVAX(C-CHAIN) address.');
+                return;
             }
 
             let gasLimit = 200000;
             // gasLimit, contractID, amountStr, ercAccount
-            if(!TOKEN){
-                return;
-            }
+            let v_UniqueKey = withdrawAVAXState.uniqueKey;
+            const contract = properties.contractList[v_UniqueKey]
 
             setLoadingStatus('confirmation')
 
-            // 출금 전송 기능
-            const {result, isSuccess} = await iostApi.onIwSwapWithdrawBC(gasLimit, TOKEN.tokenAddress, withdrawAmount, accountInfo, TOKEN.tokenName);
+            // AVAX 출금 전송 기능
+            const {result, isSuccess} = await iostApi.onIwSwapWithdrawBC(gasLimit, contract.tokenAddress, withdrawAmount, bepAccount, contract.tokenName);
             setLoadingStatus('pending')
 
             if (!isSuccess) {
@@ -197,49 +189,15 @@ const BridgeWithdrawContent = () => {
             }
 
             try{
-                if(TOKEN) {
-                    if (TOKEN.ercTokenName === 'BNB') {
-                        const {data: result} = await swapApi.bnbWithdraw(address);
-                        if (result) {
-                            setLoadingStatus('success')
-                            alert(lang.withdrawRequestMsg);
-                            onModalClose();
-                        } else {
-                            setLoadingStatus('failed')
-                            alert(t('delayWithdraw'));
-                            onModalClose();
-                        }
-                    } else {
-                        if (TOKEN.isIdo) {
-                            //tokenName, ircAccount
-                            let {data: result} = await swapApi.idoErcWithdraw(bridgeWithdrawState.tokenName.toLowerCase(),address);
-                            if (result) {
-                                setLoadingStatus('success')
-                                alert(lang.withdrawRequestMsg);
-                                onModalClose();
-                            } else {
-                                setLoadingStatus('failed')
-                                alert(t('delayWithdraw'));
-                                onModalClose();
-                            }
-                        }else {
-                            const data = {
-                                iwTokenName: bridgeWithdrawState.tokenName.toLowerCase(),
-                                ircAccount: address
-                            }
-                            //iwTokenName, ircAccount
-                            let {data: result} = await swapApi.withdrawIwErc(data);
-                            if (result) {
-                                setLoadingStatus('success')
-                                alert(lang.withdrawRequestMsg);
-                                onModalClose();
-                            } else {
-                                setLoadingStatus('failed')
-                                alert(t('delayWithdraw'));
-                                onModalClose();
-                            }
-                        }
-                    }
+                let {data: result} = await swapApi.avaxWithdraw(address);
+                if (result) {
+                    setLoadingStatus('success')
+                    alert(lang.withdrawRequestMsg);
+                    setWithdrawAVAXState({uniqueKey:'',tokenName:'',isOpen:false})
+                }else {
+                    setLoadingStatus('failed')
+                    alert(t('delayWithdraw'));
+                    setWithdrawAVAXState({uniqueKey:'',tokenName:'',isOpen:false})
                 }
             }catch (err){
                 console.slog(err)
@@ -249,16 +207,13 @@ const BridgeWithdrawContent = () => {
         }
     }
 
-    const onModalClose = () => {
-        setBridgeWithdrawState({tokenName:'',isOpen:false})
-    }
-
-    const checkSumAccount = (account) => {
+    const checkBepAccount = (account) => {
         let accountOk = true
         if(account.length === 0) {
             accountOk = false
         }
         try {
+            // bep 주소 체크 로직 (erc랑 비슷)
             let ethAccount = toChecksumAddress(account);
             if (!isValidAddress(ethAccount)) {
                 accountOk = false
@@ -269,9 +224,9 @@ const BridgeWithdrawContent = () => {
         return accountOk
     }
 
-    const onAccount = ({target}) => {
-        const {value} = target
-        setAccountInfo(value);
+    const onBepAccount = ({target}) => {
+        const {name, value} = target
+        setBepAccount(value);
     }
 
     const onChangeMemo = ({target}) => {
@@ -281,7 +236,7 @@ const BridgeWithdrawContent = () => {
 
     const onPasteClick = async () => {
         const text = await ComUtil.pasteClipboardText()
-        setAccountInfo(text)
+        setBepAccount(text)
     }
 
     return (
@@ -320,12 +275,8 @@ const BridgeWithdrawContent = () => {
 
             <Div p={16} my={20} shadow={'md'} bc={'light'}>
                 <Flex>
-                    {
-                        TOKEN && TOKEN.ercTokenName && <Img mr={2} width={20} src={properties.tokenImages[TOKEN.ercTokenName.toLowerCase()]} />
-                    }
-                    <h3>
-                        {amtLabel}{TOKEN && TOKEN.tokenType ==='BEP20'?'('+TOKEN.tokenType+'-BSC)':"("+TOKEN.tokenType+")"}
-                    </h3>
+                    <Img mr={2} width={20} src={ImgAvax} />
+                    <h3> AVAX (C-CHAIN)</h3>
                 </Flex>
                 <Div mt={10}>
                     <Flex mb={5} alignItems={'flex-end'}>
@@ -334,15 +285,8 @@ const BridgeWithdrawContent = () => {
                             <Button bg={'primary'} fg={'white'} px={8} py={5} rounded={3} onClick={onPasteClick} fontSize={13}>{lang.paste}</Button>
                         </Right>
                     </Flex>
-                    <Input style={{fontSize:14.7}} placeholder={TOKEN.ercTokenName === 'BNB' ?lang.receptionBepAddress:t(lang.receptionErcAddress,{x:TOKEN.ercTokenName+"(ERC20)"})} size={'large'} onChange={onAccount} value={accountInfo}/>
-                    <Div fg={'danger'} textAlign={'center'} mt={4} fontSize={12}>
-                        {
-                            TOKEN && TOKEN.ercTokenName === 'BNB' ?
-                                lang.confirmMsgTitle
-                                :
-                                t(lang.confirmMsgTitle,{x:TOKEN.ercTokenName+"(ERC20)"})
-                        }
-                    </Div>
+                    <Input name={'bep20'} style={{fontSize:14.7}} placeholder={'Reception AVAX (C-CHAIN) Address'} size={'large'} onChange={onBepAccount} value={bepAccount}/>
+                    <Div fg={'danger'} textAlign={'center'} mt={4} fontSize={12}>Please check your AVAX (C-CHAIN) address once more before withdrawal!</Div>
                 </Div>
             </Div>
 
@@ -354,12 +298,8 @@ const BridgeWithdrawContent = () => {
                     </Flex>
                     <Flex dot>
                         <Div>{lang.fee}</Div>
-                        {
-                            // TOKEN.ercTokenName === 'BNB' ?
-                            //     <Right>Free {amtLabel}</Right>
-                            //     :
-                                <Right>- {coinFee} {amtLabel}</Right>
-                        }
+                        {/*<Right>Free {amtLabel}</Right>*/}
+                        <Right>- {coinFee} {amtLabel}</Right>
                     </Flex>
                     <Flex dot fw={500}>
                         <Div>{lang.realWithdrawAmount}</Div>
@@ -373,6 +313,7 @@ const BridgeWithdrawContent = () => {
                     <Button bg='primary'
                             fg={'white'}
                             bold
+                        // bc={'info'}
                             py={15}
                             px={6}
                             block
@@ -390,39 +331,36 @@ const BridgeWithdrawContent = () => {
     )
 }
 
-const BridgeWithdrawModal = () => {
+const WithdrawAVAXModal = () => {
     const [loadingStatus, setLoadingStatus] = useRecoilState(loadingState)
     const {t} = useTranslation()
-    const [withdrawState, setWithdrawState] = useRecoilState(bridgeWithdrawModalState)
-    const TOKEN = withdrawState.tokenName && properties.exchange.bridgeTokenList.find((token)=>token.tokenName === withdrawState.tokenName);
-
+    const [withdrawAVAXState, setWithdrawAVAXState] = useRecoilState(withdrawAVAXModalState)
     const getTitle = () => {
-        if(TOKEN) {
+        if(withdrawAVAXState.uniqueKey) {
+            const v_UniqueKey = withdrawAVAXState.uniqueKey;
+            const {tokenName, ircTokenName, ercTokenName} = properties.contractList[v_UniqueKey];
             return (
                 <Flex>
                     <Div p={2} rounded={4} bc={'black'} style={{borderStyle: 'dashed', borderWidth: 2}} >
-                        <Flex bg={'info'} fg={'white'} rounded={4} px={8} pt={4}>{TOKEN.ircTokenName}(IRC)</Flex>
+                        <Flex bg={'info'} fg={'white'} rounded={4} px={8} pt={4}>{ircTokenName}(IRC)</Flex>
                     </Div>
                     <Flex mx={10}><BsArrowRightShort /></Flex>
-                    <Flex pt={4}>
-                        {
-                            TOKEN.ercTokenName && <Img width={20} src={properties.tokenImages[TOKEN.ercTokenName.toLowerCase()]} />
-                        }
-                        {`${TOKEN.ercTokenName}`}{TOKEN.tokenType === 'BEP20'? '('+TOKEN.tokenType+'-BSC)':'('+TOKEN.tokenType+')'}
-                    </Flex>
+                    <Flex pt={4}><Img width={20} src={ImgAvax} />{`${ercTokenName}(C-CHAIN)`}</Flex>
                 </Flex>
             )
+            // return 'Swap ' + ircTokenName + '(IRC) to ' + ercTokenName + '(ERC)';
         }
-    }
-    const onModalClose = () => {
-        setWithdrawState({tokenName:'',isOpen:false})
+        return 'Swap [IRC to C-CHAIN]'
     }
     return (
         <Modal
             title={getTitle()}
-            visible={withdrawState.isOpen}
+            visible={withdrawAVAXState.isOpen}
+            // onCancel={() => setWithdrawIWERCState({uniqueKey:'',tokenName:'',isOpen:false})}
             footer={null}
+            // width={'auto'} //UserLogin.js 의 width 값과 같이 맞춰야 합니다
             centered={true}
+            // focusTriggerAfterClose={false}
             getContainer={false}
             maskClosable={false}
             destroyOnClose={true}
@@ -431,12 +369,12 @@ const BridgeWithdrawModal = () => {
                 if (loadingStatus === 'loading') {
                     return
                 }
-                onModalClose()
+                setWithdrawAVAXState({uniqueKey:'',tokenName:'',isOpen:false})
             }}
         >
-            <BridgeWithdrawContent />
+            <WithdrawAVAXContent />
         </Modal>
     );
 };
 
-export default BridgeWithdrawModal;
+export default WithdrawAVAXModal;

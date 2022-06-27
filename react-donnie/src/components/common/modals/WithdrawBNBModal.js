@@ -55,7 +55,7 @@ const WithdrawBNBContent = () => {
     const [memo, setMemo] = useState("");
 
     // 해당 코인 가격 표현
-    const [coinFee,setCoinFee] = useState(0)
+    const [coinFee,setCoinFee] = useState(0.01)
     const [coinLabel, setCoinLabel] = useState("iwBNB");
     const [amtLabel, setAmtLabel] = useState("BNB");
 
@@ -81,9 +81,9 @@ const WithdrawBNBContent = () => {
             const data = await iostApi.getTokenBalance({address: address, tokenName: tokenName});
             setBalance(data);
 
-            // 해당 iwBNB 풀의 수수료없음
-            // const {data:feeAmt} = await swapApi.getIwWithdrawFee(tokenName);
-            // setCoinFee(feeAmt)
+            // 해당 iwBNB 풀의 수수료없음-> 추가.
+            const {data:feeAmt} = await swapApi.getIwWithdrawFee(tokenName);
+            setCoinFee(feeAmt)
         }
         fetch()
     }, [])
@@ -132,10 +132,10 @@ const WithdrawBNBContent = () => {
                 alert('Minimum withdraw amount is 0.05');
                 return;
             }
-            // if (withdrawAmount <= iwFee) {
-            //     window.$message.error(t(lang.withdrawAmountLimitConfirmMsg,{x:iwFee+" "+coinLabel}));
-            //     return;
-            // }
+            if (withdrawAmount <= iwFee) {
+                window.$message.error(t(lang.withdrawAmountLimitConfirmMsg,{x:iwFee+" "+coinLabel}));
+                return;
+            }
 
             // BNB BEP 주소 체크
             if(!checkBepAccount(bepAccount)){
@@ -293,8 +293,8 @@ const WithdrawBNBContent = () => {
                     </Flex>
                     <Flex dot>
                         <Div>{lang.fee}</Div>
-                        <Right>Free {amtLabel}</Right>
-                        {/*<Right>- {coinFee} {amtLabel}</Right>*/}
+                        {/*<Right>Free {amtLabel}</Right>*/}
+                        <Right>- {coinFee} {amtLabel}</Right>
                     </Flex>
                     <Flex dot fw={500}>
                         <Div>{lang.realWithdrawAmount}</Div>

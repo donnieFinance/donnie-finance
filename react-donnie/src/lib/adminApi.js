@@ -49,21 +49,34 @@ const issueIwIrcToUserFinish = ({iwSwapDepositNo, iwTokenName, ircAccount}) => a
 const sendUserIwErcToExtAccount = ({withdrawSeq, iwTokenName, ownerIrcAccount, receiverAddr, tokenAmount}) => axiosSecure(properties.restAPIHost + '/sendUserIwErcToExtAccount', {method: "post", params: {withdrawSeq:withdrawSeq, iwTokenName:iwTokenName, ownerIrcAccount:ownerIrcAccount, receiverAddr:receiverAddr, tokenAmount:tokenAmount}, withCredentials: true, credentials: 'same-origin'})
 const getIwTokenContractId = (iwTokenName) => axiosSecure(properties.restAPIHost + '/getIwTokenContractId', {method: "get", params: {iwTokenName:iwTokenName},  withCredentials: true, credentials: 'same-origin'})
 
-//bnb용
+//////bnb용
 const getBnbManagerAccount = () => axiosSecure(properties.restAPIHost + '/getBnbManagerAccount', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const getBnbManagerBalance = () => axiosSecure(properties.restAPIHost + '/getBnbManagerBalance', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const getBnbGasPrice = () => axiosSecure(properties.restAPIHost + '/getBnbGasPrice', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const bnbDepositSwap = () => axiosSecure(properties.restAPIHost + '/bnbDepositSwap', {method: "get", withCredentials: true, credentials: 'same-origin'})
 const manualBnbDeposit = (depositNo) => axiosSecure(properties.restAPIHost + '/manualBnbDeposit', {method: "post", params: {depositNo:depositNo},  withCredentials: true, credentials: 'same-origin'})
+  //출금 const bnbWithdrawSwap = () => axiosSecure(properties.restAPIHost + '/bnbWithdrawSwap', {method: "get", withCredentials: true, credentials: 'same-origin'})
+const updateBnbSwapDepositFinished = (swapBnbNo) => axiosSecure(properties.restAPIHost + '/updateBnbSwapDepositFinished', {method: "post", params: {swapBnbNo:swapBnbNo},  withCredentials: true, credentials: 'same-origin'})
+const getBep20BNBBalance = (bep20Account) => axios(properties.restAPIHost + '/getBep20BNBBalance', { method: "post", params: {bep20Account},withCredentials: true, credentials: 'same-origin' })
+  // bnb 수동 전송 관련 (출금) [셀안의기능]
+const sendUserBnbToExtAccount = ({withdrawSeq, receiverAddr, tokenAmount}) => axiosSecure(properties.restAPIHost + '/sendUserBnbToExtAccount', {method: "post", params: {withdrawSeq:withdrawSeq, receiverAddr:receiverAddr, tokenAmount:tokenAmount}, withCredentials: true, credentials: 'same-origin'})
+
+
+//////avax용
+const getAvaxManagerAccount = () => axiosSecure(properties.restAPIHost + '/getAvaxManagerAccount', {method: "get", withCredentials: true, credentials: 'same-origin'})
+const getAvaxManagerBalance = () => axiosSecure(properties.restAPIHost + '/getAvaxManagerBalance', {method: "get", withCredentials: true, credentials: 'same-origin'})
+const getAvaxGasPrice = () => axiosSecure(properties.restAPIHost + '/getAvaxGasPrice', {method: "get", withCredentials: true, credentials: 'same-origin'})
+const avaxDepositSwap = () => axiosSecure(properties.restAPIHost + '/avaxDepositSwap', {method: "get", withCredentials: true, credentials: 'same-origin'})
+const manualAvaxDeposit = (depositNo) => axiosSecure(properties.restAPIHost + '/manualAvaxDeposit', {method: "post", params: {depositNo:depositNo},  withCredentials: true, credentials: 'same-origin'})
+const updateAvaxSwapDepositFinished = (swapAvaxNo) => axiosSecure(properties.restAPIHost + '/updateAvaxwapDepositFinished', {method: "post", params: {swapAvaxNo:swapAvaxNo},  withCredentials: true, credentials: 'same-origin'})
+const getCchainAVAXBalance = (cchainAccount) => axios(properties.restAPIHost + '/getCchainAVAXBalance', { method: "post", params: {cchainAccount},withCredentials: true, credentials: 'same-origin' })
+// bnb 수동 전송 관련 (출금) [셀안의기능]
+const sendUserAvaxToExtAccount = ({withdrawSeq, receiverAddr, tokenAmount}) => axiosSecure(properties.restAPIHost + '/sendUserAvaxToExtAccount', {method: "post", params: {withdrawSeq:withdrawSeq, receiverAddr:receiverAddr, tokenAmount:tokenAmount}, withCredentials: true, credentials: 'same-origin'})
+
 
 //ido용
 const getIdoManagerBalance = (idoTokenName) => axiosSecure(properties.restAPIHost + '/getIdoManagerBalance', {method: "get", params: {idoTokenName:idoTokenName}, withCredentials: true, credentials: 'same-origin'})
 
-// const bnbWithdrawSwap = () => axiosSecure(properties.restAPIHost + '/bnbWithdrawSwap', {method: "get", withCredentials: true, credentials: 'same-origin'})
-const updateBnbSwapDepositFinished = (swapBnbNo) => axiosSecure(properties.restAPIHost + '/updateBnbSwapDepositFinished', {method: "post", params: {swapBnbNo:swapBnbNo},  withCredentials: true, credentials: 'same-origin'})
-const getBep20BNBBalance = (bep20Account) => axios(properties.restAPIHost + '/getBep20BNBBalance', { method: "post", params: {bep20Account},withCredentials: true, credentials: 'same-origin' })
-// bnb 수동 전송 관련 (출금) [셀안의기능]
-const sendUserBnbToExtAccount = ({withdrawSeq, receiverAddr, tokenAmount}) => axiosSecure(properties.restAPIHost + '/sendUserBnbToExtAccount', {method: "post", params: {withdrawSeq:withdrawSeq, receiverAddr:receiverAddr, tokenAmount:tokenAmount}, withCredentials: true, credentials: 'same-origin'})
 // don 수동 전송 관련 (출금) [셀안의기능]
 const sendUserErcDonToExtAccount = ({withdrawSeq, receiverAddr, tokenAmount}) => axiosSecure(properties.restAPIHost + '/sendUserErcDonToExtAccount', {method: "post", params: {withdrawSeq:withdrawSeq, receiverAddr:receiverAddr, tokenAmount:tokenAmount}, withCredentials: true, credentials: 'same-origin'})
 
@@ -183,12 +196,18 @@ export default {
 
     getIdoManagerBalance,
 
+    //BNB
     getBnbManagerAccount, getBnbManagerBalance, getBnbGasPrice,
     bnbDepositSwap,manualBnbDeposit,
-    // bnbWithdrawSwap,
     updateBnbSwapDepositFinished,
     getBep20BNBBalance,
     sendUserBnbToExtAccount,
+
+    //Avax
+    getAvaxManagerAccount, getAvaxManagerBalance, getAvaxGasPrice, avaxDepositSwap,manualAvaxDeposit,
+    updateAvaxSwapDepositFinished, getCchainAVAXBalance, sendUserAvaxToExtAccount,
+
+
     getIwSwapTotalAmount,
     getIwMaxWithdrawSequence,
     manualApprove0x34,
