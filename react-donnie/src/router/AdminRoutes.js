@@ -55,6 +55,12 @@ const iwStore = {
 const IdoWitchDepositSwap = (props) => <IdoErcDepositSwap {...props}/>
 const IdoWitchWithdrawSwap = (props) => <IdoErcWithdrawSwap {...props}/>
 
+//coops, tvs: idoErc활용.
+const CoopsDepositSwap = (props) => <IdoErcDepositSwap {...props}/>
+const CoopsWithdrawSwap = (props) => <IdoErcWithdrawSwap {...props}/>
+const TvsDepositSwap = (props) => <IdoErcDepositSwap {...props}/>
+const TvsWithdrawSwap = (props) => <IdoErcWithdrawSwap {...props}/>
+
 
 //Wrapper 를 통해 새로운 객체로 인식해서 didMount 를 일으켜 주기 위함
 const IwBlyDepositSwap = (props) => <IwDepositSwap {...props}/>
@@ -98,35 +104,49 @@ export default () => {
 
             {/*   ido witch Token  */}
             <PrivateRoute exact path="/admin/idoWitchDepositSwap" type={'admin'}>
-                <IdoWitchDepositSwap iwTokenName={'iwwitch'} ercTokenName={'WITCH'}/>
+                <IdoWitchDepositSwap iwTokenName={'iwwitch'} ercTokenName={'WITCH'} key={'idoWitchDepositSwap'}/>
             </PrivateRoute>
             <PrivateRoute exact path="/admin/idoWitchWithdrawSwap" type={'admin'}>
-                <IdoWitchWithdrawSwap iwTokenName={'iwwitch'} ercTokenName={'WITCH'}/>
+                <IdoWitchWithdrawSwap iwTokenName={'iwwitch'} ercTokenName={'WITCH'} key={'idoWitchWithdrawSwap'}/>
+            </PrivateRoute>
+
+            {/*   Coops/Tvs Token  */}
+            <PrivateRoute exact path="/admin/coopsDepositSwap" type={'admin'}>
+                <CoopsDepositSwap iwTokenName={'iwcoops'} ercTokenName={'COOPS'} key={'coopsDepositSwap'}/>
+            </PrivateRoute>
+            <PrivateRoute exact path="/admin/coopsWithdrawSwap" type={'admin'}>
+                <CoopsWithdrawSwap iwTokenName={'iwcoops'} ercTokenName={'COOPS'} key={'coopsWithdrawSwap'}/>
+            </PrivateRoute>
+            <PrivateRoute exact path="/admin/tvsDepositSwap" type={'admin'}>
+                <TvsDepositSwap iwTokenName={'iwtvs'} ercTokenName={'TVS'} key={'tvsDepositSwap'}/>
+            </PrivateRoute>
+            <PrivateRoute exact path="/admin/tvsWithdrawSwap" type={'admin'}>
+                <TvsWithdrawSwap iwTokenName={'iwtvs'} ercTokenName={'TVS'} key={'tvsWithdrawSwap'}/>
             </PrivateRoute>
 
 
             {/*    bly Token  */}
             <PrivateRoute exact path="/admin/iwblyDepositSwap" type={'admin'}>
-                <IwBlyDepositSwap iwTokenName={iwStore.bly.tokenName} ercTokenName={iwStore.bly.ercTokenName}/>
+                <IwBlyDepositSwap iwTokenName={iwStore.bly.tokenName} ercTokenName={iwStore.bly.ercTokenName} key={'iwblyDepositSwap'}/>
             </PrivateRoute>
             <PrivateRoute exact path="/admin/iwblyWithdrawSwap" type={'admin'}>
-                <IwBlyWithdrawSwap iwTokenName={iwStore.bly.tokenName} ercTokenName={iwStore.bly.ercTokenName}/>
+                <IwBlyWithdrawSwap iwTokenName={iwStore.bly.tokenName} ercTokenName={iwStore.bly.ercTokenName} key={'iwblyWithdrawSwap'}/>
             </PrivateRoute>
 
             {/*    btc Token  */}
             <PrivateRoute exact path="/admin/iwbtcDepositSwap" type={'admin'}>
-                <IwBtcDepositSwap iwTokenName={iwStore.wbtc.tokenName} ercTokenName={iwStore.wbtc.ercTokenName}/>
+                <IwBtcDepositSwap iwTokenName={iwStore.wbtc.tokenName} ercTokenName={iwStore.wbtc.ercTokenName} key={'iwbtcDepositSwap'}/>
             </PrivateRoute>
             <PrivateRoute exact path="/admin/iwbtcWithdrawSwap" type={'admin'}>
-                <IwBtcWithdrawSwap iwTokenName={iwStore.wbtc.tokenName} ercTokenName={iwStore.wbtc.ercTokenName}/>
+                <IwBtcWithdrawSwap iwTokenName={iwStore.wbtc.tokenName} ercTokenName={iwStore.wbtc.ercTokenName} key={'iwbtcWithdrawSwap'}/>
             </PrivateRoute>
 
             {/*    eth Token  */}
             <PrivateRoute exact path="/admin/iwethDepositSwap" type={'admin'}>
-                <IwEthDepositSwap iwTokenName={iwStore.weth.tokenName} ercTokenName={iwStore.weth.ercTokenName}/>
+                <IwEthDepositSwap iwTokenName={iwStore.weth.tokenName} ercTokenName={iwStore.weth.ercTokenName} key={'iwethDepositSwap'}/>
             </PrivateRoute>
             <PrivateRoute exact path="/admin/iwethWithdrawSwap" type={'admin'}>
-                <IwEthWithdrawSwap iwTokenName={iwStore.weth.tokenName} ercTokenName={iwStore.weth.ercTokenName}/>
+                <IwEthWithdrawSwap iwTokenName={iwStore.weth.tokenName} ercTokenName={iwStore.weth.ercTokenName} key={'iwethWithdrawSwap'}/>
             </PrivateRoute>
 
             {/* bnb Token*/}

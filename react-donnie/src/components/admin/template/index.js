@@ -166,6 +166,29 @@ const store = [
             {to: '/admin/avaxWithdrawSwap', name:'AVAX토큰출금'}
         ]
     },
+    {
+        key: 'submenu_COOPS',
+        icon: <img src={properties.tokenImages.iwcoops} width={14} height={14}/>,
+        name: 'COOPS 토큰 관리',
+        menuLvl: 2,
+        isOpen:false,
+        children: [
+            {to: '/admin/coopsDepositSwap', name:'COOPS토큰입금'},
+            {to: '/admin/coopsWithdrawSwap', name:'COOPS토큰출금'}
+        ]
+    },
+    {
+        key: 'submenu_TVS',
+        icon: <img src={properties.tokenImages.iwtvs} width={14} height={14}/>,
+        name: 'TVS 토큰 관리',
+        menuLvl: 2,
+        isOpen:false,
+        children: [
+            {to: '/admin/tvsDepositSwap', name:'TVS토큰입금'},
+            {to: '/admin/tvsWithdrawSwap', name:'TVS토큰출금'}
+        ]
+    },
+
     // {
     //     key: 'submenu_iwETH',
     //     icon: <BiCoinStack/>,

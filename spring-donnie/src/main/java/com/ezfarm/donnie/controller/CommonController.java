@@ -72,7 +72,7 @@ public class CommonController {
     }
 
     /////총 7개 coin + x개 LP 관리 중.//////////////
-    public static List<String> ALL_COIN_NAME = Arrays.asList("don", "iost", "ppt", "husd", "iwbly", "iwbtc", "iwbnb", "iwwitch","donhusdlp", "iosthusdlp", "doniostlp", "bnbhusdlp", "witchhusdlp", "zunahusdlp");
+    public static List<String> ALL_COIN_NAME = Arrays.asList("iwavax", "iwcoops", "iwtvs", "don", "iost", "ppt", "husd", "iwbly", "iwbtc", "iwbnb", "iwwitch","donhusdlp", "iosthusdlp", "doniostlp", "bnbhusdlp", "witchhusdlp", "zunahusdlp");
 
 
     //Donnie_DEX_Price용. (husd는 미사용- 개수맞춤용으로 추가) //TODO  FRONT의 properties.exchange.tokenList  EXCHANGE_COIN_NAME 순서와 개수가 같아야 함.
@@ -99,6 +99,10 @@ public class CommonController {
 
     public static String WITCH_DEFAULT_PRICE = "0.295";
     public static String ZUNA_DEFAULT_PRICE = "0.025";
+
+    public static String COOPS_DEFAULT_PRICE = "48";
+    public static String TVS_DEFAULT_PRICE = "12"; //TODO ALL_COIN_NAME에도 iwtvs 추가해야함.가격때문에.
+
 
 
 //    public static String PPT_DEFAULT_RATIO = "6.2";
@@ -212,6 +216,39 @@ public class CommonController {
         //log.info("////////////getBlyPriceReal 호출 ///////////");
         return openApiService.getAvaxPriceReal();
     }
+
+    /////////coops ////////////////
+    public static boolean coopsProcessing = false;
+    public static String prevCoopsPrice = CommonController.COOPS_DEFAULT_PRICE;
+
+    //get작업중이면 prev리턴.
+    public synchronized String getCoopsPrice() {
+
+        if (coopsProcessing)  {
+            log.info("coopsProcessing");
+            return prevCoopsPrice; //default or prev is Better
+        }
+
+        //log.info("////////////getBlyPriceReal 호출 ///////////");
+        return openApiService.getCoopsPriceReal();
+    }
+    /////////TVS ////////////////
+    public static boolean tvsProcessing = false;
+    public static String prevTvsPrice = CommonController.TVS_DEFAULT_PRICE;
+
+    //get작업중이면 prev리턴.
+    public synchronized String getTvsPrice() {
+
+        if (tvsProcessing)  {
+            log.info("tvsProcessing");
+            return prevTvsPrice; //default or prev is Better
+        }
+
+        //log.info("////////////getBlyPriceReal 호출 ///////////");
+        return openApiService.getTvsPriceReal();
+    }
+
+
 
     /////////witch ////////////////
     public static boolean witchProcessing = false;
@@ -333,6 +370,16 @@ public class CommonController {
                 coinUsdPrice = this.getAvaxPrice();
                 if (StringUtils.isEmpty(coinUsdPrice)) {
                     coinUsdPrice = AVAX_DEFAULT_PRICE;
+                }
+            }else if(name.startsWith("iwcoops")) { //_t1 가능.
+                coinUsdPrice = this.getCoopsPrice();
+                if (StringUtils.isEmpty(coinUsdPrice)) {
+                    coinUsdPrice = COOPS_DEFAULT_PRICE;
+                }
+            }else if(name.startsWith("iwtvs")) { //_t1 가능.
+                coinUsdPrice = this.getTvsPrice();
+                if (StringUtils.isEmpty(coinUsdPrice)) {
+                    coinUsdPrice = TVS_DEFAULT_PRICE;
                 }
 
             }else { ///LP 토큰들 가격 추정.///////////////////////////////

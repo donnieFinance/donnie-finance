@@ -173,6 +173,8 @@ const ModalContent = () => {
                                     >
                                         DON Swap from Coinone
                                     </Button>
+
+                                    {/*    DON Swap toCoinone*/}
                                     {/*<Button*/}
                                     {/*    bc={'primary'}*/}
                                     {/*    block*/}

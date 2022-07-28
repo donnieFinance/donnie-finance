@@ -311,7 +311,7 @@ const ErcDonDepositSwap = (props) => {
                             <Flex ml={10}>
                                 <Div mr={10}>
                                     SwapManager ETH : <Span fg="blue">{ComUtil.toCurrency(swapManagerEth && swapManagerEth.toFixed(2))}</Span> <br/>
-                                    SwapManager DON : <Span fg="blue">{ComUtil.toCurrency(swapManagerDon && swapManagerDon.toFixed(0))} </Span> <br/>
+                                    SwapManager DON : <Span fg="blue">{ComUtil.toCurrency(swapManagerDon && swapManagerDon.toFixed(2))} </Span> <br/>
                                 </Div>
                                 <Div ml={20}>
                                     donswap igas : <Span fg="blue">{ComUtil.toCurrency(managerIGas && managerIGas.toFixed(2))}</Span> <br/>

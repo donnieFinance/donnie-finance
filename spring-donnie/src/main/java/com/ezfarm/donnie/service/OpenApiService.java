@@ -73,7 +73,8 @@ public class OpenApiService {
 
         try {
 
-            String newDonPrice = this.getMxcPrice("DON_USDT");
+//MEXC 상폐:2022.07            String newDonPrice = this.getMxcPrice("DON_USDT");
+            String newDonPrice = this.getBigOnePrice("DON-USDT");
 
             //CMC에서 가져오기. - 202107 CMC에서 MXC가격 반영이 안되어 MXC우선으로 수정.
             if (StringUtils.isEmpty(newDonPrice)) {
@@ -280,6 +281,47 @@ public class OpenApiService {
             return CommonController.prevAvaxPrice;
         } finally {
             CommonController.avaxProcessing = false; //3
+        }
+        //return null;
+    }
+
+    @Cacheable(value="cache10min4", key="'coopsPrice'")
+    public String getCoopsPriceReal() {
+        CommonController.coopsProcessing = true; //1
+        try {
+            String price = this.getLbankPrice("coops_usdt");
+
+            log.info("getCoopsPriceReal Caching:" + price);
+
+            CommonController.prevCoopsPrice = price; //2
+            return price;
+
+        } catch (Exception e){
+            log.error("getCoopsPriceReal:" + e.toString());
+            return CommonController.prevCoopsPrice;
+        } finally {
+            CommonController.coopsProcessing = false; //3
+        }
+        //return null;
+    }
+
+
+    @Cacheable(value="cache10min5", key="'tvsPrice'")
+    public String getTvsPriceReal() {
+        CommonController.tvsProcessing = true; //1
+        try {
+            String price = this.getLbankPrice("tvs_usdt");
+
+            log.info("getTvsPriceReal Caching:" + price);
+
+            CommonController.prevTvsPrice = price; //2
+            return price;
+
+        } catch (Exception e){
+            log.error("getTvsPriceReal:" + e.toString());
+            return CommonController.prevTvsPrice;
+        } finally {
+            CommonController.tvsProcessing = false; //3
         }
         //return null;
     }
@@ -515,6 +557,79 @@ public class OpenApiService {
         return retPrice;
     }
 
+    public String getBigOnePrice(String tokenSymbol) { //tokenSymbol = "DON_USDT" "WHICH_USDT" 등
+
+        String retPrice = null;
+
+        String resourceUrl = "https://big.one/api/v3/asset_pairs/" + tokenSymbol+ "/ticker";
+
+        ResponseEntity<String> response;
+        JsonNode root;
+        JsonNode data = null;
+
+        try {
+            response = restTemplate.exchange(resourceUrl, HttpMethod.GET, publicEntity, String.class);
+            root = mapper.readTree(response.getBody());
+            data = root.path("data");
+
+            //data not array : ask데이타 읽기
+            if (data != null) {
+                //JsonNode blyData = data.get(0);
+                JsonNode askData = data.get("ask");
+
+                retPrice = askData.get("price").asText();
+
+                log.info("BigOne getPrice, " + tokenSymbol + " :" + retPrice);
+            }
+
+        }catch (Exception e) {
+
+            //data not array: 에러시 bid데이타 읽기
+            if (data != null ) {
+                //JsonNode blyData = data.get(0);
+                JsonNode bidData = data.get("bid");
+
+                retPrice = bidData.get("price").asText();
+
+                log.info("BigOne getPrice, " + tokenSymbol + " :" + retPrice);
+            }
+
+            log.error(e.toString());
+        }
+
+        return retPrice;
+    }
+
+    public String getLbankPrice(String tokenSymbol) { //tokenSymbol = "tvs_usdt" "coops_usdt" 등
+
+        String retPrice = null;
+
+        String resourceUrl = "https://api.lbkex.com/v2/ticker.do?symbol=" + tokenSymbol;
+
+        ResponseEntity<String> response;
+        JsonNode root;
+        JsonNode data = null;
+
+        try {
+            response = restTemplate.exchange(resourceUrl, HttpMethod.GET, publicEntity, String.class);
+            root = mapper.readTree(response.getBody());
+            data = root.path("data");
+
+            //data is array
+            if (data.isArray()) {
+                JsonNode symbolData = data.get(0);
+                JsonNode tickerData  = symbolData.get("ticker");
+                retPrice = tickerData.get("latest").asText();
+
+                log.info("LBANK getPrice, " + tokenSymbol + " :" + retPrice);
+            }
+        }catch (Exception e) {
+
+            log.error(e.toString());
+        }
+
+        return retPrice;
+    }
 
     //coinKey조회: https://pro-api.coinmarketcap.com/v1/cryptocurrency/map 로 전체 토큰key 조회 가능.
     //BTC = 1

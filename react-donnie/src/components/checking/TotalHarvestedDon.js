@@ -56,7 +56,8 @@ const TotalHarvestedDon = (props) => {
                 <Div fontSize={sizeValue(20, null,  17)} fw={500}>Total DON Distributed</Div>
                 <Div fontSize={sizeValue(40, null,  30)} fw={700}>
                     {
-                        loading ? '...' : `${ComUtil.addCommas(totalHarvestedDonBalance.toFixed(2))} DON`
+                        //2022.7월말까지 properties.js에서 0.0이라서 코멘트된 don합계: 1361063 = 25000+93750+56250+56250+10000+56250+187500+112500+12500+11112+13333+11112+13333+28572+13333+ 11112+13333+ 20000+ 76192+33333+29632+26666+100000+50000+50000+75000+50000+50000+75000
+                        loading ? '...' : `${ComUtil.addCommas((1361063 + totalHarvestedDonBalance).toFixed(2))} DON`
                     }
 
                 </Div>

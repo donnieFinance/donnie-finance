@@ -269,16 +269,16 @@ const ErcDonWithdrawSwap = (props) => {
                     <Div>
                         <Flex ml={10}>
                             <Div mr={10}>
-                                SwapManager ETH : <Span fg="blue">{ComUtil.toCurrency(swapManagerEth.toFixed(2))}</Span> <br/>
-                                SwapManager DON : <Span fg="blue">{ComUtil.toCurrency(swapManagerDon.toFixed(0))} </Span> <br/>
+                                SwapManager ETH : <Span fg="blue">{ComUtil.toCurrency(swapManagerEth && swapManagerEth.toFixed(2))}</Span> <br/>
+                                SwapManager DON : <Span fg="blue">{ComUtil.toCurrency(swapManagerEth && swapManagerDon.toFixed(2))} </Span> <br/>
                             </Div>
                             <Div ml={20}>
-                                donswap igas : <Span fg="blue">{ComUtil.toCurrency(managerIGas.toFixed(2))}</Span> <br/>
-                                donswap Don : <Span fg="blue">{ComUtil.toCurrency(managerIrcDon.toFixed(2))} </Span> <br/>
+                                donswap igas : <Span fg="blue">{ComUtil.toCurrency(managerIGas && managerIGas.toFixed(2))}</Span> <br/>
+                                donswap Don : <Span fg="blue">{ComUtil.toCurrency(managerIrcDon && managerIrcDon.toFixed(2))} </Span> <br/>
                             </Div>
                             <Div ml={20}>
-                                ethGasGwei : <Span fg="blue">{ComUtil.toCurrency(ethGasGwei.toFixed(2))}</Span> <br/>
-                                donswap iram : <Span fg="blue">{ComUtil.toCurrency(managerIRam.toFixed(2))}</Span> <br/>
+                                ethGasGwei : <Span fg="blue">{ComUtil.toCurrency(ethGasGwei && ethGasGwei.toFixed(2))}</Span> <br/>
+                                donswap iram : <Span fg="blue">{ComUtil.toCurrency(managerIRam && managerIRam.toFixed(2))}</Span> <br/>
                             </Div>
                         </Flex>
                     </Div>

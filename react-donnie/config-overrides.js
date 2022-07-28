@@ -3,6 +3,7 @@
 const path = require('path');
 const {
     useBabelRc,
+    addBabelPresets,
     addWebpackAlias,
     override,
     addBabelPlugin,
@@ -72,6 +73,11 @@ module.exports = {
         //     'window.Quill': ['react-quill', 'Quill'],
         //     'Quill': 'quill'
         // }),
+        addBabelPresets(
+            ["@babel/preset-react", {
+                "runtime": "automatic"
+            }]
+        ),
         addWebpackAlias({
             '~': path.resolve(__dirname, './src')
         }),

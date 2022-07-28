@@ -5,8 +5,8 @@ const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
 const STAKE_TOKEN = 'iwavax';
 const STAKE_TOKEN_ADDRESS = 'Contract2nmnWe6nSPTi7ZJGsrr1toXFGMJiazRsW9rHULc2FAaK';
 
-const START_TIME = 1656374400;      // 20220628:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract4vC98v5digqgcZnVnWZFsKDtj5wXxhi2yaCaH2VtoVku
-const DURATION = 24 * 3600 * 28;    // 28일, in Seconds
+const START_TIME = 1658793600;      // 20220726:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract4vC98v5digqgcZnVnWZFsKDtj5wXxhi2yaCaH2VtoVku
+const DURATION = 24 * 3600 * 56;    // 8주, in Seconds
 // const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;
 const TO_FIXED = 4;   //소수점 4자리까지 저장.

@@ -247,7 +247,7 @@ const IdoErcDepositSwap = ({iwTokenName, ercTokenName}) => {
             alert(result);
         }
         const onRetrivalClick = async() => {
-            console.slog("eth don 회수");
+            console.slog("eth 회수");
             let {data:result} = await AdminApi.iwErcAccountWeiRetrieval(iwTokenName, rowData.swapAccount);
             alert(result);
         }
@@ -276,7 +276,7 @@ const IdoErcDepositSwap = ({iwTokenName, ercTokenName}) => {
     function balanceCheckRenderer(props) {
         const rowData = props.data;
         const onHandleClick = async() => {
-            console.slog("eth don 잔액조회");
+            console.slog("erc token 잔액조회");
             let {data:result} = await AdminApi.getIwEthErcBalance(iwTokenName, rowData.swapAccount);
             alert(rowData.swapAccount + "\nEth: " + result[0] + "\n" +ercTokenName + ": " + result[1]);
         }

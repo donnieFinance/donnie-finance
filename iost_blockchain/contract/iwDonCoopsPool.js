@@ -1,10 +1,12 @@
 
 const DON_TOKEN = 'don';
 const DON_ADDRESS = 'Contract5ndTHiqRRPWnT5wBFhQ9bthhueT9LVFnuGgGEVfmVRb8';
-const STAKE_TOKEN = 'donhusdlp';
 
-const START_TIME = 1658793600;      // 20220726:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract6rUm6SRqB8gBDxMJomKJAzTyHNn28BCW3gPkFKUJUVFQ
-const DURATION = 24 * 3600 * 56;    // 8주=56일, 4주=28일, in Seconds
+const STAKE_TOKEN = 'iwcoops';
+const STAKE_TOKEN_ADDRESS = 'ContractJ5aCPnpyJmnEX2qHzhbvfpYge5vJxkStyGcSLphMGTHu';
+
+const START_TIME = 1659398400;      // 20220802:09:00(Seoul) in Seconds. 참조- https://www.epochconverter.com/ 배포 addr:Contract4vC98v5digqgcZnVnWZFsKDtj5wXxhi2yaCaH2VtoVku
+const DURATION = 24 * 3600 * 49;    // 30일, in Seconds
 // const START_TIME_NANO = new Int64(START_TIME).multi(1000000000);
 const FEE_RATE = 10;
 const TO_FIXED = 4;   //소수점 4자리까지 저장.
@@ -24,7 +26,7 @@ const USER_RPTP_MAPKEY = "userrptp";     // rptp=rewardPerTokenPaid
 const USER_REWARD_MAPKEY = "userreward"; // Unclaimed rewards
 
 
-class LpDonHusdPool {
+class IwDonCoopsPool {
     init() {
         storage.put(TOTAL_SUPPLY_KEY, "0");
         storage.put(OPEN_KEY, "true");
@@ -42,16 +44,14 @@ class LpDonHusdPool {
     ////////////////////////StakeToken Wrapper/////////////////////
 
     updateStartTime(startTime) {
-        if (tx.publisher === blockchain.contractOwner()) {
-            storage.put(START_TIME_KEY, "" + startTime);
-            let duration = storage.get(DURATION_KEY);
+        storage.put(START_TIME_KEY, ""+startTime);
+        let duration = storage.get(DURATION_KEY);
 
-            // addRewardAmount로 duration 변경 전
-            if (!duration) {
-                storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(DURATION).toString());
-            } else {
-                storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(new Int64(duration)).toString());
-            }
+        // addRewardAmount로 duration 변경 전
+        if(!duration) {
+            storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(DURATION).toString());
+        } else {
+            storage.put(PERIOD_FINISH_KEY, new Int64(startTime).plus(new Int64(duration)).toString());
         }
     }
 
@@ -194,7 +194,8 @@ class LpDonHusdPool {
         balance = balance.plus(amount);
         storage.mapPut(USER_BALANCE_MAPKEY, tx.publisher, balance.toString());
 
-        blockchain.callWithAuth("token.iost", "transfer", [STAKE_TOKEN, tx.publisher, blockchain.contractName(), amount, "stake"]);
+        //blockchain.callWithAuth("token.iost", "transfer", [STAKE_TOKEN, tx.publisher, blockchain.contractName(), amount, "stake"]);
+        blockchain.callWithAuth(STAKE_TOKEN_ADDRESS, "transfer", [STAKE_TOKEN,  tx.publisher, blockchain.contractName(), amount, "stake"]);
     }
 
     //return void.
@@ -226,7 +227,8 @@ class LpDonHusdPool {
         totalSupply = totalSupply.minus(amount);
         storage.put(TOTAL_SUPPLY_KEY, totalSupply.toString());
 
-        blockchain.callWithAuth("token.iost", "transfer", [STAKE_TOKEN, blockchain.contractName(), tx.publisher, amount, "withdraw"]);
+        //blockchain.callWithAuth("token.iost", "transfer", [STAKE_TOKEN, blockchain.contractName(), tx.publisher, amount, "withdraw"]);
+        blockchain.callWithAuth(STAKE_TOKEN_ADDRESS, "transfer", [STAKE_TOKEN, blockchain.contractName(), tx.publisher, amount, "withdraw"]);
     }
 
     //return void
@@ -371,5 +373,6 @@ class LpDonHusdPool {
             throw new Error("addRewardAmount Authority Error:" + tx.publisher + ",isopen:" + isOpen );
         }
     }
+
 }
-module.exports = LpDonHusdPool;
+module.exports = IwDonCoopsPool;

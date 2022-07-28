@@ -81,7 +81,7 @@ const WithdrawIWERCContent = () => {
             let data = await iostApi.getTokenBalance({address: address, tokenName: tokenName});
 
 
-            //iw 일 경우 destroy amount
+            //iw 일 경우 destroy amount:초기 해킹 복구용.
             if (tokenType === 'iw') {
                 if (tokenName === 'iwbly') {
                     data = new BigNumber(data).minus(ComUtil.getDestroyBlyAmount(address)).toNumber()
